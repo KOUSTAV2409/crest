@@ -1,388 +1,493 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="dark" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Crest — The Open-Source Raycast for Linux</title>
-  <meta name="description" content="Crest is a blazing-fast, privacy-first, 100% open-source application launcher for Linux. Search apps, files, calculate, convert currency — all offline, all yours." />
-  <meta property="og:title" content="Crest — The Open-Source Raycast for Linux" />
-  <meta property="og:description" content="Free forever. No telemetry. No cloud. Just speed." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Crest — The Linux Power Launcher</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#141313",
+                        "surface-container-high": "#2a2a2a",
+                        "inverse-primary": "#4d49d7",
+                        "on-surface": "#e5e2e1",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "primary-fixed": "#e2dfff",
+                        "primary-fixed-dim": "#c2c1ff",
+                        "surface-tint": "#c2c1ff",
+                        "inverse-surface": "#e5e2e1",
+                        "on-primary-fixed": "#0c006a",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#332cbf",
+                        "outline": "#918fa0",
+                        "secondary-fixed": "#ffdad7",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-fixed": "#410006",
+                        "on-secondary-fixed-variant": "#8f0d1c",
+                        "surface-bright": "#3a3939",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline-variant": "#464554",
+                        "background": "#141313",
+                        "on-primary": "#1900a7",
+                        "on-secondary": "#68000e",
+                        "surface-variant": "#353434",
+                        "secondary": "#ffb3af",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary": "#c6c6c7",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "inverse-on-surface": "#313030",
+                        "primary": "#c2c1ff",
+                        "on-error": "#690005",
+                        "on-surface-variant": "#c7c4d7",
+                        "secondary-fixed-dim": "#ffb3af",
+                        "surface-container": "#201f1f",
+                        "surface": "#141313",
+                        "surface-container-highest": "#353434",
+                        "on-background": "#e5e2e1",
+                        "primary-container": "#8382ff",
+                        "secondary-container": "#93111e",
+                        "tertiary-container": "#909191",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-container": "#ff9e9a",
+                        "on-primary-container": "#150093",
+                        "on-tertiary-container": "#282a2a",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-container-low": "#1c1b1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "display-xl": ["Space Grotesk"],
+                        "mono-code": ["Fira Code", "monospace"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "label-sm": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0e0e0e;
+            -webkit-font-smoothing: antialiased;
+        }
+        .grain {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+        .raycast-window {
+            background: rgba(20, 19, 19, 0.8);
+            backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+        .technical-line {
+            background: linear-gradient(90deg, transparent, rgba(194, 193, 255, 0.3), transparent);
+            height: 1px;
+            width: 100%;
+        }
+        .rigid-border {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .mono-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.4);
+        }
+        .high-fi-hover:hover {
+            border-color: rgba(194, 193, 255, 0.4);
+            background: rgba(255, 255, 255, 0.02);
+        }
+    </style>
 </head>
-<body>
-
-  <!-- NAV -->
-  <nav class="nav" id="nav">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo">
-        <span class="logo-icon">⌘</span>
-        <span>Crest</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#privacy">Privacy</a></li>
-        <li><a href="#install">Install</a></li>
-        <li><a href="#roadmap">Roadmap</a></li>
-        <li>
-          <a href="https://github.com/KOUSTAV2409/crest" class="nav-github" target="_blank" rel="noopener">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-            GitHub
-          </a>
-        </li>
-      </ul>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <section class="hero" id="hero">
-    <div class="hero-bg">
-      <div class="hero-glow hero-glow-1"></div>
-      <div class="hero-glow hero-glow-2"></div>
-      <div class="hero-grid"></div>
-    </div>
-    <div class="container hero-content">
-      <div class="hero-badge">
-        <span class="badge-dot"></span>
-        Open Source · Free Forever · No Telemetry
-      </div>
-      <h1 class="hero-title">
-        The <span class="gradient-text">Privacy-First</span> Power Launcher.<br />
-        For Linux.
-      </h1>
-      <p class="hero-subtitle">
-        Crest is a blazing-fast, 100% open-source Raycast alternative.<br />
-        Search apps, files, and the <strong>live web</strong> — all in one keyboard-driven UI.
-      </p>
-      <div class="hero-cta">
-        <a href="#install" class="btn btn-primary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Install Now — It's Free
-        </a>
-        <a href="https://github.com/KOUSTAV2409/crest" class="btn btn-ghost" target="_blank" rel="noopener">
-          View Source Code
-        </a>
-      </div>
-      <div class="hero-meta">
-        <span>🦀 Built with Rust</span>
-        <span>⚛️ React Frontend</span>
-        <span>🔒 Zero telemetry</span>
-        <span>🐧 Linux native</span>
-      </div>
-    </div>
-    <div class="hero-mockup container">
-      <div class="mockup-glow"></div>
-      <img src="assets/hero-mockup.png" alt="Crest launcher UI showing app search, calculator and file results" class="mockup-img" />
-    </div>
-  </section>
-
-  <!-- FEATURES -->
-  <section class="features section" id="features">
-    <div class="container">
-      <div class="section-label">Features</div>
-      <h2 class="section-title">Everything you need. Nothing you don't.</h2>
-      <p class="section-sub">Built to be fast, not bloated. Every feature runs 100% on your machine.</p>
-
-      <div class="features-grid">
-
-        <div class="feature-card feature-card-large">
-          <div class="feature-icon">🚀</div>
-          <h3>App Launcher</h3>
-          <p>Fuzzy search across all your installed applications. Powered by the <strong>Nucleo</strong> matching engine — the same algorithm used by the best code editors. Launches in under 50ms.</p>
-          <div class="feature-demo">
-            <div class="demo-bar"><span class="demo-cursor">firefox</span></div>
-            <div class="demo-result active">🦊 Firefox Browser</div>
-            <div class="demo-result">📝 Mousepad</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🧮</div>
-          <h3>Smart Calculator</h3>
-          <p>Natural language math powered by <strong>fend-core</strong>. No prefix needed — just type.</p>
-          <div class="feature-demo small">
-            <div class="demo-bar"><span class="demo-cursor">30 percent of 200</span></div>
-            <div class="demo-result active">= 60</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">💱</div>
-          <h3>Live Currency</h3>
-          <p>Real exchange rates fetched silently on startup. Type <code>20 usd to inr</code> and get the answer instantly.</p>
-          <div class="feature-demo small">
-            <div class="demo-bar"><span class="demo-cursor">1 usd to inr</span></div>
-            <div class="demo-result active">= 95.04 INR</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">📂</div>
-          <h3>File Search</h3>
-          <p>Type <code>/</code> to instantly fuzzy search across your Documents, Downloads, and Desktop. Hit Enter to open in your default app.</p>
-          <div class="feature-demo small">
-            <div class="demo-bar"><span class="demo-cursor">/budget q1</span></div>
-            <div class="demo-result active">📄 budget_q1_2025.xlsx</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>100% Offline</h3>
-          <p>Your keystrokes <strong>never leave your machine</strong>. All indexing, searching, and matching happens locally in Rust.</p>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🔍</div>
-          <h3>In-App Web Search</h3>
-          <p>Get instant answers directly inside the launcher. Powered by DuckDuckGo, Crest renders web results in a beautiful native UI, so you never have to leave your workflow.</p>
-          <div class="feature-demo small">
-            <div class="demo-bar"><span class="demo-cursor">ceo of google</span></div>
-            <div class="demo-result active">💡 Sundar Pichai (CEO of Alphabet)</div>
-          </div>
-        </div>
-
-        <div class="feature-card">
-          <div class="feature-icon">🌐</div>
-          <h3>Direct Navigation</h3>
-          <p>Type <code>github.com</code> or <code>twitter.com</code> and hit enter to jump straight to your favorite sites. No need to open a browser first.</p>
-        </div>
-
-        <div class="feature-card feature-card-large">
-          <div class="feature-icon">🔌</div>
-          <h3>Extension SDK</h3>
-          <p>Crest ships with a TypeScript Extension SDK. Write your own commands and share them as open-source extensions. The community store is growing.</p>
-          <div class="feature-tags">
-            <span class="tag">Clipboard Manager</span>
-            <span class="tag">System Controls</span>
-            <span class="tag">Snippets</span>
-            <span class="tag soon">Coming Soon</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- SHOWCASE -->
-  <section class="showcase section">
-    <div class="container">
-      <div class="section-label">Showcase</div>
-      <h2 class="section-title">Built for Power Users.</h2>
-      <div class="showcase-grid">
-        <div class="showcase-item">
-          <div class="showcase-img-wrap">
-            <img src="assets/hero-mockup.png" alt="Clipboard Manager" />
-          </div>
-          <div class="showcase-info">
-            <h3>Clipboard History</h3>
-            <p>Never lose a snippet again. Crest tracks your clipboard locally and allows you to search through 1,000+ entries instantly. All stored in a local SQLite database for maximum privacy.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRIVACY -->
-  <section class="privacy section" id="privacy">
-    <div class="container">
-      <div class="section-label">Privacy Promise</div>
-      <h2 class="section-title">We collect <em>absolutely nothing</em>.</h2>
-      <p class="section-sub">This is not a privacy policy buried in legalese. This is a table you can actually read.</p>
-
-      <div class="privacy-table-wrap">
-        <table class="privacy-table">
-          <thead>
-            <tr>
-              <th>What</th>
-              <th class="col-crest">Crest (you)</th>
-              <th class="col-cloud">Cloud Launchers</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Your search queries</td>
-              <td class="col-crest">❌ Never stored</td>
-              <td class="col-cloud">⚠️ Often logged for analytics</td>
-            </tr>
-            <tr>
-              <td>Apps you launch</td>
-              <td class="col-crest">❌ Never tracked</td>
-              <td class="col-cloud">⚠️ Usage data sent to servers</td>
-            </tr>
-            <tr>
-              <td>File names</td>
-              <td class="col-crest">❌ Stays on disk</td>
-              <td class="col-cloud">⚠️ May be indexed in cloud</td>
-            </tr>
-            <tr>
-              <td>Clipboard contents</td>
-              <td class="col-crest">❌ Local SQLite only</td>
-              <td class="col-cloud">⚠️ Cloud sync enabled by default</td>
-            </tr>
-            <tr>
-              <td>Internet connection required</td>
-              <td class="col-crest">✅ Optional (currency only)</td>
-              <td class="col-cloud">⚠️ Required for most features</td>
-            </tr>
-            <tr>
-              <td>Source code available</td>
-              <td class="col-crest">✅ 100% open source (MIT)</td>
-              <td class="col-cloud">❌ Closed source</td>
-            </tr>
-            <tr>
-              <td>Cost</td>
-              <td class="col-crest">✅ Free forever</td>
-              <td class="col-cloud">💰 $8–16/month for Pro features</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="privacy-note">
-        The currency exchange rate fetcher is the <em>only</em> optional network request Crest makes — and it fetches from a public API with no authentication, no user ID, and no identifying information.
-        You can verify this by reading the <a href="https://github.com/KOUSTAV2409/crest/blob/master/src-tauri/src/commands/search.rs" target="_blank">source code directly</a>.
-      </p>
-    </div>
-  </section>
-
-  <!-- INSTALL -->
-  <section class="install section" id="install">
-    <div class="container">
-      <div class="section-label">Get Started</div>
-      <h2 class="section-title">Download Crest for Linux</h2>
-      <p class="section-sub text-center">Choose your preferred installation method. All binaries are signed and open-source.</p>
-
-      <div class="download-grid">
-        <div class="download-card primary">
-          <div class="download-icon">📦</div>
-          <h3>AppImage</h3>
-          <p>The universal Linux package. Works on almost any distribution. No installation required—just download and run.</p>
-          <a href="#" class="btn btn-primary btn-full">Download .AppImage</a>
-          <span class="download-meta">v0.1.0 · 64MB · x86_64</span>
-        </div>
-
-        <div class="download-card">
-          <div class="download-icon">🐧</div>
-          <h3>Debian / Ubuntu</h3>
-          <p>Native package for Debian-based systems. Integrates perfectly with your system's package manager.</p>
-          <a href="#" class="btn btn-secondary btn-full">Download .deb</a>
-        </div>
-
-        <div class="download-card">
-          <div class="download-icon">🛠️</div>
-          <h3>Build from Source</h3>
-          <p>Want to contribute or audit the code? Build Crest manually using Rust and Node.js.</p>
-          <a href="#build-steps" class="btn btn-outline btn-full">View Build Guide</a>
-        </div>
-      </div>
-
-      <div id="build-steps" class="build-guide">
-        <h3 class="text-center" style="margin-top: 60px; margin-bottom: 30px;">Developer Build Guide</h3>
-        <div class="install-steps">
-          <div class="install-step">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <h3>Install Prerequisites</h3>
-              <div class="code-block">
-                <div class="code-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-                <pre><code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-npm install -g npx</code></pre>
-              </div>
+<body class="font-body-md text-on-surface selection:bg-primary/30 selection:text-white">
+<div class="grain"></div>
+<!-- Navigation -->
+<nav class="fixed top-0 w-full z-[100] border-b border-white/5 bg-surface/80 backdrop-blur-md">
+    <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-10">
+            <a class="flex items-center gap-2 font-headline-md font-bold text-lg tracking-tight" href="#">
+                <span class="material-symbols-outlined text-primary text-2xl">command</span>
+                <span>CREST</span>
+            </a>
+            <div class="hidden md:flex gap-8 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+                <a class="hover:text-primary transition-colors" href="#features">Features</a>
+                <a class="hover:text-primary transition-colors" href="#download">Download</a>
+                <a class="hover:text-primary transition-colors" href="https://github.com/koustav/crest" target="_blank">GitHub</a>
             </div>
-          </div>
-          <div class="install-step">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <h3>Compile & Run</h3>
-              <div class="code-block">
-                <div class="code-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
-                <pre><code>git clone https://github.com/KOUSTAV2409/crest.git
-cd crest && npm install
-npm run tauri dev</code></pre>
-              </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="mono-label text-primary/60 hidden sm:block">v0.1.0_alpha</span>
+            <button class="bg-white text-black px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-primary transition-all">
+                Download
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="pt-40 pb-20 px-6 overflow-hidden">
+    <div class="max-w-[1200px] mx-auto text-center mb-24">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-8">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            <span class="text-[10px] font-mono-code font-bold text-primary uppercase tracking-widest">Built for performance</span>
+        </div>
+        <h1 class="font-display-xl text-5xl md:text-8xl mb-6 tracking-tight leading-none text-white">
+            The Raycast experience,<br/>
+            <span class="italic font-light text-primary">finally on Linux.</span>
+        </h1>
+        <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            Linux deserved this years ago. A keyboard-first powerhouse built in Rust for sub-50ms execution. Zero bloat. Just raw productivity.
+        </p>
+        <div class="flex items-center justify-center gap-4">
+            <a href="#download" class="bg-primary text-on-primary-container px-8 py-3 rounded-xl font-bold text-sm tracking-tight hover:scale-[1.02] active:scale-95 transition-all">
+                Get Started
+            </a>
+            <a href="https://github.com/koustav/crest" target="_blank" class="px-8 py-3 rounded-xl font-bold text-sm tracking-tight border border-white/10 hover:bg-white/5 transition-all">
+                View on GitHub
+            </a>
+        </div>
+    </div>
+
+    <!-- Floating Window Mockup -->
+    <div class="max-w-[800px] mx-auto relative">
+        <div class="raycast-window rounded-xl overflow-hidden p-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            <div class="flex items-center px-6 py-5 border-b border-white/10">
+                <span class="material-symbols-outlined text-primary/80 mr-4 text-3xl">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-white/90 text-2xl w-full placeholder:text-white/20 font-light" placeholder="Search for anything..." readonly="" type="text"/>
             </div>
-          </div>
+            <div class="p-2">
+                <div class="bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined text-primary">terminal</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-white">Open Alacritty</div>
+                            <div class="text-[10px] text-primary/60 font-mono-code">/usr/bin/alacritty</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">ALT</span>
+                        <span class="px-2 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">1</span>
+                    </div>
+                </div>
+                <div class="p-4 flex items-center justify-between opacity-40 grayscale">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined">description</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-white">config.toml</div>
+                            <div class="text-[10px] text-white/60 font-mono-code">~/scripts/crest/</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 flex items-center justify-between opacity-40 grayscale">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center">
+                            <span class="material-symbols-outlined">dns</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-white">Manage Docker Containers</div>
+                            <div class="text-[10px] text-white/60 font-mono-code">Extension</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="px-4 py-2 border-t border-white/5 flex justify-between items-center bg-white/5">
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-xs text-white/30">settings</span>
+                    <span class="mono-label !text-[8px]">Crest Engine v0.1.0</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-[10px] text-white/40">Actions</span>
+                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">⌘</span>
+                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">K</span>
+                </div>
+            </div>
         </div>
-      </div>
+        <!-- Decorative glowing lines -->
+        <div class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 blur-[120px] rounded-full"></div>
     </div>
-  </section>
+</section>
 
-  <!-- ROADMAP -->
-  <section class="roadmap section" id="roadmap">
-    <div class="container">
-      <div class="section-label">Roadmap</div>
-      <h2 class="section-title">What's next for Crest.</h2>
-      <p class="section-sub">Built in public. Roadmap updated in real-time.</p>
-
-      <div class="roadmap-grid">
-        <div class="roadmap-col">
-          <div class="roadmap-col-title done-title">✅ Shipped</div>
-          <ul class="roadmap-list">
-            <li class="done">App Launcher (Nucleo fuzzy search)</li>
-            <li class="done">File Search (<code>/</code> prefix)</li>
-            <li class="done">Natural Language Calculator</li>
-            <li class="done">Unit Conversions</li>
-            <li class="done">Live Currency Exchange</li>
-            <li class="done">Extension SDK scaffold</li>
-            <li class="done">Clipboard History (basic)</li>
-          </ul>
+<!-- Proof of Work Section -->
+<section class="py-32 px-6" id="features">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <div class="mono-label mb-4 text-primary">Technical Proof</div>
+                <h2 class="font-headline-lg text-4xl mb-6">Zero latency by design.</h2>
+                <p class="text-on-surface-variant leading-relaxed mb-8">
+                    Crest is written in pure Rust, interfacing directly with X11/Wayland primitives. We don't use Electron. We don't use high-level abstractions that introduce garbage collection pauses.
+                </p>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4 p-4 rigid-border high-fi-hover transition-all">
+                        <span class="material-symbols-outlined text-primary">bolt</span>
+                        <div>
+                            <h4 class="text-sm font-bold mb-1 uppercase tracking-tight">Sub-1ms IPC</h4>
+                            <p class="text-xs text-white/40">Custom binary protocol between UI and core engine.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 p-4 rigid-border high-fi-hover transition-all">
+                        <span class="material-symbols-outlined text-primary">memory</span>
+                        <div>
+                            <h4 class="text-sm font-bold mb-1 uppercase tracking-tight">Low Memory Footprint</h4>
+                            <p class="text-xs text-white/40">&lt; 40MB RAM usage in idle state.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rigid-border bg-[#0a0a0a] overflow-hidden">
+                <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border-b border-white/10">
+                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
+                    <span class="ml-2 text-[10px] font-mono-code text-white/20 uppercase tracking-tighter">crest-install.sh</span>
+                </div>
+                <div class="p-6 font-mono-code text-[11px] leading-relaxed">
+                    <div class="text-white/40 mb-2"># Initializing installation...</div>
+                    <div class="flex gap-2">
+                        <span class="text-primary">$</span>
+                        <span class="text-white">curl -sSf https://crest.run/install.sh | sh</span>
+                    </div>
+                    <div class="text-white/40 mt-2">Checking architecture... x86_64</div>
+                    <div class="text-white/40">Checking window manager... Hyprland (Wayland)</div>
+                    <div class="flex gap-2 mt-2">
+                        <span class="text-green-500 font-bold">[OK]</span>
+                        <span class="text-white/80">Fetching crest-core-v0.1.0</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-green-500 font-bold">[OK]</span>
+                        <span class="text-white/80">Compiling native bindings</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-yellow-500 animate-pulse font-bold">[WAIT]</span>
+                        <span class="text-white/80">Linking system libraries...</span>
+                    </div>
+                    <div class="mt-6 p-3 bg-primary/5 border-l border-primary text-primary/80">
+                        Success. Crest is now ready. <br/>
+                        Bind [Mod+Space] to launch.
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="roadmap-col">
-          <div class="roadmap-col-title next-title">🔨 In Progress</div>
-          <ul class="roadmap-list">
-            <li class="next">Text Snippets (<code>!trigger</code> expansion)</li>
-            <li class="next">System Controls (volume, brightness, lock)</li>
-            <li class="next">Quicklinks (<code>@alias → URL</code>)</li>
-            <li class="next">Emoji Picker (<code>:</code> prefix)</li>
-          </ul>
+    </div>
+</section>
+
+<!-- Refined Feature Grid -->
+<section class="py-32 px-6 bg-surface-container-low/30" id="features">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Feature 1: Clipboard -->
+            <div class="lg:col-span-8 rigid-border p-10 high-fi-hover transition-all relative overflow-hidden group">
+                <div class="mono-label mb-8">01 // Clipboard History</div>
+                <h3 class="font-display-xl text-4xl mb-6 text-white">Never lose a copy again.</h3>
+                <p class="text-on-surface-variant max-w-xl mb-12">
+                    Crest tracks your clipboard history in a secure, local SQLite database. Search back through days of copied text, code snippets, and links with instant filtering.
+                </p>
+                <div class="flex gap-4">
+                    <div class="px-4 py-2 bg-primary/10 border border-primary/20 rounded text-[10px] font-mono-code text-primary">SQLITE_PERSISTENCE</div>
+                    <div class="px-4 py-2 bg-primary/10 border border-primary/20 rounded text-[10px] font-mono-code text-primary">AES_ENCRYPTED</div>
+                </div>
+                <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/[0.02] group-hover:text-primary/[0.05] transition-all">content_paste</span>
+            </div>
+            <!-- Feature 2: Privacy -->
+            <div class="lg:col-span-4 rigid-border p-8 high-fi-hover transition-all flex flex-col">
+                <div class="mono-label mb-4 text-primary">Philosophy</div>
+                <h3 class="text-xl font-bold mb-4">Zero Cloud.</h3>
+                <p class="text-sm text-on-surface-variant leading-relaxed flex-grow">
+                    Your data is your business. Crest works 100% offline. No telemetry, no account required, and definitely no cloud syncing.
+                </p>
+                <span class="material-symbols-outlined text-4xl text-primary/30 mt-8">security</span>
+            </div>
+            <!-- Feature 3: Web Results -->
+            <div class="lg:col-span-4 rigid-border p-8 high-fi-hover transition-all flex flex-col">
+                <div class="mono-label mb-4">Intelligence</div>
+                <h3 class="text-xl font-bold mb-4">Instant Answers.</h3>
+                <p class="text-sm text-on-surface-variant leading-relaxed flex-grow">
+                    Get Wikipedia summaries, currency conversions, and web results directly in the launcher via our privacy-respecting DuckDuckGo bridge.
+                </p>
+                <span class="material-symbols-outlined text-4xl text-white/10 mt-8">auto_awesome</span>
+            </div>
+            <!-- Feature 4: Plugin SDK -->
+            <div class="lg:col-span-8 rigid-border p-1 p-1 bg-gradient-to-br from-white/10 to-transparent">
+                <div class="bg-black/80 h-full p-10 flex flex-col md:flex-row gap-10">
+                    <div class="md:w-1/2">
+                        <div class="mono-label mb-8 text-primary">Extensibility</div>
+                        <h3 class="font-display-xl text-3xl mb-4 text-white">Infinite Plugins.</h3>
+                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
+                            Create your own commands in minutes. If it can write to stdout, Crest can display it. Support for JS, Python, and Bash scripts.
+                        </p>
+                        <div class="flex items-center gap-2">
+                             <span class="material-symbols-outlined text-sm text-primary">code</span>
+                             <span class="text-[10px] font-mono-code text-white/40">~/.config/crest/plugins/</span>
+                        </div>
+                    </div>
+                    <div class="md:w-1/2 rigid-border bg-[#111] p-4 font-mono-code text-[10px] text-primary/70 leading-tight flex items-center justify-center">
+                        <div class="text-center">
+                            <div class="text-white font-bold mb-2">PLUGIN_READY</div>
+                            <div class="text-[9px] text-white/30">Listening for commands...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="roadmap-col">
-          <div class="roadmap-col-title future-title">🔮 Planned</div>
-          <ul class="roadmap-list">
-            <li class="future">Window Management (snap/tile)</li>
-            <li class="future">Process Manager</li>
-            <li class="future">Community Extension Store</li>
-            <li class="future">Wayland-native global hotkey</li>
-            <li class="future">Theme customization</li>
-          </ul>
+    </div>
+</section>
+
+<!-- Download & Roadmap Section -->
+<section class="py-32 px-6" id="download">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            <!-- Downloads -->
+            <div>
+                <div class="mono-label mb-8">Installation</div>
+                <h2 class="font-display-xl text-4xl mb-12">Deploy to your distro.</h2>
+                <div class="space-y-4">
+                    <a href="crest_0.1.0_amd64.deb" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">download</span>
+                            <div>
+                                <h4 class="font-bold">Debian / Ubuntu</h4>
+                                <p class="text-xs text-white/40">v0.1.0-alpha • .deb bundle</p>
+                            </div>
+                        </div>
+                        <span class="mono-label text-primary">Download</span>
+                    </a>
+                    <a href="crest.AppImage" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+                        <div class="flex items-center gap-4">
+                            <span class="material-symbols-outlined text-primary">box</span>
+                            <div>
+                                <h4 class="font-bold">Generic Linux</h4>
+                                <p class="text-xs text-white/40">v0.1.0-alpha • .AppImage</p>
+                            </div>
+                        </div>
+                        <span class="mono-label text-primary">Download</span>
+                    </a>
+                </div>
+            </div>
+            <!-- Roadmap -->
+            <div>
+                <div class="mono-label mb-8">Roadmap</div>
+                <h2 class="font-display-xl text-4xl mb-12">The future of Crest.</h2>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="text-primary font-mono-code text-xs">01</div>
+                        <div>
+                            <h4 class="text-sm font-bold uppercase mb-1">Deep AI Integration</h4>
+                            <p class="text-xs text-white/40 leading-relaxed">Local LLM support for context-aware commands and coding assistance.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-primary font-mono-code text-xs">02</div>
+                        <div>
+                            <h4 class="text-sm font-bold uppercase mb-1">Plugin Marketplace</h4>
+                            <p class="text-xs text-white/40 leading-relaxed">A central registry for community-driven Rust and JS extensions.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-primary font-mono-code text-xs">03</div>
+                        <div>
+                            <h4 class="text-sm font-bold uppercase mb-1">Mobile Remote</h4>
+                            <p class="text-xs text-white/40 leading-relaxed">Control your Linux workstation via encrypted local network from your phone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
-  <!-- OPEN SOURCE CTA -->
-  <section class="oss-cta section">
-    <div class="container oss-cta-inner">
-      <div class="oss-icon">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
-      </div>
-      <h2>Built by the community, for the community.</h2>
-      <p>Crest is 100% open source under the MIT licence. Read the code, fork it, build extensions, or just star it to show your support.</p>
-      <a href="https://github.com/KOUSTAV2409/crest" class="btn btn-primary" target="_blank" rel="noopener">
-        Star on GitHub ★
-      </a>
+<!-- Technical Footer -->
+<footer class="pt-32 pb-10 px-6 border-t border-white/10 bg-black">
+    <div class="max-w-[1400px] mx-auto">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-10 mb-24">
+            <div class="col-span-2">
+                <a class="flex items-center gap-2 font-headline-md font-bold text-xl tracking-tight mb-6" href="#">
+                    <span class="material-symbols-outlined text-primary text-2xl">command</span>
+                    <span>CREST</span>
+                </a>
+                <p class="text-white/40 text-xs leading-relaxed max-w-xs mb-8">
+                    A high-fidelity system utility for power users. Built for the Linux desktop with Rust, Tauri, and absolute intentionality.
+                </p>
+                <div class="flex gap-4">
+                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="#">
+                        <img alt="GitHub" class="w-4 h-4 invert opacity-40" src="https://www.svgrepo.com/show/512317/github-142.svg"/>
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4 class="mono-label mb-6 text-white/80">Product</h4>
+                <ul class="space-y-4 text-xs text-white/40 font-semibold">
+                    <li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Store</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Themes</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Integrations</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="mono-label mb-6 text-white/80">Developer</h4>
+                <ul class="space-y-4 text-xs text-white/40 font-semibold">
+                    <li><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">SDK</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">GitHub</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="mono-label mb-6 text-white/80">Company</h4>
+                <ul class="space-y-4 text-xs text-white/40 font-semibold">
+                    <li><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Press</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="mono-label mb-6 text-white/80">Status</h4>
+                <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 mb-2">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                    ALL SYSTEMS NOMINAL
+                </div>
+                <div class="text-[9px] text-white/20 font-mono-code">
+                    Uptime: 99.998%<br/>
+                    Response: 14ms
+                </div>
+            </div>
+        </div>
+        <div class="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-white/5 gap-6">
+            <div class="text-[10px] font-mono-code text-white/20 tracking-wider">
+                © 2024 CREST PROTOCOL. MIT LICENSED. OPEN SOURCE FOREVER.
+            </div>
+            <div class="flex gap-8 text-[10px] font-mono-code text-white/20 uppercase tracking-widest">
+                <a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
+                <a class="hover:text-white transition-colors" href="#">Terms of Service</a>
+                <a class="hover:text-white transition-colors" href="#">Cookies</a>
+            </div>
+        </div>
     </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer-inner">
-      <div class="footer-logo">
-        <span class="logo-icon">⌘</span> Crest
-      </div>
-      <p class="footer-tagline">The open-source Raycast for Linux.</p>
-      <div class="footer-links">
-        <a href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/KOUSTAV2409/crest/blob/master/DOCUMENTBOOK.md" target="_blank" rel="noopener">Docs</a>
-        <a href="https://github.com/KOUSTAV2409/crest/issues" target="_blank" rel="noopener">Issues</a>
-        <a href="https://github.com/KOUSTAV2409/crest/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a>
-      </div>
-      <p class="footer-copy">© 2025 Crest Contributors. No rights reserved.</p>
-    </div>
-  </footer>
-
-  <script src="script.js"></script>
+</footer>
 </body>
 </html>
