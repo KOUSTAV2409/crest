@@ -1,0 +1,170 @@
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct ResultIcon {
+    pub kind: String, // "app"|"emoji"|"file"|"url"
+    pub value: String,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Action {
+    pub id: String,
+    pub title: String,
+    pub shortcut: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Preview {
+    pub title: String,
+    pub subtitle: Option<String>,
+    pub description: Option<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct SearchResult {
+    pub id: String,
+    pub title: String,
+    pub subtitle: String,
+    pub icon: ResultIcon,
+    pub category: String,
+    pub score: f32,
+    pub actions: Vec<Action>,
+    pub preview: Option<Preview>,
+}
+
+#[tauri::command]
+pub async fn search(query: String, category: Option<String>) -> Result<Vec<SearchResult>, String> {
+    use rusqlite::Connection;
+    use nucleo::{Nucleo, Config};
+    use std::path::PathBuf;
+    
+    let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
+    let db_path = db_dir.join("crest_index.db");
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+    
+    let mut stmt = conn.prepare("SELECT id, name, exec, icon, comment FROM apps").map_err(|e| e.to_string())?;
+    
+    struct AppEntry {
+        id: String,
+        name: String,
+        exec: String,
+        icon: String,
+        comment: String,
+    }
+    
+    let app_iter = stmt.query_map([], |row| {
+        Ok(AppEntry {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            exec: row.get(2)?,
+            icon: row.get(3)?,
+            comment: row.get(4)?,
+        })
+    }).map_err(|e| e.to_string())?;
+    
+    let mut apps = Vec::new();
+    for app in app_iter {
+        if let Ok(app) = app {
+            apps.push(app);
+        }
+    }
+    
+    if query.is_empty() {
+        // Return top apps if query is empty
+        return Ok(apps.into_iter().take(20).map(|app| SearchResult {
+            id: app.id,
+            title: app.name,
+            subtitle: app.comment,
+            icon: ResultIcon { kind: "app".into(), value: app.icon },
+            category: "Applications".into(),
+            score: 0.0,
+            actions: vec![
+                Action { id: "launch".into(), title: "Launch".into(), shortcut: Some("↵".into()) }
+            ],
+            preview: Some(Preview {
+                title: "Launch Application".into(),
+                subtitle: Some(app.exec),
+                description: None,
+            })
+        }).collect());
+    }
+    
+    // Setup Nucleo fuzzy matcher
+    let mut matcher = Nucleo::<AppEntry>::new(Config::DEFAULT, std::sync::Arc::new(|| ()), None, 2);
+    let injector = matcher.injector();
+    
+    for app in apps {
+        injector.push(app, |a, columns| {
+            columns[0] = a.name.clone().into();
+            columns[1] = a.comment.clone().into();
+        });
+    }
+    
+    matcher.pattern.reparse(0, &query, nucleo::pattern::CaseMatching::Ignore, nucleo::pattern::Normalization::Smart, false);
+    matcher.tick(10); // Run matcher with timeout
+    
+    let snapshot = matcher.snapshot();
+    let count = snapshot.matched_item_count();
+    
+    let mut results = Vec::new();
+    for i in 0..count.min(20) {
+        if let Some(item) = snapshot.get_matched_item(i) {
+            let app = item.data;
+            results.push(SearchResult {
+                id: app.id.clone(),
+                title: app.name.clone(),
+                subtitle: app.comment.clone(),
+                icon: ResultIcon { kind: "app".into(), value: app.icon.clone() },
+                category: "Applications".into(),
+                score: 0.0, // Score not easily available in 0.5 without SnapshotItem extensions
+                actions: vec![
+                    Action { id: "launch".into(), title: "Launch".into(), shortcut: Some("↵".into()) }
+                ],
+                preview: Some(Preview {
+                    title: app.name.clone(),
+                    subtitle: Some(app.exec.clone()),
+                    description: Some(app.comment.clone()),
+                })
+            });
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn launch_app(app_id: String) -> Result<(), String> {
+    use std::process::Command;
+    use rusqlite::Connection;
+    use std::path::PathBuf;
+    
+    let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
+    let db_path = db_dir.join("crest_index.db");
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+    
+    let mut stmt = conn.prepare("SELECT exec FROM apps WHERE id = ?1").map_err(|e| e.to_string())?;
+    let mut exec: String = stmt.query_row([&app_id], |row| row.get(0)).map_err(|e| e.to_string())?;
+    
+    // Clean up Exec string (remove %U, %f, etc)
+    exec = exec.replace("%U", "").replace("%u", "").replace("%F", "").replace("%f", "").trim().to_string();
+    
+    let args: Vec<&str> = exec.split_whitespace().collect();
+    if args.is_empty() {
+        return Err("Empty Exec command".into());
+    }
+    
+    Command::new(args[0])
+        .args(&args[1..])
+        .spawn()
+        .map_err(|e| e.to_string())?;
+        
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn calculate(expr: String) -> Result<String, String> {
+    match meval::eval_str(&expr) {
+        Ok(result) => Ok(result.to_string()),
+        Err(_) => Err("Invalid expression".to_string()),
+    }
+}
