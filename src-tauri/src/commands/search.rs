@@ -398,7 +398,7 @@ pub async fn search_web(query: String) -> Result<(), String> {
 pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, String> {
     println!("Web search requested for: {}", query);
     let client = reqwest::Client::builder()
-        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+        .user_agent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
         .build()
         .map_err(|e| e.to_string())?;
     
@@ -438,7 +438,9 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
     // 2. Fallback to scraping DuckDuckGo Lite for organic results
     if results.len() < 3 {
         println!("Falling back to Lite scraping for: {}", query);
-        let lite_url = format!("https://duckduckgo.com/lite/?q={}", urlencoding::encode(&query));
+        // DDG Lite often prefers + for spaces
+        let safe_query = query.replace(" ", "+");
+        let lite_url = format!("https://duckduckgo.com/lite/?q={}", urlencoding::encode(&safe_query));
         if let Ok(resp) = client.get(&lite_url).send().await {
             if let Ok(html) = resp.text().await {
                 // Scope the document to ensure it's dropped before the function ends
@@ -446,13 +448,17 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
                 let mut scraped_results = Vec::new();
                 {
                     let document = scraper::Html::parse_document(&html);
-                    let title_selector = scraper::Selector::parse("a.result-link").unwrap();
-                    let snippet_selector = scraper::Selector::parse("td.result-snippet").unwrap();
+                    let title_selector = scraper::Selector::parse(".result-link").unwrap();
+                    let snippet_selector = scraper::Selector::parse(".result-snippet").unwrap();
                     
                     let titles: Vec<_> = document.select(&title_selector).collect();
                     let snippets: Vec<_> = document.select(&snippet_selector).collect();
                     
                     println!("Scraped {} titles and {} snippets from Lite", titles.len(), snippets.len());
+                    
+                    if titles.is_empty() {
+                        println!("HTML Snippet (first 500 chars): {}", &html[..html.len().min(500)]);
+                    }
 
                     for (i, title_node) in titles.into_iter().take(5).enumerate() {
                         let title = title_node.text().collect::<String>().trim().to_string();

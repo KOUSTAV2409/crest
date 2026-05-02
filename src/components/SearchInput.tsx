@@ -149,7 +149,11 @@ const SearchInput: React.FC = () => {
                     
                     if (webResults.length > 0 && latestQuery === currentQuery) {
                         console.log("Injecting web results into UI");
-                        setResults([...res, ...webResults]);
+                        // Merge with the LATEST results from the store, not the stale 'res'
+                        const currentResults = (useAppStore.getState() as any).results;
+                        // Filter out existing web results if any (to prevent duplicates)
+                        const nonWebResults = currentResults.filter((r: any) => r.category !== 'Web Result' && r.category !== 'Web Answer');
+                        setResults([...nonWebResults, ...webResults]);
                     }
                 } catch (e) {
                     console.error("Web fetch error", e);
