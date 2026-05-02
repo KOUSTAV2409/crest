@@ -122,6 +122,30 @@ const SearchInput: React.FC = () => {
         }
         
         setResults(res);
+
+        // 4. In-app Web Search (Background Fetch)
+        if (val.length > 2) { // Lowered to 2 for faster feedback
+            const currentQuery = val;
+            clearTimeout((window as any).webSearchTimeout);
+            (window as any).webSearchTimeout = setTimeout(async () => {
+                console.log("Triggering web search for:", currentQuery);
+                try {
+                    const webResults: any = await invoke('fetch_web_results', { query: currentQuery });
+                    console.log("Received web results:", webResults.length);
+                    
+                    // Get latest query to prevent race conditions
+                    const latestQuery = (useAppStore.getState() as any).query;
+                    
+                    if (webResults.length > 0 && latestQuery === currentQuery) {
+                        console.log("Injecting web results into UI");
+                        setResults([...res, ...webResults]);
+                    }
+                } catch (e) {
+                    console.error("Web fetch error", e);
+                }
+            }, 600);
+        }
+
       } catch (err) {
         console.error("Search error", err);
       }

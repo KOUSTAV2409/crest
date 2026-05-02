@@ -45,8 +45,13 @@ const ResultList: React.FC = () => {
         .then(() => console.log('Web search for:', query))
         .catch((e) => console.error('search_web error:', e));
     } else if (actionId === 'open_url') {
-      const url = item.id.replace('open-url-', '');
-      invoke('open_file', { path: url }) // open_file uses xdg-open which works for URLs
+      let url = item.id;
+      if (url.startsWith('open-url-')) url = url.replace('open-url-', '');
+      if (url.startsWith('web-abs-')) url = url.replace('web-abs-', '');
+      if (url.startsWith('web-rel-')) url = url.replace('web-rel-', '');
+      if (url.startsWith('web-lite-')) url = url.replace('web-lite-', '');
+      
+      invoke('open_file', { path: url }) 
         .then(() => console.log('Opened URL:', url))
         .catch((e) => console.error('open_url error:', e));
     } else if (actionId === 'copy') {

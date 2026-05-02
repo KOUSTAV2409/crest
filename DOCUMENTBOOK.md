@@ -57,6 +57,9 @@ Crest acts as a bridge between your desktop and the web.
 **Web Search:**
 If your query doesn't match a local app or file, Crest automatically offers a **"Search Google for..."** option at the bottom of the list. Pressing `Enter` on this will instantly open your default web browser and perform the search.
 
+**In-App Results:**
+Crest now fetches real search results in the background. After a short pause in typing, Crest will pull the top results from the web and display them directly in the launcher. You can see the page titles and snippets without ever leaving the app. Pressing `Enter` on these results will open that specific page in your browser.
+
 **Direct URL Navigation:**
 If you type something that looks like a URL (e.g., `github.com`, `localhost:3000`, or `https://...`), Crest will show an **"Open URL"** result at the top. This allows you to jump directly to your favorite sites without manually opening a browser and navigating to the address bar.
 
