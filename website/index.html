@@ -250,60 +250,61 @@
   <!-- INSTALL -->
   <section class="install section" id="install">
     <div class="container">
-      <div class="section-label">Installation</div>
-      <h2 class="section-title">Up and running in 60 seconds.</h2>
+      <div class="section-label">Get Started</div>
+      <h2 class="section-title">Download Crest for Linux</h2>
+      <p class="section-sub text-center">Choose your preferred installation method. All binaries are signed and open-source.</p>
 
-      <div class="install-steps">
+      <div class="download-grid">
+        <div class="download-card primary">
+          <div class="download-icon">📦</div>
+          <h3>AppImage</h3>
+          <p>The universal Linux package. Works on almost any distribution. No installation required—just download and run.</p>
+          <a href="#" class="btn btn-primary btn-full">Download .AppImage</a>
+          <span class="download-meta">v0.1.0 · 64MB · x86_64</span>
+        </div>
 
-        <div class="install-step">
-          <div class="step-num">1</div>
-          <div class="step-content">
-            <h3>Prerequisites</h3>
-            <p>Make sure you have Rust and Node.js installed.</p>
-            <div class="code-block">
-              <div class="code-header">
-                <span>bash</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+        <div class="download-card">
+          <div class="download-icon">🐧</div>
+          <h3>Debian / Ubuntu</h3>
+          <p>Native package for Debian-based systems. Integrates perfectly with your system's package manager.</p>
+          <a href="#" class="btn btn-secondary btn-full">Download .deb</a>
+        </div>
+
+        <div class="download-card">
+          <div class="download-icon">🛠️</div>
+          <h3>Build from Source</h3>
+          <p>Want to contribute or audit the code? Build Crest manually using Rust and Node.js.</p>
+          <a href="#build-steps" class="btn btn-outline btn-full">View Build Guide</a>
+        </div>
+      </div>
+
+      <div id="build-steps" class="build-guide">
+        <h3 class="text-center" style="margin-top: 60px; margin-bottom: 30px;">Developer Build Guide</h3>
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <h3>Install Prerequisites</h3>
+              <div class="code-block">
+                <div class="code-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+npm install -g npx</code></pre>
               </div>
-              <pre><code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-# Then install Node.js via your package manager
-sudo apt install nodejs npm   # Ubuntu/Debian
-sudo pacman -S nodejs npm     # Arch Linux</code></pre>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <h3>Compile & Run</h3>
+              <div class="code-block">
+                <div class="code-header"><span>bash</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>
+                <pre><code>git clone https://github.com/KOUSTAV2409/crest.git
+cd crest && npm install
+npm run tauri dev</code></pre>
+              </div>
             </div>
           </div>
         </div>
-
-        <div class="install-step">
-          <div class="step-num">2</div>
-          <div class="step-content">
-            <h3>Clone & Install</h3>
-            <div class="code-block">
-              <div class="code-header">
-                <span>bash</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><code>git clone https://github.com/KOUSTAV2409/crest.git
-cd crest
-npm install</code></pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="install-step">
-          <div class="step-num">3</div>
-          <div class="step-content">
-            <h3>Run</h3>
-            <div class="code-block">
-              <div class="code-header">
-                <span>bash</span>
-                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-              </div>
-              <pre><code>npm run tauri dev</code></pre>
-            </div>
-            <p class="step-note">Press <kbd>Ctrl</kbd> + <kbd>Space</kbd> to open the launcher from anywhere.</p>
-          </div>
-        </div>
-
       </div>
     </div>
   </section>

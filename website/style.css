@@ -314,6 +314,73 @@ body {
   color: var(--text-2);
   line-height: 1.7;
 }
+
+/* DOWNLOADS */
+.download-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.download-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.download-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-4px);
+}
+
+.download-card.primary {
+  border-color: rgba(124, 107, 255, 0.3);
+  background: linear-gradient(180deg, rgba(124, 107, 255, 0.05) 0%, transparent 100%);
+}
+
+.download-icon {
+  font-size: 32px;
+  margin-bottom: 20px;
+}
+
+.download-card h3 {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.download-card p {
+  font-size: 14px;
+  color: var(--text-2);
+  margin-bottom: 24px;
+  flex-grow: 1;
+}
+
+.download-meta {
+  display: block;
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 12px;
+  text-align: center;
+}
+
+.btn-full {
+  width: 100%;
+  justify-content: center;
+}
+
+.build-guide {
+  margin-top: 80px;
+  border-top: 1px solid var(--border);
+  padding-top: 40px;
+}
+
 .feature-demo {
   margin-top: 20px;
   background: var(--bg);
