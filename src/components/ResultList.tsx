@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useAppStore } from '../store';
 import clsx from 'clsx';
@@ -18,6 +18,30 @@ const ResultList: React.FC = () => {
     overscan: 5,
   });
 
+  // Shared activation logic — used by keyboard Enter and mouse click/double-click
+  const activateItem = useCallback((index: number) => {
+    const item = results[index];
+    if (!item) return;
+
+    if (item.actions.length === 0) {
+      console.warn('No actions for item:', item.title);
+      return;
+    }
+
+    const actionId = item.actions[0].id;
+    console.log('Activating:', item.title, '| action:', actionId, '| id:', item.id);
+
+    if (actionId === 'launch') {
+      invoke('launch_app', { appId: item.id })
+        .then(() => console.log('Launched:', item.title))
+        .catch((e) => console.error('launch_app error:', e));
+    } else if (actionId === 'open_file') {
+      invoke('open_file', { path: item.id })
+        .then(() => console.log('Opened file:', item.id))
+        .catch((e) => console.error('open_file error:', e));
+    }
+  }, [results]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (results.length === 0) return;
@@ -33,21 +57,13 @@ const ResultList: React.FC = () => {
         rowVirtualizer.scrollToIndex(prev);
       } else if (e.key === 'Enter') {
         e.preventDefault();
-        const activeItem = results[activeIndex];
-        if (activeItem && activeItem.actions.length > 0) {
-          const actionId = activeItem.actions[0].id;
-          if (actionId === 'launch') {
-             invoke('launch_app', { appId: activeItem.id }).catch(console.error);
-          } else if (actionId === 'open_file') {
-             invoke('open_file', { path: activeItem.id }).catch(console.error);
-          }
-        }
+        activateItem(activeIndex);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeIndex, results.length, setActiveIndex, rowVirtualizer]);
+  }, [activeIndex, results.length, setActiveIndex, rowVirtualizer, activateItem]);
 
   if (results.length === 0) {
     return (
@@ -61,9 +77,7 @@ const ResultList: React.FC = () => {
     <div ref={parentRef} className="result-list-scroll">
       <div
         className="virtual-list-inner"
-        style={{
-          height: `${rowVirtualizer.getTotalSize()}px`,
-        }}
+        style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
       >
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const item = results[virtualRow.index];
@@ -79,15 +93,26 @@ const ResultList: React.FC = () => {
                 width: '100%',
                 height: `${virtualRow.size}px`,
                 transform: `translateY(${virtualRow.start}px)`,
+                cursor: 'pointer',
               }}
               onMouseEnter={() => setActiveIndex(virtualRow.index)}
+              // Double-click always opens immediately
+              onDoubleClick={() => activateItem(virtualRow.index)}
+              // Single click: first click selects, second click on same item opens
+              onClick={() => {
+                if (isActive) {
+                  activateItem(virtualRow.index);
+                } else {
+                  setActiveIndex(virtualRow.index);
+                }
+              }}
             >
               {isActive && (
-                <motion.div 
-                  layoutId="active-selection" 
+                <motion.div
+                  layoutId="active-selection"
                   className="active-bg"
                   initial={false}
-                  transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 />
               )}
               <div className="item-content">
@@ -95,7 +120,9 @@ const ResultList: React.FC = () => {
                   {item.icon.kind === 'emoji' ? (
                     <span className="emoji-icon">{item.icon.value}</span>
                   ) : item.icon.kind === 'file' ? (
-                    <span className="file-ext-badge">{item.icon.value ? item.icon.value.toUpperCase().slice(0, 4) : '📄'}</span>
+                    <span className="file-ext-badge">
+                      {item.icon.value ? item.icon.value.toUpperCase().slice(0, 4) : '📄'}
+                    </span>
                   ) : (
                     <div className="placeholder-icon" />
                   )}

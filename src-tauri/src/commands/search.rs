@@ -194,6 +194,9 @@ pub async fn launch_app(app_id: String) -> Result<(), String> {
     
     Command::new(args[0])
         .args(&args[1..])
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
         .spawn()
         .map_err(|e| e.to_string())?;
         
@@ -322,6 +325,13 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
 
 #[tauri::command]
 pub async fn open_file(path: String) -> Result<(), String> {
-    open::that(&path).map_err(|e| e.to_string())?;
+    use std::process::Command;
+    Command::new("xdg-open")
+        .arg(&path)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| format!("xdg-open failed: {}", e))?;
     Ok(())
 }
