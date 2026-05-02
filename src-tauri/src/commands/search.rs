@@ -406,28 +406,23 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
         let lite_url = format!("https://duckduckgo.com/lite/?q={}", urlencoding::encode(&query));
         if let Ok(resp) = client.get(&lite_url).send().await {
             if let Ok(html) = resp.text().await {
-                let document = scraper::Html::parse_document(&html);
-                let result_selector = scraper::Selector::parse(".result-link").unwrap();
-                let snippet_selector = scraper::Selector::parse(".result-snippet").unwrap();
-                
-                // Lite results are often structured in a way that selectors need to be precise
-                // Actually, Lite uses simple tables or divs.
-                // Let's use a more general selector if the above fails
-                let table_selector = scraper::Selector::parse("table").unwrap();
-                let rows = document.select(&table_selector).nth(2); // The main results table is usually the 3rd one
-                
-                if let Some(table) = rows {
-                    let link_selector = scraper::Selector::parse("a.result-link").unwrap();
+                // Scope the document to ensure it's dropped before the function ends
+                // This satisfies the 'Send' requirement for the async future.
+                let mut scraped_results = Vec::new();
+                {
+                    let document = scraper::Html::parse_document(&html);
+                    let title_selector = scraper::Selector::parse("a.result-link").unwrap();
                     let snippet_selector = scraper::Selector::parse("td.result-snippet").unwrap();
                     
-                    let links: Vec<_> = table.select(&link_selector).take(5).collect();
-                    let snippets: Vec<_> = table.select(&snippet_selector).take(5).collect();
+                    let titles: Vec<_> = document.select(&title_selector).collect();
+                    let snippets: Vec<_> = document.select(&snippet_selector).collect();
                     
-                    for (i, link_node) in links.into_iter().enumerate() {
-                        let title = link_node.text().collect::<String>().trim().to_string();
-                        let href = link_node.value().attr("href").unwrap_or("");
+                    println!("Scraped {} titles and {} snippets from Lite", titles.len(), snippets.len());
+
+                    for (i, title_node) in titles.into_iter().take(5).enumerate() {
+                        let title = title_node.text().collect::<String>().trim().to_string();
+                        let href = title_node.value().attr("href").unwrap_or("");
                         
-                        // Parse the real URL from DDG redirect
                         let real_url = if href.contains("uddg=") {
                             href.split("uddg=").nth(1)
                                 .and_then(|s| s.split("&").next())
@@ -441,7 +436,7 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
                             .map(|s| s.text().collect::<String>().trim().to_string())
                             .unwrap_or_else(|| "No description available".to_string());
 
-                        results.push(SearchResult {
+                        scraped_results.push(SearchResult {
                             id: format!("web-lite-{}", real_url),
                             title,
                             subtitle: snippet.clone(),
@@ -459,6 +454,7 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
                         });
                     }
                 }
+                results.extend(scraped_results);
             }
         }
     }

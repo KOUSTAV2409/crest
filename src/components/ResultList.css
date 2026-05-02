@@ -127,20 +127,32 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  color: var(--text-tertiary);
+  gap: 8px;
 }
 
 .item-shortcut {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-tertiary);
-  border: 1px solid var(--border);
+  background: var(--bg-hover);
+  border: 1px solid var(--border-strong);
   border-radius: 4px;
-  padding: 1px 5px;
+  padding: 1px 6px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.item-category-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.8;
 }
 
 .chevron {
-  color: var(--text-secondary);
-  opacity: 0.6;
+  color: var(--text-primary);
+  opacity: 0.8;
 }
 
 /* ── Empty state ── */

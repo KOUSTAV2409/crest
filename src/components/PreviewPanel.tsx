@@ -16,67 +16,84 @@ const PreviewPanel: React.FC = () => {
   const { results, activeIndex } = useAppStore();
   const activeItem = results[activeIndex];
 
-  if (!activeItem) return null;
+  if (!activeItem) return (
+    <div className="preview-panel empty">
+      <div className="empty-state">
+        <div className="empty-icon">🏔️</div>
+        <h3>Crest Launcher</h3>
+        <p>Type to search apps, files, and more</p>
+      </div>
+    </div>
+  );
 
   const isFile = activeItem.icon.kind === 'file';
   const isEmoji = activeItem.icon.kind === 'emoji';
+  const isApp = activeItem.category.toLowerCase() === 'applications';
 
   return (
     <motion.div
       key={activeItem.id}
-      className="preview-panel fade-in"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.12 }}
+      className="preview-panel"
+      initial={{ opacity: 0, x: 5 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.15 }}
     >
-      {/* Header */}
-      <div className="preview-header">
-        <div className="preview-icon-wrap">
-          {isEmoji ? (
-            <span className="emoji-icon-large">{activeItem.icon.value}</span>
-          ) : isFile ? (
-            <span className="preview-file-badge">
-              {activeItem.icon.value ? activeItem.icon.value.toUpperCase().slice(0, 4) : 'FILE'}
-            </span>
-          ) : (
-            <div className="placeholder-icon-large" />
-          )}
-        </div>
-
-        <h2 className="preview-title">{activeItem.title}</h2>
-
-        <div className="preview-meta">
-          <span className={`meta-chip ${getCategoryClass(activeItem.category)}`}>
+      <div className="preview-content">
+        {/* Large Hero Icon */}
+        <div className="preview-hero">
+          <div className={`hero-icon-container ${getCategoryClass(activeItem.category)}`}>
+            {isEmoji ? (
+              <span className="hero-emoji">{activeItem.icon.value}</span>
+            ) : isFile ? (
+              <span className="hero-file-type">{activeItem.icon.value.toUpperCase().slice(0, 3)}</span>
+            ) : (
+              <div className="hero-icon-app">
+                <span className="hero-emoji">🚀</span>
+              </div>
+            )}
+          </div>
+          <h2 className="hero-title">{activeItem.title}</h2>
+          <span className={`hero-badge ${getCategoryClass(activeItem.category)}`}>
             {activeItem.category}
           </span>
-          {activeItem.subtitle && activeItem.category !== 'Files' && (
-            <>
-              <div className="meta-dot" />
-              <span className="meta-path">{activeItem.subtitle}</span>
-            </>
+        </div>
+
+        <div className="preview-divider" />
+
+        {/* Metadata Section */}
+        <div className="preview-metadata-list">
+          {activeItem.subtitle && (
+            <div className="metadata-row">
+              <span className="metadata-label">{isFile ? 'Location' : 'Subtitle'}</span>
+              <span className="metadata-value truncate">{activeItem.subtitle}</span>
+            </div>
+          )}
+          
+          {activeItem.preview?.description && (
+            <div className="metadata-row vertical">
+              <span className="metadata-label">Description</span>
+              <p className="metadata-text">{activeItem.preview.description}</p>
+            </div>
+          )}
+
+          {activeItem.category === 'Internet' && (
+             <div className="metadata-row">
+                <span className="metadata-label">Search Provider</span>
+                <span className="metadata-value">Google / DuckDuckGo</span>
+             </div>
           )}
         </div>
       </div>
 
-      {/* Body */}
-      <div className="preview-body">
-        {activeItem.preview?.description && (
-          <p className="preview-description">{activeItem.preview.description}</p>
-        )}
-        {isFile && activeItem.subtitle && (
-          <div className="preview-path-full">{activeItem.subtitle}</div>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="preview-actions">
-        <div className="action-row">
-          <span className="action-name">Open</span>
-          <kbd className="action-kbd">↵</kbd>
+      {/* Action Footer */}
+      <div className="preview-footer">
+        <div className="footer-action primary">
+          <span className="action-key">↵</span>
+          <span className="action-text">{activeItem.actions?.[0]?.title || 'Open'}</span>
         </div>
-        <div className="action-row">
-          <span className="action-name">Copy Info</span>
-          <kbd className="action-kbd">⌘G</kbd>
+        <div className="footer-action secondary">
+          <span className="action-key">⌘K</span>
+          <span className="action-text">Actions</span>
         </div>
       </div>
     </motion.div>

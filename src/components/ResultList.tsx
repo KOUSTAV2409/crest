@@ -1,44 +1,38 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { useVirtualizer } from '@tanstack/react-virtual';
+import React from 'react';
 import { useAppStore } from '../store';
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { invoke } from '@tauri-apps/api/core';
 import './ResultList.css';
 
+const ITEM_HEIGHT = 44;
+
 const ResultList: React.FC = () => {
-  const { results, activeIndex, setActiveIndex } = useAppStore();
-  const parentRef = useRef<HTMLDivElement>(null);
+  const { results, activeIndex, setActiveIndex, setIndex } = useAppStore();
+  const parentRef = React.useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
     count: results.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 52,
-    overscan: 5,
+    estimateSize: () => ITEM_HEIGHT,
+    overscan: 10,
   });
 
-  // Shared activation logic — used by keyboard Enter and mouse click/double-click
-  const activateItem = useCallback((index: number) => {
+  const activateItem = async (index: number) => {
     const item = results[index];
-    if (!item) return;
+    if (!item || !item.actions || item.actions.length === 0) return;
 
-    if (item.actions.length === 0) {
-      console.warn('No actions for item:', item.title);
-      return;
-    }
+    const action = item.actions[0];
+    const actionId = action.id;
 
-    const actionId = item.actions[0].id;
-    console.log('Activating:', item.title, '| action:', actionId, '| id:', item.id);
+    console.log('Activating action:', actionId, 'for item:', item.id);
 
     if (actionId === 'launch') {
       invoke('launch_app', { appId: item.id })
-        .then(() => console.log('Launched:', item.title))
+        .then(() => console.log('Launched app:', item.title))
         .catch((e) => console.error('launch_app error:', e));
-    } else if (actionId === 'open_file') {
-      invoke('open_file', { path: item.id })
-        .then(() => console.log('Opened file:', item.id))
-        .catch((e) => console.error('open_file error:', e));
     } else if (actionId === 'search_web') {
       const query = item.id.replace('web-search-', '');
       invoke('search_web', { query })
@@ -55,47 +49,38 @@ const ResultList: React.FC = () => {
         .then(() => console.log('Opened URL:', url))
         .catch((e) => console.error('open_url error:', e));
     } else if (actionId === 'copy') {
-      navigator.clipboard.writeText(item.title)
-        .then(() => console.log('Copied to clipboard:', item.title))
-        .catch((e) => console.error('Clipboard error:', e));
-    }
-  }, [results]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (results.length === 0) return;
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        const next = Math.min(activeIndex + 1, results.length - 1);
-        setActiveIndex(next);
-        rowVirtualizer.scrollToIndex(next);
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        const prev = Math.max(activeIndex - 1, 0);
-        setActiveIndex(prev);
-        rowVirtualizer.scrollToIndex(prev);
-      } else if (e.key === 'Enter') {
-        e.preventDefault();
-        activateItem(activeIndex);
+      try {
+        await navigator.clipboard.writeText(item.title);
+        console.log('Copied to clipboard:', item.title);
+      } catch (e) {
+        console.error('Clipboard error:', e);
       }
-    };
+    } else if (actionId === 'open_file') {
+      invoke('open_file', { path: item.subtitle })
+        .then(() => console.log('Opened file:', item.subtitle))
+        .catch((e) => console.error('open_file error:', e));
+    }
+  };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeIndex, results.length, setActiveIndex, rowVirtualizer, activateItem]);
+  // Sync scroll position when activeIndex changes
+  React.useEffect(() => {
+    if (activeIndex !== -1) {
+      rowVirtualizer.scrollToIndex(activeIndex, { align: 'center' });
+    }
+  }, [activeIndex, rowVirtualizer]);
 
   if (results.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">⌘</div>
+        <div className="empty-state-icon">🔍</div>
         <p>No results found</p>
-        <span className="empty-state-hint">Try a different search, or type / for files</span>
+        <span className="empty-state-hint">Try a different search term</span>
       </div>
     );
   }
 
   return (
-    <div ref={parentRef} className="result-list-scroll">
+    <div className="result-list-scroll" ref={parentRef}>
       <div
         className="virtual-list-inner"
         style={{ height: `${rowVirtualizer.getTotalSize()}px` }}
@@ -117,9 +102,7 @@ const ResultList: React.FC = () => {
                 cursor: 'pointer',
               }}
               onMouseEnter={() => setActiveIndex(virtualRow.index)}
-              // Double-click always opens immediately
               onDoubleClick={() => activateItem(virtualRow.index)}
-              // Single click: first click selects, second click on same item opens
               onClick={() => {
                 if (isActive) {
                   activateItem(virtualRow.index);
@@ -142,18 +125,24 @@ const ResultList: React.FC = () => {
                     <span className="emoji-icon">{item.icon.value}</span>
                   ) : item.icon.kind === 'file' ? (
                     <span className="file-ext-badge">
-                      {item.icon.value ? item.icon.value.toUpperCase().slice(0, 4) : '📄'}
+                      {item.icon.value ? item.icon.value.toUpperCase().slice(0, 3) : '📄'}
                     </span>
                   ) : (
-                    <div className="placeholder-icon" />
+                    <div className="placeholder-icon">🚀</div>
                   )}
                 </div>
+                
                 <div className="item-text">
                   <span className="item-title">{item.title}</span>
-                  {item.subtitle && <span className="item-subtitle">{item.subtitle}</span>}
+                  {item.subtitle && <span className="item-subtitle truncate">{item.subtitle}</span>}
                 </div>
+
                 <div className="item-actions">
-                  {isActive && <ChevronRight size={16} className="chevron" />}
+                   {!isActive && <span className="item-category-label">{item.category}</span>}
+                   {isActive && item.actions?.[0]?.shortcut && (
+                     <span className="item-shortcut">{item.actions[0].shortcut}</span>
+                   )}
+                   {isActive && <ChevronRight size={14} className="chevron" />}
                 </div>
               </div>
             </div>
