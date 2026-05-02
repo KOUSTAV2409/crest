@@ -7,7 +7,7 @@ import { ChevronRight } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import './ResultList.css';
 
-const ITEM_HEIGHT = 44;
+const ITEM_HEIGHT = 72; // Increased for multi-line support
 
 const ResultList: React.FC = () => {
   const { results, activeIndex, setActiveIndex, setIndex } = useAppStore();
@@ -86,9 +86,11 @@ const ResultList: React.FC = () => {
   if (results.length === 0) {
     return (
       <div className="empty-state">
-        <div className="empty-state-icon">🔍</div>
-        <p>No results found</p>
-        <span className="empty-state-hint">Try a different search term</span>
+        <div className="empty-state-content">
+          <div className="empty-state-icon">🔍</div>
+          <h3 className="empty-state-title">No results found</h3>
+          <p className="empty-state-description">Try a different search term or run a command.</p>
+        </div>
       </div>
     );
   }
@@ -149,6 +151,11 @@ const ResultList: React.FC = () => {
                 <div className="item-text">
                   <span className="item-title">{item.title}</span>
                   {item.subtitle && <span className="item-subtitle truncate">{item.subtitle}</span>}
+                  {item.preview?.description && (
+                    <span className="item-description-snippet">
+                      {item.preview.description}
+                    </span>
+                  )}
                 </div>
 
                 <div className="item-actions">

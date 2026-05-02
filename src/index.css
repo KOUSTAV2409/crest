@@ -1,41 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Background layers */
-  --bg:              rgba(22, 22, 26, 0.92);
-  --bg-elevated:     rgba(32, 32, 38, 0.98);
-  --bg-hover:        rgba(255, 255, 255, 0.045);
-  --bg-selected:     rgba(110, 108, 249, 0.16);
+  /* Background layers - Premium Glassmorphism */
+  --bg:              rgba(20, 20, 26, 0.88);
+  --bg-elevated:     rgba(28, 28, 34, 0.98);
+  --bg-hover:        rgba(255, 255, 255, 0.05);
+  --bg-selected:     rgba(124, 107, 255, 0.12);
+  --bg-sidebar:      rgba(15, 15, 20, 0.4);
 
-  /* Borders */
-  --border:          rgba(255, 255, 255, 0.07);
-  --border-strong:   rgba(255, 255, 255, 0.12);
+  /* Borders - Ultra Sharp 0.5px style */
+  --border:          rgba(255, 255, 255, 0.06);
+  --border-strong:   rgba(255, 255, 255, 0.1);
+  --border-active:   rgba(124, 107, 255, 0.4);
 
-  /* Text */
-  --text-primary:    #f0eff5;
-  --text-secondary:  rgba(240, 239, 245, 0.5);
-  --text-tertiary:   rgba(240, 239, 245, 0.28);
+  /* Text - High Legibility */
+  --text-primary:    #ffffff;
+  --text-secondary:  rgba(255, 255, 255, 0.6);
+  --text-tertiary:   rgba(255, 255, 255, 0.35);
 
-  /* Accent */
-  --accent:          #7c6bff;
-  --accent-hover:    #9186ff;
-  --accent-glow:     rgba(124, 107, 255, 0.22);
+  /* Accent - Vibrant Indigo */
+  --accent:          #8b5cf6; /* Indigo 500 */
+  --accent-hover:    #a78bfa; /* Indigo 400 */
+  --accent-glow:     rgba(139, 92, 246, 0.25);
 
-  /* Category colors */
-  --color-app:       #ff9f43;
-  --color-file:      #54a0ff;
-  --color-calc:      #5eba8f;
-  --color-web:       #00d2ff;
-  --color-system:    #ff6b81;
+  /* Category colors - Refined Pastel/Neon */
+  --color-app:       #fbbf24; /* Amber 400 */
+  --color-file:      #3b82f6; /* Blue 500 */
+  --color-calc:      #10b981; /* Emerald 500 */
+  --color-web:       #06b6d4; /* Cyan 500 */
+  --color-system:    #f43f5e; /* Rose 500 */
 
-  /* Danger */
-  --danger:          #ff453a;
-
-  /* Radii */
-  --radius-window:   14px;
-  --radius-item:     8px;
-  --radius-badge:    5px;
-  --radius-icon:     10px;
+  /* Radii - Modern & Soft */
+  --radius-window:   18px;
+  --radius-item:     10px;
+  --radius-badge:    6px;
+  --radius-icon:     12px;
 }
 
 *, *::before, *::after {
@@ -71,15 +70,14 @@ body {
 .window-container {
   width: 100%;
   height: 100%;
-  background-color: var(--bg);
-  backdrop-filter: blur(48px) saturate(160%);
-  -webkit-backdrop-filter: blur(48px) saturate(160%);
+  background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.03), transparent), var(--bg);
+  backdrop-filter: blur(40px) saturate(180%);
+  -webkit-backdrop-filter: blur(40px) saturate(180%);
   border-radius: var(--radius-window);
   border: 1px solid var(--border-strong);
   box-shadow:
-    0 32px 64px rgba(0, 0, 0, 0.55),
-    0 0 0 0.5px rgba(255, 255, 255, 0.06) inset,
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+    0 24px 80px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
   display: flex;
   flex-direction: column;
   overflow: hidden;

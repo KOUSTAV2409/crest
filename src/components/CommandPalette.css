@@ -12,12 +12,13 @@
 }
 
 .result-list-container {
-  width: 42%;
-  min-width: 42%;
+  width: 58%; /* Wider list for multi-line content */
+  min-width: 58%;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: rgba(0, 0, 0, 0.1); /* Subtle dark contrast for list */
 }
 
 .result-list-container.full-width {
@@ -31,6 +32,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: transparent;
 }
 
 /* ── Status / Footer bar ── */
@@ -51,21 +53,28 @@
 }
 
 .status-category-chip {
-  display: flex;
-  align-items: center;
-  gap: 5px;
   font-size: 11px;
   font-weight: 500;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   letter-spacing: 0.01em;
 }
 
-.status-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--accent);
-  opacity: 0.7;
+.status-divider {
+  width: 1px;
+  height: 12px;
+  background: var(--border-strong);
+}
+
+.status-action-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.action-text {
+  font-weight: 500;
 }
 
 .status-right {
@@ -77,6 +86,7 @@
 .status-count {
   font-size: 11px;
   color: var(--text-tertiary);
+  margin-right: 8px;
 }
 
 .status-shortcut {

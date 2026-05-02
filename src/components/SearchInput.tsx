@@ -8,23 +8,22 @@ const SearchInput: React.FC = () => {
   const { query, setQuery, setMode, setResults, mode } = useAppStore();
   const inputRef = useRef<HTMLInputElement>(null);
   
-  const [placeholder, setPlaceholder] = useState("Search apps...");
+  const modeLabel: Record<string, string> = {
+    default: 'apps and commands',
+    calculator: 'calculator',
+    command: 'commands',
+    file: 'files',
+    clipboard: 'clipboard history'
+  };
   
   useEffect(() => {
     // Focus input on mount
     inputRef.current?.focus();
-    
-    // Cycle placeholder
-    const placeholders = ["Search apps...", "Run commands...", "Find files..."];
-    let i = 0;
-    const interval = setInterval(() => {
-      if (!query) {
-        i = (i + 1) % placeholders.length;
-        setPlaceholder(placeholders[i]);
-      }
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [query]);
+  }, []);
+
+  const currentPlaceholder = mode === 'default' 
+    ? 'Search for apps and commands...' 
+    : `Search in ${modeLabel[mode]}...`;
 
   const isUrl = (str: string) => {
     try {
@@ -184,14 +183,14 @@ const SearchInput: React.FC = () => {
             setResults([]);
           }
         }}
-        placeholder={placeholder}
+        placeholder={currentPlaceholder}
         className="search-input"
         spellCheck={false}
         autoComplete="off"
         autoCorrect="off"
       />
       <div className="search-badges">
-        <kbd className="kbd-badge">⌘K</kbd>
+        <kbd className="search-kbd-badge">⌘K</kbd>
       </div>
     </div>
   );

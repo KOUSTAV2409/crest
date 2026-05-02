@@ -45,27 +45,24 @@ const CommandPalette: React.FC = () => {
           )}
         </div>
 
-        {/* Status bar */}
         <div className="status-bar">
           <div className="status-left">
             <div className="status-category-chip">
-              <div className="status-dot" />
               {modeLabel[mode] ?? mode}
+            </div>
+            <div className="status-divider" />
+            <div className="status-action-hint">
+              <span className="action-text">Actions</span>
+              <kbd className="status-kbd">⌘K</kbd>
             </div>
           </div>
           <div className="status-right">
-            <span className="status-count">{results.length} results</span>
             <div className="status-shortcut">
-              <kbd className="status-kbd">↑↓</kbd>
-              <span>Navigate</span>
+              <span className="status-count">{results.length} results</span>
             </div>
             <div className="status-shortcut">
               <kbd className="status-kbd">↵</kbd>
               <span>Open</span>
-            </div>
-            <div className="status-shortcut">
-              <kbd className="status-kbd">Esc</kbd>
-              <span>Close</span>
             </div>
           </div>
         </div>

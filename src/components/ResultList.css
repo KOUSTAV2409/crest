@@ -10,38 +10,51 @@
   position: relative;
 }
 
-/* ── Section header (category label) ── */
+/* Section header (category label) */
 .section-header {
-  padding: 16px 10px 4px;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
+  padding: 16px 12px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-tertiary);
+  opacity: 0.7;
 }
 
-/* ── Individual result row ── */
+/* Individual result row */
 .result-item {
   display: flex;
   align-items: center;
-  padding: 0 8px;
+  padding: 0 10px;
   cursor: default;
   position: relative;
   border-radius: var(--radius-item);
-  overflow: hidden;
-  transition: background 0.08s;
+  overflow: visible; /* Changed to visible for glow */
+  transition: all 0.1s var(--ease);
+  margin: 1px 0;
 }
 
-.result-item:hover { background: var(--bg-hover); }
-
-/* Motion selection highlight */
+/* Premium selection highlight - Raycast style */
 .active-bg {
   position: absolute;
   inset: 0;
-  background: var(--bg-selected);
+  background: var(--bg-hover);
   border-radius: var(--radius-item);
-  border-left: 2px solid var(--accent);
+  border: 1px solid var(--border-strong);
   z-index: 0;
+}
+
+.active-bg::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-glow);
 }
 
 /* ── Row content ── */
@@ -54,10 +67,10 @@
   min-width: 0;
 }
 
-/* ── Icon container ── */
+/* Icon container */
 .item-icon {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,16 +79,16 @@
 }
 
 .emoji-icon {
-  font-size: 18px;
+  font-size: 24px;
   line-height: 1;
 }
 
 .placeholder-icon {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-icon);
-  background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%);
-  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 
 .file-ext-badge {
@@ -101,25 +114,38 @@
   justify-content: center;
   flex: 1;
   min-width: 0;
-  gap: 1px;
+  gap: 2px;
 }
 
 .item-title {
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px; /* Larger title */
+  font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
 }
 
 .item-subtitle {
   font-size: 11px;
-  color: var(--text-tertiary);
+  font-weight: 500;
+  color: var(--accent); /* Accent for subtitle/source */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.8;
+}
+
+.item-description-snippet {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-tertiary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 2px;
 }
 
 /* ── Right side (chevron / shortcut) ── */
@@ -155,30 +181,40 @@
   opacity: 0.8;
 }
 
-/* ── Empty state ── */
+/* Empty state - Raycast style */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   flex: 1;
-  gap: 8px;
   padding: 48px 24px;
-  color: var(--text-tertiary);
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 280px;
 }
 
 .empty-state-icon {
-  font-size: 28px;
-  opacity: 0.5;
+  font-size: 32px;
+  margin-bottom: 16px;
+  opacity: 0.4;
+  filter: grayscale(1);
 }
 
-.empty-state p {
+.empty-state-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.empty-state-description {
   font-size: 13px;
+  line-height: 1.5;
   color: var(--text-tertiary);
-}
-
-.empty-state-hint {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  opacity: 0.6;
 }

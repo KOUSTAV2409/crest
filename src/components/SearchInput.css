@@ -1,18 +1,19 @@
 .search-input-container {
   display: flex;
   align-items: center;
-  height: 52px;
-  padding: 0 16px;
+  height: 60px; /* Taller search bar */
+  padding: 0 20px;
   border-bottom: 1px solid var(--border);
-  gap: 10px;
+  gap: 12px;
 }
 
 .search-icon {
-  color: var(--text-tertiary);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  opacity: 0.8;
 }
 
 .search-input {
@@ -21,9 +22,9 @@
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 16px;
-  font-weight: 400;
-  letter-spacing: -0.01em;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
   min-width: 0;
 }
 
@@ -52,8 +53,21 @@
 
 .search-badges {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.search-kbd-badge {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  font-family: inherit;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
 .kbd-badge {
