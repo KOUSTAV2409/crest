@@ -181,6 +181,26 @@ const SearchInput: React.FC = () => {
           if (e.key === 'Backspace' && query === '' && mode !== 'default') {
             setMode('default');
             setResults([]);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+            if (results.length > 0) {
+              setActiveIndex((activeIndex + 1) % results.length);
+            }
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+            if (results.length > 0) {
+              setActiveIndex((activeIndex - 1 + results.length) % results.length);
+            }
+          } else if (e.key === 'Enter') {
+            const { results, activeIndex } = useAppStore.getState();
+            const item = results[activeIndex];
+            if (item) {
+              // Trigger click on the active item
+              const activeEl = document.querySelector('.result-item.active') as HTMLElement;
+              activeEl?.click();
+            }
           }
         }}
         placeholder={currentPlaceholder}
