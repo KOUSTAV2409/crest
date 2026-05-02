@@ -26,6 +26,14 @@ const SearchInput: React.FC = () => {
     return () => clearInterval(interval);
   }, [query]);
 
+  const isUrl = (str: string) => {
+    try {
+      const url = str.trim();
+      return url.startsWith('http://') || url.startsWith('https://') || 
+             (/^([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}(:\d+)?(\/.*)?$/i.test(url));
+    } catch { return false; }
+  };
+
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setQuery(val);
@@ -42,7 +50,7 @@ const SearchInput: React.FC = () => {
             category: 'Calculator',
             icon: { kind: 'emoji', value: '🧮' },
             score: 1,
-            actions: []
+            actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }]
           }]);
         } catch (e) {
           // Ignore parse errors
@@ -69,25 +77,49 @@ const SearchInput: React.FC = () => {
         return;
       }
       try {
-        const res: any = await invoke('search', { query: val, category: null });
+        let res: any = await invoke('search', { query: val, category: null });
         
-        // Try calculator implicitly
+        // 1. Try calculator implicitly
         try {
            const calcRes = await invoke('calculate', { expr: val });
            let calcResStr = calcRes as string;
-           // Format long decimals to 2 decimal places for cleaner UI (e.g. 95.041538 -> 95.04)
            calcResStr = calcResStr.replace(/(\.\d{2})\d+/, '$1');
            
            res.unshift({
               id: 'calc',
               title: calcResStr,
-              subtitle: 'Result',
+              subtitle: 'Calculator Result',
               category: 'Calculator',
               icon: { kind: 'emoji', value: '🧮' },
-              score: 1,
-              actions: []
+              score: 1.1,
+              actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }]
            });
         } catch(e) {}
+
+        // 2. Add "Search Google" option
+        res.push({
+          id: `web-search-${val}`,
+          title: `Search Google for "${val}"`,
+          subtitle: 'Web Search',
+          category: 'Internet',
+          icon: { kind: 'emoji', value: '🔍' },
+          score: 0.1,
+          actions: [{ id: 'search_web', title: 'Search Google', shortcut: '↵' }]
+        });
+
+        // 3. Check if it looks like a URL
+        if (isUrl(val)) {
+          const url = val.startsWith('http') ? val : `https://${val}`;
+          res.unshift({
+            id: `open-url-${url}`,
+            title: `Open ${url}`,
+            subtitle: 'Web Browser',
+            category: 'Internet',
+            icon: { kind: 'emoji', value: '🌐' },
+            score: 1.2,
+            actions: [{ id: 'open_url', title: 'Open in Browser', shortcut: '↵' }]
+          });
+        }
         
         setResults(res);
       } catch (err) {

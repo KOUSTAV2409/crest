@@ -82,6 +82,7 @@
 .meta-chip.cat-app    { background: rgba(255,159,67,0.1);  border-color: rgba(255,159,67,0.2);  color: var(--color-app);  }
 .meta-chip.cat-file   { background: rgba(84,160,255,0.1);  border-color: rgba(84,160,255,0.2);  color: var(--color-file); }
 .meta-chip.cat-calc   { background: rgba(94,186,143,0.1);  border-color: rgba(94,186,143,0.2);  color: var(--color-calc); }
+.meta-chip.cat-web    { background: rgba(0,210,255,0.1);   border-color: rgba(0,210,255,0.2);   color: var(--color-web);  }
 
 .meta-dot {
   width: 3px;

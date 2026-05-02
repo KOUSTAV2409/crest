@@ -8,6 +8,7 @@ const getCategoryClass = (category: string) => {
   if (c === 'applications') return 'cat-app';
   if (c === 'files') return 'cat-file';
   if (c === 'calculator') return 'cat-calc';
+  if (c === 'internet') return 'cat-web';
   return '';
 };
 

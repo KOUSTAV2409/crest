@@ -23,6 +23,7 @@ pub fn run() {
             commands::search::calculate,
             commands::search::search_files,
             commands::search::open_file,
+            commands::search::search_web,
             commands::system::get_system_actions,
             commands::extensions::run_extension,
             commands::extensions::get_clipboard_history

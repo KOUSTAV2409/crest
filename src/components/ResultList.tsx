@@ -39,6 +39,20 @@ const ResultList: React.FC = () => {
       invoke('open_file', { path: item.id })
         .then(() => console.log('Opened file:', item.id))
         .catch((e) => console.error('open_file error:', e));
+    } else if (actionId === 'search_web') {
+      const query = item.id.replace('web-search-', '');
+      invoke('search_web', { query })
+        .then(() => console.log('Web search for:', query))
+        .catch((e) => console.error('search_web error:', e));
+    } else if (actionId === 'open_url') {
+      const url = item.id.replace('open-url-', '');
+      invoke('open_file', { path: url }) // open_file uses xdg-open which works for URLs
+        .then(() => console.log('Opened URL:', url))
+        .catch((e) => console.error('open_url error:', e));
+    } else if (actionId === 'copy') {
+      navigator.clipboard.writeText(item.title)
+        .then(() => console.log('Copied to clipboard:', item.title))
+        .catch((e) => console.error('Clipboard error:', e));
     }
   }, [results]);
 

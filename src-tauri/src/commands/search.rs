@@ -335,3 +335,17 @@ pub async fn open_file(path: String) -> Result<(), String> {
         .map_err(|e| format!("xdg-open failed: {}", e))?;
     Ok(())
 }
+
+#[tauri::command]
+pub async fn search_web(query: String) -> Result<(), String> {
+    use std::process::Command;
+    let url = format!("https://www.google.com/search?q={}", urlencoding::encode(&query));
+    Command::new("xdg-open")
+        .arg(&url)
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::null())
+        .stderr(std::process::Stdio::null())
+        .spawn()
+        .map_err(|e| format!("xdg-open failed: {}", e))?;
+    Ok(())
+}

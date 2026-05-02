@@ -50,3 +50,15 @@ File indexing is 100% local. No filenames or paths ever leave your machine.
 
 **Launching files:**
 Pressing `Enter` on a file result will open it with your system's default application (e.g., your PDF viewer, image viewer, or text editor). Crest uses the standard `xdg-open` mechanism under the hood.
+
+## 🌐 Internet Search & URLs
+Crest acts as a bridge between your desktop and the web.
+
+**Web Search:**
+If your query doesn't match a local app or file, Crest automatically offers a **"Search Google for..."** option at the bottom of the list. Pressing `Enter` on this will instantly open your default web browser and perform the search.
+
+**Direct URL Navigation:**
+If you type something that looks like a URL (e.g., `github.com`, `localhost:3000`, or `https://...`), Crest will show an **"Open URL"** result at the top. This allows you to jump directly to your favorite sites without manually opening a browser and navigating to the address bar.
+
+**Privacy Note:**
+Crest **does not** send your keystrokes to any search engine as you type. The "Search Google" option is generated entirely locally. Your query is only sent to the browser when you explicitly press `Enter` on the search result.
