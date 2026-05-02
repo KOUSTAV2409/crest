@@ -12,6 +12,9 @@ pub fn run() {
             window::setup_window_events(app.handle());
             indexer::apps::init();
             indexer::files::init();
+            
+            // Initialize currency rates in background
+            tauri::async_runtime::spawn(commands::search::fetch_exchange_rates());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

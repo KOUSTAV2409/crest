@@ -50,9 +50,6 @@ const SearchInput: React.FC = () => {
       } else {
         setResults([]);
       }
-    } else if (val.startsWith('/')) {
-      setMode('file');
-      // Implement file search invoke
     } else if (val.startsWith('>')) {
       setMode('command');
       // Implement command search invoke
@@ -64,6 +61,21 @@ const SearchInput: React.FC = () => {
       }
       try {
         const res: any = await invoke('search', { query: val, category: null });
+        
+        // Try calculator implicitly
+        try {
+           const calcRes = await invoke('calculate', { expr: val });
+           res.unshift({
+              id: 'calc',
+              title: calcRes as string,
+              subtitle: 'Result',
+              category: 'Calculator',
+              icon: { kind: 'emoji', value: '🧮' },
+              score: 1,
+              actions: []
+           });
+        } catch(e) {}
+        
         setResults(res);
       } catch (err) {
         console.error("Search error", err);

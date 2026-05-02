@@ -1,4 +1,43 @@
 use serde::{Serialize, Deserialize};
+use std::sync::RwLock;
+use std::collections::HashMap;
+use once_cell::sync::Lazy;
+
+static EXCHANGE_RATES: Lazy<RwLock<HashMap<String, f64>>> = Lazy::new(|| RwLock::new(HashMap::new()));
+
+pub async fn fetch_exchange_rates() {
+    if let Ok(resp) = reqwest::get("https://open.er-api.com/v6/latest/USD").await {
+        if let Ok(json) = resp.json::<serde_json::Value>().await {
+            if let Some(rates) = json.get("rates").and_then(|r| r.as_object()) {
+                let mut map = HashMap::new();
+                for (k, v) in rates {
+                    if let Some(f) = v.as_f64() {
+                        map.insert(k.to_string(), f);
+                    }
+                }
+                if let Ok(mut cache) = EXCHANGE_RATES.write() {
+                    *cache = map;
+                }
+            }
+        }
+    }
+}
+
+struct CurrencyHandler;
+impl fend_core::ExchangeRateFnV2 for CurrencyHandler {
+    fn relative_to_base_currency(
+        &self,
+        currency: &str,
+        _options: &fend_core::ExchangeRateFnV2Options,
+    ) -> Result<f64, Box<dyn std::error::Error + Send + Sync + 'static>> {
+        let cache = EXCHANGE_RATES.read().map_err(|_| "Lock poisoned")?;
+        if let Some(&rate) = cache.get(&currency.to_uppercase()) {
+            Ok(rate)
+        } else {
+            Err("Currency not found".into())
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize)]
 pub struct ResultIcon {
@@ -163,8 +202,24 @@ pub async fn launch_app(app_id: String) -> Result<(), String> {
 
 #[tauri::command]
 pub async fn calculate(expr: String) -> Result<String, String> {
-    match meval::eval_str(&expr) {
-        Ok(result) => Ok(result.to_string()),
+    let mut context = fend_core::Context::new();
+    context.set_exchange_rate_handler_v2(CurrencyHandler);
+    
+    // Map natural language to fend-supported syntax
+    let parsed_expr = expr
+        .to_lowercase()
+        .replace("percent of", "% of")
+        .replace("percent", "%");
+        
+    match fend_core::evaluate(&parsed_expr, &mut context) {
+        Ok(result) => {
+            let result_str = result.get_main_result();
+            if result_str.is_empty() || result_str == expr {
+                Err("No meaningful result".to_string())
+            } else {
+                Ok(result_str.to_string())
+            }
+        },
         Err(_) => Err("Invalid expression".to_string()),
     }
 }
