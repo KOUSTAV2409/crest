@@ -12,6 +12,7 @@ const modeLabel: Record<string, string> = {
   file: 'Files',
   calculator: 'Calculator',
   command: 'Commands',
+  clipboard: 'Clipboard',
 };
 
 const CommandPalette: React.FC = () => {

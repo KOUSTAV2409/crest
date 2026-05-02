@@ -70,6 +70,18 @@ const SearchInput: React.FC = () => {
       } catch (e) {
         console.error("File search error", e);
       }
+    } else if (mode === 'clipboard') {
+        try {
+          const res: any = await invoke('get_clipboard_history');
+          // Filter locally for now
+          const filtered = res.filter((item: any) => 
+            item.title.toLowerCase().includes(val.toLowerCase()) || 
+            (item.preview?.description && item.preview.description.toLowerCase().includes(val.toLowerCase()))
+          );
+          setResults(filtered);
+        } catch (e) {
+          console.error("Clipboard fetch error", e);
+        }
     } else {
       setMode('default');
       if (val.trim() === '') {
@@ -160,11 +172,18 @@ const SearchInput: React.FC = () => {
       {mode === 'file' && <span className="search-mode-pill mode-file">📂 Files</span>}
       {mode === 'calculator' && <span className="search-mode-pill mode-calc">🧮 Calc</span>}
       {mode === 'command' && <span className="search-mode-pill mode-cmd">⌘ CMD</span>}
+      {mode === 'clipboard' && <span className="search-mode-pill mode-clip">📋 Clip</span>}
       <input
         ref={inputRef}
         type="text"
         value={query}
         onChange={handleChange}
+        onKeyDown={(e) => {
+          if (e.key === 'Backspace' && query === '' && mode !== 'default') {
+            setMode('default');
+            setResults([]);
+          }
+        }}
         placeholder={placeholder}
         className="search-input"
         spellCheck={false}

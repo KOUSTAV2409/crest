@@ -59,6 +59,20 @@ const ResultList: React.FC = () => {
       invoke('open_file', { path: item.subtitle })
         .then(() => console.log('Opened file:', item.subtitle))
         .catch((e) => console.error('open_file error:', e));
+    } else if (actionId === 'open_clipboard') {
+      const { setMode, setQuery } = useAppStore.getState();
+      setMode('clipboard');
+      setQuery(''); // Clear query to show all history
+    } else if (actionId === 'run_extension') {
+      invoke('run_extension', { id: item.id, action: 'run', args: {} })
+        .then((res: any) => {
+          console.log('Extension results:', res);
+          if (Array.isArray(res)) {
+            const { setResults } = useAppStore.getState();
+            setResults(res);
+          }
+        })
+        .catch((e) => console.error('run_extension error:', e));
     }
   };
 

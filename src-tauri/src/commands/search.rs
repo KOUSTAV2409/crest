@@ -155,7 +155,7 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
                 subtitle: app.comment.clone(),
                 icon: ResultIcon { kind: "app".into(), value: app.icon.clone() },
                 category: "Applications".into(),
-                score: 0.0, // Score not easily available in 0.5 without SnapshotItem extensions
+                score: 0.0,
                 actions: vec![
                     Action { id: "launch".into(), title: "Launch".into(), shortcut: Some("↵".into()) }
                 ],
@@ -166,6 +166,41 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
                 })
             });
         }
+    }
+
+    // --- INTEGRATE PLUGINS ---
+    let plugins = crate::plugins::list_plugins();
+    for plugin in plugins {
+        if plugin.name.to_lowercase().contains(&query.to_lowercase()) {
+            results.push(SearchResult {
+                id: format!("plugin-{}", plugin.name),
+                title: plugin.name,
+                subtitle: plugin.description,
+                icon: ResultIcon { kind: "emoji".into(), value: plugin.icon },
+                category: "Extension".into(),
+                score: 0.05,
+                actions: vec![
+                    Action { id: "run_extension".into(), title: "Run".into(), shortcut: Some("↵".into()) }
+                ],
+                preview: None,
+            });
+        }
+    }
+
+    // --- CLIPBOARD SHORTCUT ---
+    if query.to_lowercase() == "clip" || query.to_lowercase() == "clipboard" {
+        results.push(SearchResult {
+            id: "system-clipboard".into(),
+            title: "Clipboard History".into(),
+            subtitle: "View and search your clipboard history".into(),
+            icon: ResultIcon { kind: "emoji".into(), value: "📋".into() },
+            category: "System".into(),
+            score: 0.1,
+            actions: vec![
+                Action { id: "open_clipboard".into(), title: "Open".into(), shortcut: Some("↵".into()) }
+            ],
+            preview: None,
+        });
     }
     
     Ok(results)

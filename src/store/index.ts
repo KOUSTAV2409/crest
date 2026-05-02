@@ -20,8 +20,8 @@ interface AppState {
   setActiveIndex: (index: number) => void;
   activeCategory: string | null;
   setActiveCategory: (cat: string | null) => void;
-  mode: 'default' | 'calculator' | 'file' | 'command';
-  setMode: (mode: 'default' | 'calculator' | 'file' | 'command') => void;
+  mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard';
+  setMode: (mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard') => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({

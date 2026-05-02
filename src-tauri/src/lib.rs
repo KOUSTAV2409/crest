@@ -2,6 +2,8 @@ pub mod commands;
 pub mod indexer;
 pub mod hotkey;
 pub mod window;
+pub mod clipboard;
+pub mod plugins;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -12,6 +14,7 @@ pub fn run() {
             window::setup_window_events(app.handle());
             indexer::apps::init();
             indexer::files::init();
+            clipboard::init();
             
             // Initialize currency rates in background
             tauri::async_runtime::spawn(commands::search::fetch_exchange_rates());
