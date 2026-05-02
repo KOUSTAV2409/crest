@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crest — The Open-Source Raycast for Linux</title>
+  <meta name="description" content="Crest is a blazing-fast, privacy-first, 100% open-source application launcher for Linux. Search apps, files, calculate, convert currency — all offline, all yours." />
+  <meta property="og:title" content="Crest — The Open-Source Raycast for Linux" />
+  <meta property="og:description" content="Free forever. No telemetry. No cloud. Just speed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <span class="logo-icon">⌘</span>
+        <span>Crest</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#privacy">Privacy</a></li>
+        <li><a href="#install">Install</a></li>
+        <li><a href="#roadmap">Roadmap</a></li>
+        <li>
+          <a href="https://github.com/KOUSTAV2409/crest" class="nav-github" target="_blank" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+            GitHub
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <div class="hero-glow hero-glow-1"></div>
+      <div class="hero-glow hero-glow-2"></div>
+      <div class="hero-grid"></div>
+    </div>
+    <div class="container hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Open Source · Free Forever · No Telemetry
+      </div>
+      <h1 class="hero-title">
+        The <span class="gradient-text">Raycast</span> you always wanted.<br />
+        For Linux.
+      </h1>
+      <p class="hero-subtitle">
+        Crest is a blazing-fast, privacy-first launcher built with Rust + React.<br />
+        Search apps, open files, calculate, convert currency — all local, all yours.
+      </p>
+      <div class="hero-cta">
+        <a href="#install" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Install Now — It's Free
+        </a>
+        <a href="https://github.com/KOUSTAV2409/crest" class="btn btn-ghost" target="_blank" rel="noopener">
+          View Source Code
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span>🦀 Built with Rust</span>
+        <span>⚛️ React Frontend</span>
+        <span>🔒 Zero telemetry</span>
+        <span>🐧 Linux native</span>
+      </div>
+    </div>
+    <div class="hero-mockup container">
+      <div class="mockup-glow"></div>
+      <img src="assets/hero-mockup.png" alt="Crest launcher UI showing app search, calculator and file results" class="mockup-img" />
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features section" id="features">
+    <div class="container">
+      <div class="section-label">Features</div>
+      <h2 class="section-title">Everything you need. Nothing you don't.</h2>
+      <p class="section-sub">Built to be fast, not bloated. Every feature runs 100% on your machine.</p>
+
+      <div class="features-grid">
+
+        <div class="feature-card feature-card-large">
+          <div class="feature-icon">🚀</div>
+          <h3>App Launcher</h3>
+          <p>Fuzzy search across all your installed applications. Powered by the <strong>Nucleo</strong> matching engine — the same algorithm used by the best code editors. Launches in under 50ms.</p>
+          <div class="feature-demo">
+            <div class="demo-bar"><span class="demo-cursor">firefox</span></div>
+            <div class="demo-result active">🦊 Firefox Browser</div>
+            <div class="demo-result">📝 Mousepad</div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🧮</div>
+          <h3>Smart Calculator</h3>
+          <p>Natural language math powered by <strong>fend-core</strong>. No prefix needed — just type.</p>
+          <div class="feature-demo small">
+            <div class="demo-bar"><span class="demo-cursor">30 percent of 200</span></div>
+            <div class="demo-result active">= 60</div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💱</div>
+          <h3>Live Currency</h3>
+          <p>Real exchange rates fetched silently on startup. Type <code>20 usd to inr</code> and get the answer instantly.</p>
+          <div class="feature-demo small">
+            <div class="demo-bar"><span class="demo-cursor">1 usd to inr</span></div>
+            <div class="demo-result active">= 95.04 INR</div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📂</div>
+          <h3>File Search</h3>
+          <p>Type <code>/</code> to instantly fuzzy search across your Documents, Downloads, and Desktop. Hit Enter to open in your default app.</p>
+          <div class="feature-demo small">
+            <div class="demo-bar"><span class="demo-cursor">/budget q1</span></div>
+            <div class="demo-result active">📄 budget_q1_2025.xlsx</div>
+          </div>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3>100% Offline</h3>
+          <p>Your keystrokes <strong>never leave your machine</strong>. All indexing, searching, and matching happens locally in Rust.</p>
+        </div>
+
+        <div class="feature-card feature-card-large">
+          <div class="feature-icon">🔌</div>
+          <h3>Extension SDK</h3>
+          <p>Crest ships with a TypeScript Extension SDK. Write your own commands and share them as open-source extensions. The community store is growing.</p>
+          <div class="feature-tags">
+            <span class="tag">Clipboard Manager</span>
+            <span class="tag">System Controls</span>
+            <span class="tag">Snippets</span>
+            <span class="tag soon">Coming Soon</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- PRIVACY -->
+  <section class="privacy section" id="privacy">
+    <div class="container">
+      <div class="section-label">Privacy Promise</div>
+      <h2 class="section-title">We collect <em>absolutely nothing</em>.</h2>
+      <p class="section-sub">This is not a privacy policy buried in legalese. This is a table you can actually read.</p>
+
+      <div class="privacy-table-wrap">
+        <table class="privacy-table">
+          <thead>
+            <tr>
+              <th>What</th>
+              <th class="col-crest">Crest (you)</th>
+              <th class="col-cloud">Cloud Launchers</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Your search queries</td>
+              <td class="col-crest">❌ Never stored</td>
+              <td class="col-cloud">⚠️ Often logged for analytics</td>
+            </tr>
+            <tr>
+              <td>Apps you launch</td>
+              <td class="col-crest">❌ Never tracked</td>
+              <td class="col-cloud">⚠️ Usage data sent to servers</td>
+            </tr>
+            <tr>
+              <td>File names</td>
+              <td class="col-crest">❌ Stays on disk</td>
+              <td class="col-cloud">⚠️ May be indexed in cloud</td>
+            </tr>
+            <tr>
+              <td>Clipboard contents</td>
+              <td class="col-crest">❌ Local SQLite only</td>
+              <td class="col-cloud">⚠️ Cloud sync enabled by default</td>
+            </tr>
+            <tr>
+              <td>Internet connection required</td>
+              <td class="col-crest">✅ Optional (currency only)</td>
+              <td class="col-cloud">⚠️ Required for most features</td>
+            </tr>
+            <tr>
+              <td>Source code available</td>
+              <td class="col-crest">✅ 100% open source (MIT)</td>
+              <td class="col-cloud">❌ Closed source</td>
+            </tr>
+            <tr>
+              <td>Cost</td>
+              <td class="col-crest">✅ Free forever</td>
+              <td class="col-cloud">💰 $8–16/month for Pro features</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="privacy-note">
+        The currency exchange rate fetcher is the <em>only</em> optional network request Crest makes — and it fetches from a public API with no authentication, no user ID, and no identifying information.
+        You can verify this by reading the <a href="https://github.com/KOUSTAV2409/crest/blob/master/src-tauri/src/commands/search.rs" target="_blank">source code directly</a>.
+      </p>
+    </div>
+  </section>
+
+  <!-- INSTALL -->
+  <section class="install section" id="install">
+    <div class="container">
+      <div class="section-label">Installation</div>
+      <h2 class="section-title">Up and running in 60 seconds.</h2>
+
+      <div class="install-steps">
+
+        <div class="install-step">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h3>Prerequisites</h3>
+            <p>Make sure you have Rust and Node.js installed.</p>
+            <div class="code-block">
+              <div class="code-header">
+                <span>bash</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# Then install Node.js via your package manager
+sudo apt install nodejs npm   # Ubuntu/Debian
+sudo pacman -S nodejs npm     # Arch Linux</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h3>Clone & Install</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span>bash</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>git clone https://github.com/KOUSTAV2409/crest.git
+cd crest
+npm install</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="install-step">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h3>Run</h3>
+            <div class="code-block">
+              <div class="code-header">
+                <span>bash</span>
+                <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+              </div>
+              <pre><code>npm run tauri dev</code></pre>
+            </div>
+            <p class="step-note">Press <kbd>Ctrl</kbd> + <kbd>Space</kbd> to open the launcher from anywhere.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ROADMAP -->
+  <section class="roadmap section" id="roadmap">
+    <div class="container">
+      <div class="section-label">Roadmap</div>
+      <h2 class="section-title">What's next for Crest.</h2>
+      <p class="section-sub">Built in public. Roadmap updated in real-time.</p>
+
+      <div class="roadmap-grid">
+        <div class="roadmap-col">
+          <div class="roadmap-col-title done-title">✅ Shipped</div>
+          <ul class="roadmap-list">
+            <li class="done">App Launcher (Nucleo fuzzy search)</li>
+            <li class="done">File Search (<code>/</code> prefix)</li>
+            <li class="done">Natural Language Calculator</li>
+            <li class="done">Unit Conversions</li>
+            <li class="done">Live Currency Exchange</li>
+            <li class="done">Extension SDK scaffold</li>
+            <li class="done">Clipboard History (basic)</li>
+          </ul>
+        </div>
+        <div class="roadmap-col">
+          <div class="roadmap-col-title next-title">🔨 In Progress</div>
+          <ul class="roadmap-list">
+            <li class="next">Text Snippets (<code>!trigger</code> expansion)</li>
+            <li class="next">System Controls (volume, brightness, lock)</li>
+            <li class="next">Quicklinks (<code>@alias → URL</code>)</li>
+            <li class="next">Emoji Picker (<code>:</code> prefix)</li>
+          </ul>
+        </div>
+        <div class="roadmap-col">
+          <div class="roadmap-col-title future-title">🔮 Planned</div>
+          <ul class="roadmap-list">
+            <li class="future">Window Management (snap/tile)</li>
+            <li class="future">Process Manager</li>
+            <li class="future">Community Extension Store</li>
+            <li class="future">Wayland-native global hotkey</li>
+            <li class="future">Theme customization</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OPEN SOURCE CTA -->
+  <section class="oss-cta section">
+    <div class="container oss-cta-inner">
+      <div class="oss-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </div>
+      <h2>Built by the community, for the community.</h2>
+      <p>Crest is 100% open source under the MIT licence. Read the code, fork it, build extensions, or just star it to show your support.</p>
+      <a href="https://github.com/KOUSTAV2409/crest" class="btn btn-primary" target="_blank" rel="noopener">
+        Star on GitHub ★
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <span class="logo-icon">⌘</span> Crest
+      </div>
+      <p class="footer-tagline">The open-source Raycast for Linux.</p>
+      <div class="footer-links">
+        <a href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/KOUSTAV2409/crest/blob/master/DOCUMENTBOOK.md" target="_blank" rel="noopener">Docs</a>
+        <a href="https://github.com/KOUSTAV2409/crest/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/KOUSTAV2409/crest/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a>
+      </div>
+      <p class="footer-copy">© 2025 Crest Contributors. No rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
