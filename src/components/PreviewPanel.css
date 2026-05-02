@@ -2,101 +2,166 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 24px;
+  background: rgba(0, 0, 0, 0.08);
 }
 
+/* ── Icon + Title header ── */
 .preview-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 24px;
+  padding: 32px 24px 20px;
+  border-bottom: 1px solid var(--border);
+  gap: 10px;
 }
 
-.preview-icon-large {
-  width: 64px;
-  height: 64px;
+.preview-icon-wrap {
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16px;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
 }
 
 .emoji-icon-large {
-  font-size: 48px;
+  font-size: 32px;
+  line-height: 1;
+}
+
+.preview-file-badge {
+  font-size: 12px;
+  font-weight: 800;
+  color: #54a0ff;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  letter-spacing: 0.04em;
 }
 
 .placeholder-icon-large {
-  width: 64px;
-  height: 64px;
-  border-radius: 12px;
-  background-color: rgba(255, 255, 255, 0.1);
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 100%);
 }
 
 .preview-title {
-  font-size: 18px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 4px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+  word-break: break-word;
 }
 
+/* ── Breadcrumb meta ── */
 .preview-meta {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
+  gap: 5px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
+
+.meta-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text-secondary);
+  letter-spacing: 0.01em;
+}
+
+.meta-chip.cat-app    { background: rgba(255,159,67,0.1);  border-color: rgba(255,159,67,0.2);  color: var(--color-app);  }
+.meta-chip.cat-file   { background: rgba(84,160,255,0.1);  border-color: rgba(84,160,255,0.2);  color: var(--color-file); }
+.meta-chip.cat-calc   { background: rgba(94,186,143,0.1);  border-color: rgba(94,186,143,0.2);  color: var(--color-calc); }
 
 .meta-dot {
-  font-size: 8px;
-  opacity: 0.5;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
 }
 
+.meta-path {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+/* ── Body ── */
 .preview-body {
   flex: 1;
   overflow-y: auto;
+  padding: 16px 20px;
 }
 
 .preview-description {
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.6;
   color: var(--text-secondary);
 }
 
+.preview-path-full {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 11px;
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  color: var(--text-secondary);
+  word-break: break-all;
+  line-height: 1.5;
+}
+
+/* ── Actions footer ── */
 .preview-actions {
-  margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding-top: 16px;
+  gap: 4px;
+  padding: 10px 12px;
   border-top: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
 .action-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background-color: var(--bg-elevated);
-  border-radius: var(--radius-item);
+  padding: 7px 10px;
+  border-radius: 7px;
   cursor: pointer;
+  transition: background 0.1s;
 }
 
-.action-row:hover {
-  background-color: var(--selection);
-}
+.action-row:hover { background: var(--bg-hover); }
+.action-row:first-child { background: rgba(255,255,255,0.04); border: 1px solid var(--border); }
+.action-row:first-child:hover { background: rgba(255,255,255,0.07); }
 
 .action-name {
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .action-kbd {
   font-family: inherit;
-  font-size: 11px;
-  color: var(--text-secondary);
-  background-color: rgba(255, 255, 255, 0.05);
-  padding: 2px 6px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 1px 6px;
   border-radius: 4px;
 }

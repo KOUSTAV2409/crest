@@ -5,7 +5,7 @@ import { useAppStore } from '../store';
 import './SearchInput.css';
 
 const SearchInput: React.FC = () => {
-  const { query, setQuery, setMode, setResults } = useAppStore();
+  const { query, setQuery, setMode, setResults, mode } = useAppStore();
   const inputRef = useRef<HTMLInputElement>(null);
   
   const [placeholder, setPlaceholder] = useState("Search apps...");
@@ -99,8 +99,11 @@ const SearchInput: React.FC = () => {
   return (
     <div className="search-input-container">
       <div className="search-icon">
-        <Search size={18} />
+        <Search size={16} />
       </div>
+      {mode === 'file' && <span className="search-mode-pill mode-file">📂 Files</span>}
+      {mode === 'calculator' && <span className="search-mode-pill mode-calc">🧮 Calc</span>}
+      {mode === 'command' && <span className="search-mode-pill mode-cmd">⌘ CMD</span>}
       <input
         ref={inputRef}
         type="text"
@@ -109,10 +112,11 @@ const SearchInput: React.FC = () => {
         placeholder={placeholder}
         className="search-input"
         spellCheck={false}
+        autoComplete="off"
+        autoCorrect="off"
       />
       <div className="search-badges">
         <kbd className="kbd-badge">⌘K</kbd>
-        <kbd className="kbd-badge">?</kbd>
       </div>
     </div>
   );

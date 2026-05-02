@@ -68,7 +68,9 @@ const ResultList: React.FC = () => {
   if (results.length === 0) {
     return (
       <div className="empty-state">
+        <div className="empty-state-icon">⌘</div>
         <p>No results found</p>
+        <span className="empty-state-hint">Try a different search, or type / for files</span>
       </div>
     );
   }

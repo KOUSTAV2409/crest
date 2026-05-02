@@ -1,17 +1,18 @@
 .search-input-container {
   display: flex;
   align-items: center;
-  height: 56px;
+  height: 52px;
   padding: 0 16px;
   border-bottom: 1px solid var(--border);
+  gap: 10px;
 }
 
 .search-icon {
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
+  flex-shrink: 0;
 }
 
 .search-input {
@@ -20,25 +21,45 @@
   background: transparent;
   border: none;
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
+  letter-spacing: -0.01em;
+  min-width: 0;
 }
 
 .search-input::placeholder {
   color: var(--text-tertiary);
-  transition: opacity 0.3s ease;
+  font-weight: 400;
 }
+
+/* Mode pill shown when in a specific mode */
+.search-mode-pill {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+
+.mode-file   { background: rgba(84,160,255,0.12); color: #54a0ff; }
+.mode-calc   { background: rgba(94,186,143,0.12); color: #5eba8f; }
+.mode-cmd    { background: rgba(255,107,129,0.12); color: #ff6b81; }
 
 .search-badges {
   display: flex;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .kbd-badge {
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
-  color: var(--text-secondary);
-  padding: 2px 6px;
+  color: var(--text-tertiary);
+  padding: 2px 7px;
   border-radius: var(--radius-badge);
   font-size: 11px;
   font-family: inherit;

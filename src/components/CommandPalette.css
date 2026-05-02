@@ -9,44 +9,90 @@
   display: flex;
   flex: 1;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
 }
 
 .result-list-container {
-  width: 45%;
+  width: 42%;
+  min-width: 42%;
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .result-list-container.full-width {
   width: 100%;
+  min-width: 100%;
   border-right: none;
 }
 
 .preview-panel-container {
-  width: 55%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  background-color: rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
+/* ── Status / Footer bar ── */
 .status-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 16px;
-  height: 32px;
+  padding: 0 14px;
+  height: 30px;
+  flex-shrink: 0;
+  border-top: 1px solid var(--border);
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-category-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 11px;
+  font-weight: 500;
   color: var(--text-tertiary);
-  background-color: rgba(0, 0, 0, 0.2);
+  letter-spacing: 0.01em;
+}
+
+.status-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.7;
 }
 
 .status-right {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
 }
 
-.status-shortcuts {
-  font-family: monospace;
+.status-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.status-shortcut {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.status-kbd {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0px 5px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-family: inherit;
 }
