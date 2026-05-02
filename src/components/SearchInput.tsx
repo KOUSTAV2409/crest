@@ -149,7 +149,11 @@ const SearchInput: React.FC = () => {
                     
                     if (webResults.length > 0 && latestQuery === currentQuery) {
                         console.log("Injecting web results into UI");
-                        setResults([...res, ...webResults]);
+                        // Merge with the LATEST results from the store, not the stale 'res'
+                        const currentResults = (useAppStore.getState() as any).results;
+                        // Filter out existing web results if any (to prevent duplicates)
+                        const nonWebResults = currentResults.filter((r: any) => r.category !== 'Web Result' && r.category !== 'Web Answer');
+                        setResults([...nonWebResults, ...webResults]);
                     }
                 } catch (e) {
                     console.error("Web fetch error", e);
@@ -181,6 +185,26 @@ const SearchInput: React.FC = () => {
           if (e.key === 'Backspace' && query === '' && mode !== 'default') {
             setMode('default');
             setResults([]);
+          } else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+            if (results.length > 0) {
+              setActiveIndex((activeIndex + 1) % results.length);
+            }
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+            if (results.length > 0) {
+              setActiveIndex((activeIndex - 1 + results.length) % results.length);
+            }
+          } else if (e.key === 'Enter') {
+            const { results, activeIndex } = useAppStore.getState();
+            const item = results[activeIndex];
+            if (item) {
+              // Trigger click on the active item
+              const activeEl = document.querySelector('.result-item.active') as HTMLElement;
+              activeEl?.click();
+            }
           }
         }}
         placeholder={currentPlaceholder}
