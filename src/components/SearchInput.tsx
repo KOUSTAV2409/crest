@@ -53,6 +53,15 @@ const SearchInput: React.FC = () => {
     } else if (val.startsWith('>')) {
       setMode('command');
       // Implement command search invoke
+    } else if (val.startsWith('/')) {
+      setMode('file');
+      try {
+        const queryStr = val === '/' ? '' : val.substring(1);
+        const res: any = await invoke('search_files', { query: queryStr });
+        setResults(res);
+      } catch (e) {
+        console.error("File search error", e);
+      }
     } else {
       setMode('default');
       if (val.trim() === '') {

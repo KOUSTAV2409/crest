@@ -56,6 +56,22 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
+.file-ext-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #2a2a3d 0%, #1e1e2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--accent);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
 .item-text {
   display: flex;
   flex-direction: column;

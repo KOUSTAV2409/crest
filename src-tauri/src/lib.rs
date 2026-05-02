@@ -21,6 +21,8 @@ pub fn run() {
             commands::search::search,
             commands::search::launch_app,
             commands::search::calculate,
+            commands::search::search_files,
+            commands::search::open_file,
             commands::system::get_system_actions,
             commands::extensions::run_extension,
             commands::extensions::get_clipboard_history

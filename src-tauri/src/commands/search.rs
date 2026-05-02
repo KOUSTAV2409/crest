@@ -72,7 +72,7 @@ pub struct SearchResult {
 }
 
 #[tauri::command]
-pub async fn search(query: String, category: Option<String>) -> Result<Vec<SearchResult>, String> {
+pub async fn search(query: String, _category: Option<String>) -> Result<Vec<SearchResult>, String> {
     use rusqlite::Connection;
     use nucleo::{Nucleo, Config};
     use std::path::PathBuf;
@@ -222,4 +222,106 @@ pub async fn calculate(expr: String) -> Result<String, String> {
         },
         Err(_) => Err("Invalid expression".to_string()),
     }
+}
+
+#[tauri::command]
+pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
+    use rusqlite::Connection;
+    use nucleo::{Nucleo, Config};
+    use std::path::PathBuf;
+    
+    let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
+    let db_path = db_dir.join("crest_index.db");
+    let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
+    
+    let mut stmt = conn.prepare("SELECT id, name, path, extension FROM files").map_err(|e| e.to_string())?;
+    
+    struct FileEntry {
+        id: String,
+        name: String,
+        path: String,
+        extension: String,
+    }
+    
+    let file_iter = stmt.query_map([], |row| {
+        Ok(FileEntry {
+            id: row.get(0)?,
+            name: row.get(1)?,
+            path: row.get(2)?,
+            extension: row.get(3)?,
+        })
+    }).map_err(|e| e.to_string())?;
+    
+    let mut files = Vec::new();
+    for file in file_iter {
+        if let Ok(file) = file {
+            files.push(file);
+        }
+    }
+    
+    if query.is_empty() {
+        return Ok(files.into_iter().take(20).map(|file| SearchResult {
+            id: file.id,
+            title: file.name.clone(),
+            subtitle: file.path.clone(),
+            icon: ResultIcon { kind: "file".into(), value: file.extension },
+            category: "Files".into(),
+            score: 0.0,
+            actions: vec![
+                Action { id: "open_file".into(), title: "Open File".into(), shortcut: Some("↵".into()) }
+            ],
+            preview: Some(Preview {
+                title: file.name,
+                subtitle: Some(file.path),
+                description: None,
+            })
+        }).collect());
+    }
+    
+    // Setup Nucleo fuzzy matcher
+    let mut matcher = Nucleo::<FileEntry>::new(Config::DEFAULT, std::sync::Arc::new(|| ()), None, 1);
+    let injector = matcher.injector();
+    
+    for file in files {
+        injector.push(file, |f, columns| {
+            columns[0] = f.name.clone().into();
+        });
+    }
+    
+    matcher.pattern.reparse(0, &query, nucleo::pattern::CaseMatching::Ignore, nucleo::pattern::Normalization::Smart, false);
+    matcher.tick(10); // Run matcher with timeout
+    
+    let snapshot = matcher.snapshot();
+    let count = snapshot.matched_item_count();
+    
+    let mut results = Vec::new();
+    for i in 0..count.min(20) {
+        if let Some(item) = snapshot.get_matched_item(i) {
+            let file = item.data;
+            results.push(SearchResult {
+                id: file.id.clone(),
+                title: file.name.clone(),
+                subtitle: file.path.clone(),
+                icon: ResultIcon { kind: "file".into(), value: file.extension.clone() },
+                category: "Files".into(),
+                score: 0.0,
+                actions: vec![
+                    Action { id: "open_file".into(), title: "Open File".into(), shortcut: Some("↵".into()) }
+                ],
+                preview: Some(Preview {
+                    title: file.name.clone(),
+                    subtitle: Some(file.path.clone()),
+                    description: None,
+                })
+            });
+        }
+    }
+    
+    Ok(results)
+}
+
+#[tauri::command]
+pub async fn open_file(path: String) -> Result<(), String> {
+    open::that(&path).map_err(|e| e.to_string())?;
+    Ok(())
 }

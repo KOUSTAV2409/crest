@@ -4,6 +4,7 @@ import { useAppStore } from '../store';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { invoke } from '@tauri-apps/api/core';
 import './ResultList.css';
 
 const ResultList: React.FC = () => {
@@ -30,6 +31,17 @@ const ResultList: React.FC = () => {
         const prev = Math.max(activeIndex - 1, 0);
         setActiveIndex(prev);
         rowVirtualizer.scrollToIndex(prev);
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const activeItem = results[activeIndex];
+        if (activeItem && activeItem.actions.length > 0) {
+          const actionId = activeItem.actions[0].id;
+          if (actionId === 'launch') {
+             invoke('launch_app', { appId: activeItem.id }).catch(console.error);
+          } else if (actionId === 'open_file') {
+             invoke('open_file', { path: activeItem.id }).catch(console.error);
+          }
+        }
       }
     };
 
@@ -82,6 +94,8 @@ const ResultList: React.FC = () => {
                 <div className="item-icon">
                   {item.icon.kind === 'emoji' ? (
                     <span className="emoji-icon">{item.icon.value}</span>
+                  ) : item.icon.kind === 'file' ? (
+                    <span className="file-ext-badge">{item.icon.value ? item.icon.value.toUpperCase().slice(0, 4) : '📄'}</span>
                   ) : (
                     <div className="placeholder-icon" />
                   )}
