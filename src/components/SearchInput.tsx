@@ -65,9 +65,13 @@ const SearchInput: React.FC = () => {
         // Try calculator implicitly
         try {
            const calcRes = await invoke('calculate', { expr: val });
+           let calcResStr = calcRes as string;
+           // Format long decimals to 2 decimal places for cleaner UI (e.g. 95.041538 -> 95.04)
+           calcResStr = calcResStr.replace(/(\.\d{2})\d+/, '$1');
+           
            res.unshift({
               id: 'calc',
-              title: calcRes as string,
+              title: calcResStr,
               subtitle: 'Result',
               category: 'Calculator',
               icon: { kind: 'emoji', value: '🧮' },
