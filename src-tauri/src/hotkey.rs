@@ -21,9 +21,10 @@ pub fn init(app: &AppHandle) {
             if let Ok(event) = receiver.recv() {
                 if event.id == hotkey.id() {
                     let handle = app_handle.clone();
+                    let handle_clone = handle.clone();
                     // Move window interaction to the main thread
                     let _ = handle.run_on_main_thread(move || {
-                        if let Some(window) = handle.get_webview_window("main") {
+                        if let Some(window) = handle_clone.get_webview_window("main") {
                             if window.is_visible().unwrap_or(false) {
                                 let _ = window.hide();
                             } else {
