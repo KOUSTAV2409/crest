@@ -6,8 +6,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/koustav/crest/releases">
-    <img src="https://img.shields.io/github/v/release/koustav/crest?style=flat-square&color=c2c1ff" alt="Latest Release">
+  <a href="https://github.com/KOUSTAV2409/crest/releases">
+    <img src="https://img.shields.io/github/v/release/KOUSTAV2409/crest?style=flat-square&color=c2c1ff" alt="Latest Release">
   </a>
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square&color=4d49d7" alt="License">
   <img src="https://img.shields.io/badge/built_with-Rust-orange?style=flat-square&logo=rust" alt="Built with Rust">
@@ -33,36 +33,29 @@
 - **Database**: Local SQLite for high-speed metadata and history storage.
 - **Footprint**: < 40MB RAM idle usage.
 
-## 🚀 Getting Started
+## 🚀 Installation & Setup
 
-### Prerequisites
-- Node.js (v18+)
-- Rust (Stable)
-- System dependencies (for Ubuntu/Debian):
-  ```bash
-  sudo apt install libwebkit2gtk-4.1-dev build-essential curl wget file libssl-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev
-  ```
+### 1. Download
+Head to [GitHub Releases](https://github.com/KOUSTAV2409/crest/releases) and download the latest asset for your distribution:
+- **Debian/Ubuntu**: `.deb` package
+- **Generic Linux**: `.AppImage`
 
-### Development
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/koustav/crest.git
-   cd crest
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Run in development mode:
-   ```bash
-   npm run tauri dev
-   ```
+### 2. Install
+- **Debian/Ubuntu**: `sudo apt install ./crest_0.1.0_amd64.deb`
+- **Generic Linux**: `chmod +x crest.AppImage && ./crest.AppImage`
 
-### Building
-To build a production bundle (.deb, .AppImage):
-```bash
-npm run tauri build
-```
+### 3. Bind Global Shortcut
+To launch Crest from anywhere, bind the `crest` command to a keyboard shortcut in your Desktop Environment settings (e.g., `Alt + Space` or `Super + Space`).
+
+## ⌨️ How to Use
+
+- **Search**: Start typing to find apps, files, or calculate math.
+- **Navigate**: Use `Up` and `Down` arrows to select results.
+- **Execute**: Press `Enter` to launch the primary action.
+- **Actions**: Press `Cmd + K` (or `Ctrl + K`) to open the secondary action menu.
+- **Modes**: Use `Backspace` on an empty search bar to switch between Clipboard, Search, and File modes.
+
+## 🛠️ Development Setup (For Contributors)
 
 ## 🗺️ Roadmap
 - [ ] **Deep AI Integration**: Local LLM support for context-aware commands.
@@ -70,4 +63,4 @@ npm run tauri build
 - [ ] **Mobile Remote**: Control your Linux desktop from your phone via local network.
 
 ## 📄 License
-MIT © [Koustav](https://github.com/koustav)
+MIT © [Koustav](https://github.com/KOUSTAV2409)

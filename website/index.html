@@ -4,6 +4,22 @@
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>Crest — The Linux Power Launcher</title>
+    <meta name="description" content="A high-performance, Raycast-inspired productivity launcher for Linux. Built with Rust and Tauri.">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://crest.run/">
+    <meta property="og:title" content="Crest — The Linux Power Launcher">
+    <meta property="og:description" content="The Raycast experience, finally on Linux. Built in Rust for absolute performance.">
+    <meta property="og:image" content="website/assets/hero-mockup.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://crest.run/">
+    <meta property="twitter:title" content="Crest — The Linux Power Launcher">
+    <meta property="twitter:description" content="The Raycast experience, finally on Linux. Built in Rust for absolute performance.">
+    <meta property="twitter:image" content="website/assets/hero-mockup.png">
+
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -133,14 +149,14 @@
             <div class="hidden md:flex gap-8 text-[11px] font-semibold uppercase tracking-widest text-white/40">
                 <a class="hover:text-primary transition-colors" href="#features">Features</a>
                 <a class="hover:text-primary transition-colors" href="#download">Download</a>
-                <a class="hover:text-primary transition-colors" href="https://github.com/koustav/crest" target="_blank">GitHub</a>
+                <a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank">GitHub</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
             <span class="mono-label text-primary/60 hidden sm:block">v0.1.0_alpha</span>
-            <button class="bg-white text-black px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-primary transition-all">
+            <a href="#download" class="bg-white text-black px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-primary transition-all">
                 Download
-            </button>
+            </a>
         </div>
     </div>
 </nav>
@@ -148,9 +164,12 @@
 <!-- Hero Section -->
 <section class="pt-40 pb-20 px-6 overflow-hidden">
     <div class="max-w-[1200px] mx-auto text-center mb-24">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-8">
-            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-            <span class="text-[10px] font-mono-code font-bold text-primary uppercase tracking-widest">Built for performance</span>
+        <div class="inline-flex items-center gap-4 mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
+                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[10px] font-mono-code font-bold text-primary uppercase tracking-widest">Built for performance</span>
+            </div>
+            <div class="text-[10px] font-mono-code font-bold text-white/40 uppercase tracking-widest">Free &amp; Open Source</div>
         </div>
         <h1 class="font-display-xl text-5xl md:text-8xl mb-6 tracking-tight leading-none text-white">
             The Raycast experience,<br/>
@@ -163,7 +182,7 @@
             <a href="#download" class="bg-primary text-on-primary-container px-8 py-3 rounded-xl font-bold text-sm tracking-tight hover:scale-[1.02] active:scale-95 transition-all">
                 Get Started
             </a>
-            <a href="https://github.com/koustav/crest" target="_blank" class="px-8 py-3 rounded-xl font-bold text-sm tracking-tight border border-white/10 hover:bg-white/5 transition-all">
+            <a href="https://github.com/KOUSTAV2409/crest" target="_blank" class="px-8 py-3 rounded-xl font-bold text-sm tracking-tight border border-white/10 hover:bg-white/5 transition-all">
                 View on GitHub
             </a>
         </div>
@@ -357,6 +376,42 @@
     </div>
 </section>
 
+<!-- Setup Guide Section -->
+<section class="py-32 px-6 border-t border-white/5" id="setup">
+    <div class="max-w-[1200px] mx-auto">
+        <div class="text-center mb-20">
+            <div class="mono-label mb-4 text-primary">Get Started</div>
+            <h2 class="font-display-xl text-4xl">Setup in 60 seconds.</h2>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div class="p-8 rigid-border relative group">
+                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">01</div>
+                <h4 class="font-bold mb-4 uppercase tracking-tight">Download</h4>
+                <p class="text-xs text-on-surface-variant leading-relaxed">
+                    Grab the <code class="bg-white/5 px-1 rounded">.deb</code> or <code class="bg-white/5 px-1 rounded">.AppImage</code> from our GitHub Releases.
+                </p>
+                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">download</span>
+            </div>
+            <div class="p-8 rigid-border relative group">
+                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">02</div>
+                <h4 class="font-bold mb-4 uppercase tracking-tight">Install</h4>
+                <p class="text-xs text-on-surface-variant leading-relaxed">
+                    Run the installer or make the AppImage executable with <code class="bg-white/5 px-1 rounded">chmod +x</code>.
+                </p>
+                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">install_desktop</span>
+            </div>
+            <div class="p-8 rigid-border relative group">
+                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">03</div>
+                <h4 class="font-bold mb-4 uppercase tracking-tight">Bind Key</h4>
+                <p class="text-xs text-on-surface-variant leading-relaxed">
+                    Map <code class="bg-white/5 px-1 rounded">crest</code> to a shortcut like <kbd class="bg-white/10 px-1 rounded text-[10px]">Alt + Space</kbd> in settings.
+                </p>
+                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">keyboard</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <!-- Download & Roadmap Section -->
 <section class="py-32 px-6" id="download">
     <div class="max-w-[1200px] mx-auto">
@@ -366,7 +421,7 @@
                 <div class="mono-label mb-8">Installation</div>
                 <h2 class="font-display-xl text-4xl mb-12">Deploy to your distro.</h2>
                 <div class="space-y-4">
-                    <a href="crest_0.1.0_amd64.deb" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-primary">download</span>
                             <div>
@@ -376,7 +431,7 @@
                         </div>
                         <span class="mono-label text-primary">Download</span>
                     </a>
-                    <a href="crest.AppImage" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-primary">box</span>
                             <div>
@@ -433,7 +488,7 @@
                     A high-fidelity system utility for power users. Built for the Linux desktop with Rust, Tauri, and absolute intentionality.
                 </p>
                 <div class="flex gap-4">
-                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="#">
+                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="https://github.com/KOUSTAV2409/crest">
                         <img alt="GitHub" class="w-4 h-4 invert opacity-40" src="https://www.svgrepo.com/show/512317/github-142.svg"/>
                     </a>
                 </div>
