@@ -10,7 +10,7 @@ import './ResultList.css';
 const ITEM_HEIGHT = 72; // Increased for multi-line support
 
 const ResultList: React.FC = () => {
-  const { results, activeIndex, setActiveIndex, setIndex } = useAppStore();
+  const { results, activeIndex, setActiveIndex } = useAppStore();
   const parentRef = React.useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({

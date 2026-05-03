@@ -28,7 +28,6 @@ const PreviewPanel: React.FC = () => {
 
   const isFile = activeItem.icon.kind === 'file';
   const isEmoji = activeItem.icon.kind === 'emoji';
-  const isApp = activeItem.category.toLowerCase() === 'applications';
 
   return (
     <motion.div

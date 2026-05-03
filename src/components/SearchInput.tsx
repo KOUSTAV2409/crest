@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Search } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useAppStore } from '../store';
