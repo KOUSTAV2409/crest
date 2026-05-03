@@ -16,13 +16,13 @@
         "title": "Crest",
         "width": 720,
         "height": 520,
-        "resizable": true,
-        "decorations": true,
-        "transparent": false,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
         "alwaysOnTop": true,
         "center": true,
         "visible": true,
-        "skipTaskbar": false,
+        "skipTaskbar": true,
         "shadow": true
       }
     ],
