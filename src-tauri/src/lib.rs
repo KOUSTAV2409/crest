@@ -8,7 +8,20 @@ pub mod plugins;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    use tauri::Manager;
+
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, _argv, _cwd| {
+            if let Some(w) = app.get_webview_window("main") {
+                let visible = w.is_visible().unwrap_or(false);
+                if visible {
+                    let _ = w.hide();
+                } else {
+                    let _ = w.show();
+                    let _ = w.set_focus();
+                }
+            }
+        }))
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             hotkey::init(app.handle());

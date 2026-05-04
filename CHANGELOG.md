@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.1] - 2026-05-04
+
+### Fixed
+- **Wayland-friendly launcher toggle**: integrated [`tauri-plugin-single-instance`](https://v2.tauri.app/plugin/single-instance/). Running **`crest`** while the app is already open **shows or hides** the main window — so desktop shortcuts (“Custom shortcut” → `crest`) behave like Raycast/Crest on desktops where internal **Super+Space** grabs fail.
+
+### Changed
+- **global-hotkey** updated to **0.8** (x11rb-based path on Linux).
+- **Diagnostics**: shortcut parse/register failures append **`~/.local/share/crest/hotkey.log`** (and stderr) with concrete guidance.
+
 ## [0.2.0] - 2026-05-04
 
 ### Added
@@ -24,3 +33,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 - If you used extensions as **loose files** in `~/.config/crest/plugins/`, add **`manifest.json`** or set **`plugin_policy` to `"open"`** in `config.json`.
 
 [0.2.0]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.0
+[0.2.1]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.1
