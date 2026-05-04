@@ -2,7 +2,7 @@
 
 This document provides a transparent overview of what Crest can do today and where it is headed. Our goal is to build the most powerful, private productivity tool for the Linux desktop.
 
-## 🚀 Current Capabilities (v0.1.0 Alpha)
+## 🚀 Current Capabilities (v0.2.0)
 
 ### 📋 Clipboard Management
 - **Native Listener**: Background thread monitors clipboard changes with zero CPU overhead.

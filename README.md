@@ -41,7 +41,7 @@ Head to [GitHub Releases](https://github.com/KOUSTAV2409/crest/releases) and dow
 - **Generic Linux**: `.AppImage`
 
 ### 2. Install
-- **Debian/Ubuntu**: `sudo apt install ./crest_0.1.3_amd64.deb`
+- **Debian/Ubuntu**: `sudo apt install ./crest_0.2.0_amd64.deb`
 - **Generic Linux**: `chmod +x crest.AppImage && ./crest.AppImage`
 
 ### 3. Global shortcut
