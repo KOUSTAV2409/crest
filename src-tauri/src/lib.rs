@@ -1,4 +1,5 @@
 pub mod commands;
+pub mod config;
 pub mod indexer;
 pub mod hotkey;
 pub mod window;

@@ -43,7 +43,7 @@ By default, Crest indexes the following directories on startup:
 - Developer build artefacts: `node_modules`, `target`, `build`, `dist`, `vendor`, `__pycache__`
 
 **How indexing works:**
-When Crest first launches, it runs a background scan of the above directories and caches the file metadata (name, full path, extension) into a local SQLite database. This scan does **not** block app startup — you can start searching for apps and using the calculator immediately while the file index builds in the background.
+When Crest first launches, it runs a background scan of the above directories and caches the file metadata (name, full path, extension) into a local SQLite database. This scan does **not** block app startup — you can start searching for apps and using the calculator immediately while the file index builds in the background. After the first pass, Crest watches those folders (debounced) and re-runs an incremental sync when files change, without wiping the whole index on every save.
 
 **Privacy Note:**
 File indexing is 100% local. No filenames or paths ever leave your machine.
@@ -55,7 +55,7 @@ Pressing `Enter` on a file result will open it with your system's default applic
 Crest acts as a bridge between your desktop and the web.
 
 **Web Search:**
-If your query doesn't match a local app or file, Crest automatically offers a **"Search Google for..."** option at the bottom of the list. Pressing `Enter` on this will instantly open your default web browser and perform the search.
+If your query doesn't match a local app or file, Crest offers a **"Search DuckDuckGo for…"** row. Pressing `Enter` opens your default browser on DuckDuckGo for that query (the same provider used for in-app instant answers and Lite fallbacks).
 
 **In-App Results:**
 Crest integrates with DuckDuckGo to fetch real search results and instant answers (like Wikipedia summaries) in the background. After a short pause (600ms) in typing, Crest pulls the top results and displays them directly in the launcher. You can see page titles, descriptions, and site snippets without leaving your keyboard.
@@ -65,3 +65,8 @@ If you type something that looks like a URL (e.g., `github.com`, `localhost:3000
 
 **Privacy Note:**
 Crest **does not** track your searches. Web results are fetched anonymously using a standard web-scraping fallback when official APIs are unavailable. No user-identifiable tokens, cookies, or account information are ever sent during these requests. Results are only fetched after a "typing pause" to minimize network traffic and respect your privacy.
+
+## ⚙️ Global shortcut & extensions
+**Hotkey**: `~/.config/crest/config.json` exposes `global_shortcut` (default `super+Space`). Parsing matches the `global-hotkey` crate (`alt+Esc`, `control+shift+KeyK`, …).
+
+**Plugins**: With the default **`plugin_policy: "manifest"`**, Crest only discovers extensions listed in `~/.config/crest/plugins/manifest.json`. Each entry resolves to a path under that directory—no upward path segments are allowed—and the launcher invokes the binary or script without routing your query through a shell. Scripts should print JSON that deserializes to the same shape as other search rows. Legacy installs may set **`plugin_policy: "open"`** to scan every loose file under the plugins directory (full trust on that folder).

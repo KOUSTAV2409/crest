@@ -1,9 +1,12 @@
-use std::path::PathBuf;
-use std::process::Command;
-use serde::{Serialize, Deserialize};
-use crate::commands::search::SearchResult;
+use serde::Deserialize;
+#[cfg(unix)]
+use std::os::unix::fs::PermissionsExt;
+use std::path::{Component, Path, PathBuf};
+use std::process::{Command, Stdio};
 
-#[derive(Serialize, Deserialize)]
+use serde::Serialize;
+
+#[derive(Clone, Serialize)]
 pub struct Plugin {
     pub name: String,
     pub command: String,
@@ -11,45 +14,229 @@ pub struct Plugin {
     pub icon: String,
 }
 
-pub fn get_plugins_dir() -> PathBuf {
-    dirs::config_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest").join("plugins")
+#[derive(Debug, Deserialize)]
+struct PluginManifestFile {
+    version: u32,
+    entries: Vec<PluginManifestEntry>,
 }
 
-pub fn list_plugins() -> Vec<Plugin> {
+#[derive(Debug, Deserialize)]
+struct PluginManifestEntry {
+    /// Relative path inside the plugins directory (e.g. `notes.sh`).
+    path: String,
+    #[serde(default = "default_true")]
+    enabled: bool,
+    #[serde(default)]
+    description: Option<String>,
+    #[serde(default)]
+    icon: Option<String>,
+}
+
+fn default_true() -> bool {
+    true
+}
+
+pub fn get_plugins_dir() -> PathBuf {
+    dirs::config_dir()
+        .unwrap_or_else(|| PathBuf::from("/tmp"))
+        .join("crest")
+        .join("plugins")
+}
+
+fn manifest_path() -> PathBuf {
+    get_plugins_dir().join("manifest.json")
+}
+
+fn canonical_under_root(root: &Path, relative: &str) -> Option<PathBuf> {
+    let _ = std::fs::create_dir_all(root);
+    let root = root.canonicalize().ok()?;
+    let candidate =
+        PathBuf::from(relative.trim().trim_start_matches(['/', '\\']));
+    if candidate
+        .components()
+        .any(|c| matches!(c, Component::ParentDir))
+    {
+        return None;
+    }
+    let joined = root.join(candidate);
+    let joined = joined.canonicalize().ok()?;
+    if joined.starts_with(&root) {
+        Some(joined)
+    } else {
+        None
+    }
+}
+
+fn load_manifest() -> Result<PluginManifestFile, String> {
+    let path = manifest_path();
+    let raw = std::fs::read_to_string(&path).map_err(|e| format!("read manifest: {}", e))?;
+    serde_json::from_str(&raw).map_err(|e| format!("{}", e))
+}
+
+pub fn list_plugins_manifest_only() -> Vec<Plugin> {
+    let plugins_dir = get_plugins_dir();
+    if !manifest_path().exists() {
+        eprintln!(
+            "Crest plugins: manifest missing at {:?}. Create one (see configs/plugins.manifest.example.json). Manifest mode does not execute loose files.",
+            manifest_path()
+        );
+        return vec![];
+    }
+
+    match load_manifest() {
+        Ok(m) => {
+            if m.version != 1 {
+                eprintln!("Crest plugins: unsupported manifest version {}", m.version);
+                return vec![];
+            }
+            m.entries
+                .into_iter()
+                .filter(|e| e.enabled)
+                .filter_map(|e| {
+                    let trimmed = e.path.trim();
+                    let abs = canonical_under_root(&plugins_dir, trimmed)?;
+                    if !abs.is_file() {
+                        eprintln!(
+                            "Crest plugins: manifest entry {:?} is not a file; skipping.",
+                            trimmed
+                        );
+                        return None;
+                    }
+                    let fname = Path::new(trimmed)
+                        .file_stem()
+                        .map(|s| s.to_string_lossy().into_owned())
+                        .unwrap_or_else(|| trimmed.to_string());
+
+                    Some(Plugin {
+                        name: fname.clone(),
+                        command: abs.to_string_lossy().into_owned(),
+                        description: e
+                            .description
+                            .unwrap_or_else(|| format!("Extension: {}", fname)),
+                        icon: e.icon.unwrap_or_else(|| "🔌".into()),
+                    })
+                })
+                .collect()
+        }
+        Err(e) => {
+            eprintln!("Crest plugins: invalid manifest: {}", e);
+            vec![]
+        }
+    }
+}
+
+fn list_plugins_open_policy() -> Vec<Plugin> {
     let dir = get_plugins_dir();
     if !dir.exists() {
         let _ = std::fs::create_dir_all(&dir);
         return vec![];
     }
 
+    let root_ok = dir.canonicalize().ok();
+
     let mut plugins = Vec::new();
-    if let Ok(entries) = std::fs::read_dir(dir) {
+    if let Ok(entries) = std::fs::read_dir(&dir) {
         for entry in entries.flatten() {
             let path = entry.path();
-            if path.is_file() {
-                let name = path.file_stem().unwrap().to_string_lossy().to_string();
-                plugins.push(Plugin {
-                    name: name.clone(),
-                    command: path.to_string_lossy().to_string(),
-                    description: format!("Extension: {}", name),
-                    icon: "🔌".into(),
-                });
+            if path.file_name().and_then(|n| n.to_str()) == Some("manifest.json") {
+                continue;
             }
+            if !path.is_file() {
+                continue;
+            }
+
+            let canonical = match path.canonicalize() {
+                Ok(p) => p,
+                Err(_) => continue,
+            };
+
+            if let Some(ref root) = root_ok {
+                if !canonical.starts_with(root) {
+                    continue;
+                }
+            }
+
+            let name = path.file_stem().unwrap().to_string_lossy().to_string();
+            plugins.push(Plugin {
+                name: name.clone(),
+                command: canonical.to_string_lossy().into_owned(),
+                description: format!("Extension: {}", name),
+                icon: "🔌".into(),
+            });
         }
     }
     plugins
 }
 
-pub fn run_plugin(command: &str, query: &str) -> Vec<SearchResult> {
-    let output = if cfg!(target_os = "windows") {
-        Command::new("cmd").args(["/C", command, query]).output()
-    } else {
-        Command::new("sh").args(["-c", &format!("{} \"{}\"", command, query)]).output()
-    };
+pub fn list_plugins() -> Vec<Plugin> {
+    match crate::config::load_app_config().plugin_policy {
+        crate::config::PluginPolicy::Manifest => list_plugins_manifest_only(),
+        crate::config::PluginPolicy::Open => {
+            eprintln!(
+                "Crest plugins: plugin_policy=open trusts every executable/script in {:?}. Prefer \"manifest\" in config.",
+                get_plugins_dir()
+            );
+            list_plugins_open_policy()
+        }
+    }
+}
 
+/// Run plugin script/binary with `query` as a single argv argument (no arbitrary shell interpretation).
+pub fn run_plugin(command_abs: &str, query: &str) -> Vec<crate::commands::search::SearchResult> {
+    let cmd_path = Path::new(command_abs);
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        let Ok(meta) = std::fs::metadata(cmd_path) else {
+            return vec![];
+        };
+        if !meta.is_file() {
+            return vec![];
+        }
+
+        let is_executable = (meta.permissions().mode() & 0o111) != 0;
+        let output = if command_abs.ends_with(".sh") || !is_executable {
+            Command::new("/bin/sh")
+                .arg(command_abs)
+                .arg(query)
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .output()
+        } else {
+            Command::new(command_abs)
+                .arg(query)
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .output()
+        };
+
+        return parse_plugin_output(output);
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        let output =
+            Command::new("cmd")
+                .args(["/C", command_abs, query])
+                .stdin(Stdio::null())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .output();
+
+        parse_plugin_output(output)
+    }
+}
+
+fn parse_plugin_output(
+    output: Result<std::process::Output, std::io::Error>,
+) -> Vec<crate::commands::search::SearchResult> {
     if let Ok(out) = output {
         let stdout = String::from_utf8_lossy(&out.stdout);
-        if let Ok(results) = serde_json::from_str::<Vec<SearchResult>>(&stdout) {
+        if let Ok(results) =
+            serde_json::from_str::<Vec<crate::commands::search::SearchResult>>(&stdout)
+        {
             return results;
         }
     }

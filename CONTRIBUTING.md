@@ -28,11 +28,13 @@ npm install
 ```
 
 ### 3. Development Workflow
-Run the dev server:
+Use the bundled script so devtools-enabled WebView tooling is linked:
+
 ```bash
-npm run tauri dev
+npm run tauri:dev
 ```
-This will open the Crest launcher. You can use the search bar to test your changes.
+
+This runs `tauri dev --features devtools` against the `crest` crate. Releases omit that feature (`npm run build` followed by `tauri build` / CI).
 
 ## 📬 Pull Request Process
 1. Create a new branch: `git checkout -b feature/your-feature-name`.

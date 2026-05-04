@@ -1,15 +1,5 @@
 import { create } from 'zustand';
-
-export interface SearchResult {
-  id: string;
-  title: string;
-  subtitle: string;
-  icon: { kind: string; value: string };
-  category: string;
-  score: number;
-  actions: any[];
-  preview?: any;
-}
+import type { SearchResult } from '../types/ipc';
 
 interface AppState {
   query: string;
@@ -20,8 +10,15 @@ interface AppState {
   setActiveIndex: (index: number) => void;
   activeCategory: string | null;
   setActiveCategory: (cat: string | null) => void;
-  mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard';
-  setMode: (mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard') => void;
+  mode:
+    | 'default'
+    | 'calculator'
+    | 'file'
+    | 'command'
+    | 'clipboard';
+  setMode: (
+    mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard'
+  ) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -34,5 +31,5 @@ export const useAppStore = create<AppState>((set) => ({
   activeCategory: null,
   setActiveCategory: (c) => set({ activeCategory: c }),
   mode: 'default',
-  setMode: (m) => set({ mode: m })
+  setMode: (m) => set({ mode: m }),
 }));

@@ -22,14 +22,14 @@
 - 📋 **Clipboard History**: Native Rust listener with secure local persistence. Search back through days of copies instantly.
 - 🌐 **Instant Web Search**: Privacy-respecting DuckDuckGo bridge with instant answers (Wikipedia, Calculator, etc.).
 - 🚀 **App Launcher**: Blazing fast application indexing with fuzzy search and shortcut support.
-- 🧩 **Plugin Engine**: Extensible architecture supporting JS, Python, and Bash scripts.
+- 🧩 **Plugin Engine**: Extensions run as separate processes; by default only scripts listed in `~/.config/crest/plugins/manifest.json` are loaded (see `configs/plugins.manifest.example.json`).
 - 💎 **Premium UI**: Ultra-sharp glassmorphism, ⌘K action bars, and smooth Framer Motion transitions.
 - 🔒 **Privacy First**: 100% local-first. No cloud syncing, no telemetry, no accounts.
 
 ## 🛠️ Technical Specs
 
 - **Core**: Pure Rust for system integration (Clipboard, Indexing, Search).
-- **UI**: React + TypeScript + Tailwind CSS via Tauri.
+- **UI**: React + TypeScript + Vite, with component-scoped CSS and shared variables in `index.css` (no Tailwind in this repo).
 - **Database**: Local SQLite for high-speed metadata and history storage.
 - **Footprint**: < 40MB RAM idle usage.
 
@@ -41,11 +41,14 @@ Head to [GitHub Releases](https://github.com/KOUSTAV2409/crest/releases) and dow
 - **Generic Linux**: `.AppImage`
 
 ### 2. Install
-- **Debian/Ubuntu**: `sudo apt install ./crest_0.1.0_amd64.deb`
+- **Debian/Ubuntu**: `sudo apt install ./crest_0.1.3_amd64.deb`
 - **Generic Linux**: `chmod +x crest.AppImage && ./crest.AppImage`
 
-### 3. Bind Global Shortcut
-To launch Crest from anywhere, bind the `crest` command to a keyboard shortcut in your Desktop Environment settings (e.g., `Alt + Space` or `Super + Space`).
+### 3. Global shortcut
+Crest registers a **global hotkey** from your config (default **`super+Space`**, i.e. Windows/Meta + Space). Edit `~/.config/crest/config.json` and set `global_shortcut` to any string supported by [global-hotkey](https://docs.rs/global-hotkey) (modifiers first), e.g. `alt+Space`, `super+K`, `control+shift+KeyP`. Alternatively, you can still launch the binary from a DE shortcut bound to `crest`.
+
+### 4. Plugins (extensions)
+By default **`plugin_policy` is `"manifest"`**: only entries in `~/.config/crest/plugins/manifest.json` run. Copy `configs/plugins.manifest.example.json` into that path, list your scripts with relative paths, and `chmod +x` them as needed. To opt back into the legacy “any file in the folder is runnable” model (full trust), set `"plugin_policy": "open"` in `config.json`.
 
 ## ⌨️ How to Use
 
@@ -56,6 +59,8 @@ To launch Crest from anywhere, bind the `crest` command to a keyboard shortcut i
 - **Modes**: Use `Backspace` on an empty search bar to switch between Clipboard, Search, and File modes.
 
 ## 🛠️ Development Setup (For Contributors)
+
+Install Rust, Node 18+, and dependencies (`npm install`). Use **`npm run tauri:dev`** so the native shell is built with the optional **`devtools`** Cargo feature (WebView inspector). Release builds and CI use **`cargo build --release` / `tauri build` without that flag.
 
 ## 🗺️ Roadmap
 - [ ] **Deep AI Integration**: Local LLM support for context-aware commands.

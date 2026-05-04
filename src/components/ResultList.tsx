@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
+import type { SearchResult } from '../types/ipc';
 import './ResultList.css';
 
 const ITEM_HEIGHT = 72; // Increased for multi-line support
@@ -66,12 +67,12 @@ const ResultList: React.FC = () => {
       setMode('clipboard');
       setQuery(''); // Clear query to show all history
     } else if (actionId === 'run_extension') {
-      invoke('run_extension', { id: item.id, action: 'run', args: {} })
-        .then((res: any) => {
+      invoke<unknown>('run_extension', { id: item.id, action: 'run', args: {} })
+        .then((res) => {
           console.log('Extension results:', res);
           if (Array.isArray(res)) {
             const { setResults } = useAppStore.getState();
-            setResults(res);
+            setResults(res as SearchResult[]);
           }
         })
         .catch((e) => console.error('run_extension error:', e));

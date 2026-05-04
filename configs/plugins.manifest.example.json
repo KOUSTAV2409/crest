@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "path": "hello.sh",
+      "enabled": true,
+      "description": "Replace with your script (must output JSON matching SearchResult[]).",
+      "icon": "🔌"
+    }
+  ]
+}

@@ -77,8 +77,8 @@ const PreviewPanel: React.FC = () => {
 
           {activeItem.category === 'Internet' && (
              <div className="metadata-row">
-                <span className="metadata-label">Search Provider</span>
-                <span className="metadata-value">Google / DuckDuckGo</span>
+                <span className="metadata-label">Search</span>
+                <span className="metadata-value">DuckDuckGo (browser + in-app)</span>
              </div>
           )}
         </div>

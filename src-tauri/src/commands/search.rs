@@ -71,18 +71,27 @@ pub struct SearchResult {
     pub preview: Option<Preview>,
 }
 
+fn sqlite_like_pattern_contains(raw: &str) -> String {
+    format!(
+        "%{}%",
+        raw.trim()
+            .to_lowercase()
+            .replace('\\', r"\\")
+            .replace('%', r"\%")
+            .replace('_', r"\_")
+    )
+}
+
 #[tauri::command]
 pub async fn search(query: String, _category: Option<String>) -> Result<Vec<SearchResult>, String> {
+    use nucleo::{Config, Nucleo};
     use rusqlite::Connection;
-    use nucleo::{Nucleo, Config};
     use std::path::PathBuf;
-    
-    let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
-    let db_path = db_dir.join("crest_index.db");
+
+    let db_path =
+        dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest").join("crest_index.db");
     let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
-    
-    let mut stmt = conn.prepare("SELECT id, name, exec, icon, comment FROM apps").map_err(|e| e.to_string())?;
-    
+
     struct AppEntry {
         id: String,
         name: String,
@@ -90,26 +99,27 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
         icon: String,
         comment: String,
     }
-    
-    let app_iter = stmt.query_map([], |row| {
-        Ok(AppEntry {
-            id: row.get(0)?,
-            name: row.get(1)?,
-            exec: row.get(2)?,
-            icon: row.get(3)?,
-            comment: row.get(4)?,
-        })
-    }).map_err(|e| e.to_string())?;
-    
-    let mut apps = Vec::new();
-    for app in app_iter {
-        if let Ok(app) = app {
-            apps.push(app);
-        }
-    }
-    
+
     if query.is_empty() {
-        // Return top apps if query is empty
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, name, exec, icon, comment FROM apps ORDER BY name COLLATE NOCASE LIMIT 80",
+            )
+            .map_err(|e| e.to_string())?;
+        let apps: Vec<AppEntry> = stmt
+            .query_map([], |row| {
+                Ok(AppEntry {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    exec: row.get(2)?,
+                    icon: row.get(3)?,
+                    comment: row.get(4)?,
+                })
+            })
+            .map_err(|e| e.to_string())?
+            .filter_map(Result::ok)
+            .take(40)
+            .collect();
         return Ok(apps.into_iter().take(20).map(|app| SearchResult {
             id: app.id,
             title: app.name,
@@ -117,34 +127,83 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
             icon: ResultIcon { kind: "app".into(), value: app.icon },
             category: "Applications".into(),
             score: 0.0,
-            actions: vec![
-                Action { id: "launch".into(), title: "Launch".into(), shortcut: Some("↵".into()) }
-            ],
+            actions: vec![Action {
+                id: "launch".into(),
+                title: "Launch".into(),
+                shortcut: Some("↵".into()),
+            }],
             preview: Some(Preview {
                 title: "Launch Application".into(),
                 subtitle: Some(app.exec),
                 description: None,
-            })
+            }),
         }).collect());
     }
-    
-    // Setup Nucleo fuzzy matcher
+
+    let pat = sqlite_like_pattern_contains(&query);
+    let mut stmt = conn
+        .prepare(
+            r#"SELECT id, name, exec, icon, comment FROM apps
+               WHERE lower(name) LIKE ?1 ESCAPE '\'
+                  OR lower(COALESCE(comment, '')) LIKE ?1 ESCAPE '\'
+               LIMIT 4000"#,
+        )
+        .map_err(|e| e.to_string())?;
+    let mut apps: Vec<AppEntry> = stmt
+        .query_map([&pat], |row| {
+            Ok(AppEntry {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                exec: row.get(2)?,
+                icon: row.get(3)?,
+                comment: row.get(4)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(Result::ok)
+        .collect();
+
+    if apps.is_empty() {
+        let mut stmt_full = conn
+            .prepare("SELECT id, name, exec, icon, comment FROM apps LIMIT 6500")
+            .map_err(|e| e.to_string())?;
+        apps = stmt_full
+            .query_map([], |row| {
+                Ok(AppEntry {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    exec: row.get(2)?,
+                    icon: row.get(3)?,
+                    comment: row.get(4)?,
+                })
+            })
+            .map_err(|e| e.to_string())?
+            .filter_map(Result::ok)
+            .collect();
+    }
+
     let mut matcher = Nucleo::<AppEntry>::new(Config::DEFAULT, std::sync::Arc::new(|| ()), None, 2);
     let injector = matcher.injector();
-    
+
     for app in apps {
         injector.push(app, |a, columns| {
             columns[0] = a.name.clone().into();
             columns[1] = a.comment.clone().into();
         });
     }
-    
-    matcher.pattern.reparse(0, &query, nucleo::pattern::CaseMatching::Ignore, nucleo::pattern::Normalization::Smart, false);
-    matcher.tick(10); // Run matcher with timeout
-    
+
+    matcher.pattern.reparse(
+        0,
+        &query,
+        nucleo::pattern::CaseMatching::Ignore,
+        nucleo::pattern::Normalization::Smart,
+        false,
+    );
+    matcher.tick(10);
+
     let snapshot = matcher.snapshot();
     let count = snapshot.matched_item_count();
-    
+
     let mut results = Vec::new();
     for i in 0..count.min(20) {
         if let Some(item) = snapshot.get_matched_item(i) {
@@ -156,19 +215,20 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
                 icon: ResultIcon { kind: "app".into(), value: app.icon.clone() },
                 category: "Applications".into(),
                 score: 0.0,
-                actions: vec![
-                    Action { id: "launch".into(), title: "Launch".into(), shortcut: Some("↵".into()) }
-                ],
+                actions: vec![Action {
+                    id: "launch".into(),
+                    title: "Launch".into(),
+                    shortcut: Some("↵".into()),
+                }],
                 preview: Some(Preview {
                     title: app.name.clone(),
                     subtitle: Some(app.exec.clone()),
                     description: Some(app.comment.clone()),
-                })
+                }),
             });
         }
     }
 
-    // --- INTEGRATE PLUGINS ---
     let plugins = crate::plugins::list_plugins();
     for plugin in plugins {
         if plugin.name.to_lowercase().contains(&query.to_lowercase()) {
@@ -176,33 +236,43 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
                 id: format!("plugin-{}", plugin.name),
                 title: plugin.name,
                 subtitle: plugin.description,
-                icon: ResultIcon { kind: "emoji".into(), value: plugin.icon },
+                icon: ResultIcon {
+                    kind: "emoji".into(),
+                    value: plugin.icon,
+                },
                 category: "Extension".into(),
                 score: 0.05,
-                actions: vec![
-                    Action { id: "run_extension".into(), title: "Run".into(), shortcut: Some("↵".into()) }
-                ],
+                actions: vec![Action {
+                    id: "run_extension".into(),
+                    title: "Run".into(),
+                    shortcut: Some("↵".into()),
+                }],
                 preview: None,
             });
         }
     }
 
-    // --- CLIPBOARD SHORTCUT ---
-    if query.to_lowercase() == "clip" || query.to_lowercase() == "clipboard" {
+    let q_lc = query.to_lowercase();
+    if q_lc == "clip" || q_lc == "clipboard" {
         results.push(SearchResult {
             id: "system-clipboard".into(),
             title: "Clipboard History".into(),
             subtitle: "View and search your clipboard history".into(),
-            icon: ResultIcon { kind: "emoji".into(), value: "📋".into() },
+            icon: ResultIcon {
+                kind: "emoji".into(),
+                value: "📋".into(),
+            },
             category: "System".into(),
             score: 0.1,
-            actions: vec![
-                Action { id: "open_clipboard".into(), title: "Open".into(), shortcut: Some("↵".into()) }
-            ],
+            actions: vec![Action {
+                id: "open_clipboard".into(),
+                title: "Open".into(),
+                shortcut: Some("↵".into()),
+            }],
             preview: None,
         });
     }
-    
+
     Ok(results)
 }
 
@@ -273,40 +343,38 @@ pub async fn calculate(expr: String) -> Result<String, String> {
 
 #[tauri::command]
 pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
+    use nucleo::{Config, Nucleo};
     use rusqlite::Connection;
-    use nucleo::{Nucleo, Config};
     use std::path::PathBuf;
-    
-    let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
-    let db_path = db_dir.join("crest_index.db");
+
+    let db_path =
+        dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest").join("crest_index.db");
     let conn = Connection::open(db_path).map_err(|e| e.to_string())?;
-    
-    let mut stmt = conn.prepare("SELECT id, name, path, extension FROM files").map_err(|e| e.to_string())?;
-    
+
     struct FileEntry {
         id: String,
         name: String,
         path: String,
         extension: String,
     }
-    
-    let file_iter = stmt.query_map([], |row| {
-        Ok(FileEntry {
-            id: row.get(0)?,
-            name: row.get(1)?,
-            path: row.get(2)?,
-            extension: row.get(3)?,
-        })
-    }).map_err(|e| e.to_string())?;
-    
-    let mut files = Vec::new();
-    for file in file_iter {
-        if let Ok(file) = file {
-            files.push(file);
-        }
-    }
-    
+
     if query.is_empty() {
+        let mut stmt = conn
+            .prepare("SELECT id, name, path, extension FROM files ORDER BY name COLLATE NOCASE LIMIT 60")
+            .map_err(|e| e.to_string())?;
+        let files: Vec<FileEntry> = stmt
+            .query_map([], |row| {
+                Ok(FileEntry {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    path: row.get(2)?,
+                    extension: row.get(3)?,
+                })
+            })
+            .map_err(|e| e.to_string())?
+            .filter_map(Result::ok)
+            .take(40)
+            .collect();
         return Ok(files.into_iter().take(20).map(|file| SearchResult {
             id: file.id,
             title: file.name.clone(),
@@ -314,33 +382,80 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
             icon: ResultIcon { kind: "file".into(), value: file.extension },
             category: "Files".into(),
             score: 0.0,
-            actions: vec![
-                Action { id: "open_file".into(), title: "Open File".into(), shortcut: Some("↵".into()) }
-            ],
+            actions: vec![Action {
+                id: "open_file".into(),
+                title: "Open File".into(),
+                shortcut: Some("↵".into()),
+            }],
             preview: Some(Preview {
                 title: file.name,
                 subtitle: Some(file.path),
                 description: None,
-            })
+            }),
         }).collect());
     }
-    
-    // Setup Nucleo fuzzy matcher
+
+    let pat = sqlite_like_pattern_contains(&query);
+    let mut stmt = conn
+        .prepare(
+            r#"SELECT id, name, path, extension FROM files
+               WHERE lower(name) LIKE ?1 ESCAPE '\'
+                  OR lower(path) LIKE ?1 ESCAPE '\'
+               LIMIT 5000"#,
+        )
+        .map_err(|e| e.to_string())?;
+    let mut files: Vec<FileEntry> = stmt
+        .query_map([&pat], |row| {
+            Ok(FileEntry {
+                id: row.get(0)?,
+                name: row.get(1)?,
+                path: row.get(2)?,
+                extension: row.get(3)?,
+            })
+        })
+        .map_err(|e| e.to_string())?
+        .filter_map(Result::ok)
+        .collect();
+
+    if files.is_empty() {
+        let mut stmt_full =
+            conn.prepare("SELECT id, name, path, extension FROM files LIMIT 9000")
+                .map_err(|e| e.to_string())?;
+        files = stmt_full
+            .query_map([], |row| {
+                Ok(FileEntry {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    path: row.get(2)?,
+                    extension: row.get(3)?,
+                })
+            })
+            .map_err(|e| e.to_string())?
+            .filter_map(Result::ok)
+            .collect();
+    }
+
     let mut matcher = Nucleo::<FileEntry>::new(Config::DEFAULT, std::sync::Arc::new(|| ()), None, 1);
     let injector = matcher.injector();
-    
+
     for file in files {
         injector.push(file, |f, columns| {
             columns[0] = f.name.clone().into();
         });
     }
-    
-    matcher.pattern.reparse(0, &query, nucleo::pattern::CaseMatching::Ignore, nucleo::pattern::Normalization::Smart, false);
-    matcher.tick(10); // Run matcher with timeout
-    
+
+    matcher.pattern.reparse(
+        0,
+        &query,
+        nucleo::pattern::CaseMatching::Ignore,
+        nucleo::pattern::Normalization::Smart,
+        false,
+    );
+    matcher.tick(10);
+
     let snapshot = matcher.snapshot();
     let count = snapshot.matched_item_count();
-    
+
     let mut results = Vec::new();
     for i in 0..count.min(20) {
         if let Some(item) = snapshot.get_matched_item(i) {
@@ -352,18 +467,20 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
                 icon: ResultIcon { kind: "file".into(), value: file.extension.clone() },
                 category: "Files".into(),
                 score: 0.0,
-                actions: vec![
-                    Action { id: "open_file".into(), title: "Open File".into(), shortcut: Some("↵".into()) }
-                ],
+                actions: vec![Action {
+                    id: "open_file".into(),
+                    title: "Open File".into(),
+                    shortcut: Some("↵".into()),
+                }],
                 preview: Some(Preview {
                     title: file.name.clone(),
                     subtitle: Some(file.path.clone()),
                     description: None,
-                })
+                }),
             });
         }
     }
-    
+
     Ok(results)
 }
 
@@ -383,7 +500,10 @@ pub async fn open_file(path: String) -> Result<(), String> {
 #[tauri::command]
 pub async fn search_web(query: String) -> Result<(), String> {
     use std::process::Command;
-    let url = format!("https://www.google.com/search?q={}", urlencoding::encode(&query));
+    let url = format!(
+        "https://duckduckgo.com/?q={}",
+        urlencoding::encode(&query)
+    );
     Command::new("xdg-open")
         .arg(&url)
         .stdin(std::process::Stdio::null())
