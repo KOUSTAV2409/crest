@@ -26,8 +26,10 @@ pub fn run() {
             commands::search::calculate,
             commands::search::search_files,
             commands::search::open_file,
+            commands::search::open_url,
             commands::search::search_web,
             commands::search::fetch_web_results,
+            commands::search::quit_app,
             commands::system::get_system_actions,
             commands::extensions::run_extension,
             commands::extensions::get_clipboard_history

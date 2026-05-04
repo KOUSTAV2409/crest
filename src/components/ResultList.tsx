@@ -45,9 +45,11 @@ const ResultList: React.FC = () => {
       if (url.startsWith('web-rel-')) url = url.replace('web-rel-', '');
       if (url.startsWith('web-lite-')) url = url.replace('web-lite-', '');
       
-      invoke('open_file', { path: url }) 
+      invoke('open_url', { url }) 
         .then(() => console.log('Opened URL:', url))
         .catch((e) => console.error('open_url error:', e));
+    } else if (actionId === 'quit') {
+      invoke('quit_app');
     } else if (actionId === 'copy') {
       try {
         await navigator.clipboard.writeText(item.title);
