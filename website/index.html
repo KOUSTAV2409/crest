@@ -142,14 +142,14 @@
 <nav class="fixed top-0 w-full z-[100] border-b border-white/5 bg-surface/80 backdrop-blur-md">
     <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
         <div class="flex items-center gap-10">
-            <a class="flex items-center gap-2 font-headline-md font-bold text-lg tracking-tight" href="#">
-                <span class="material-symbols-outlined text-primary text-2xl">command</span>
-                <span>CREST</span>
-            </a>
+            <a class="font-headline-md font-bold text-lg tracking-tight text-white no-underline" href="index.html">CREST</a>
             <div class="hidden md:flex gap-8 text-[11px] font-semibold uppercase tracking-widest text-white/40">
+                <a class="hover:text-primary transition-colors" href="#architecture">Architecture</a>
                 <a class="hover:text-primary transition-colors" href="#features">Features</a>
+                <a class="hover:text-primary transition-colors" href="documentation.html">Documentation</a>
+                <a class="hover:text-primary transition-colors" href="#setup">Setup</a>
                 <a class="hover:text-primary transition-colors" href="#download">Download</a>
-                <a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank">GitHub</a>
+                <a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
@@ -241,7 +241,7 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <span class="text-[10px] text-white/40">Actions</span>
-                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">⌘</span>
+                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">Ctrl</span>
                     <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">K</span>
                 </div>
             </div>
@@ -252,14 +252,14 @@
 </section>
 
 <!-- Proof of Work Section -->
-<section class="py-32 px-6" id="features">
+<section class="py-32 px-6 scroll-mt-24" id="architecture">
     <div class="max-w-[1200px] mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
                 <div class="mono-label mb-4 text-primary">Technical Proof</div>
                 <h2 class="font-headline-lg text-4xl mb-6">Zero latency by design.</h2>
                 <p class="text-on-surface-variant leading-relaxed mb-8">
-                    Crest is written in pure Rust, interfacing directly with X11/Wayland primitives. We don't use Electron. We don't use high-level abstractions that introduce garbage collection pauses.
+                    Crest is written in Rust with a tight Tauri shell over a native Linux WebView stack. That means no Electron Chromium bundle and predictable memory use for a keyboard-first launcher.
                 </p>
                 <div class="space-y-4">
                     <div class="flex items-start gap-4 p-4 rigid-border high-fi-hover transition-all">
@@ -316,7 +316,7 @@
 </section>
 
 <!-- Refined Feature Grid -->
-<section class="py-32 px-6 bg-surface-container-low/30" id="features">
+<section class="py-32 px-6 bg-surface-container-low/30 scroll-mt-24" id="features">
     <div class="max-w-[1200px] mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             <!-- Feature 1: Clipboard -->
@@ -377,7 +377,7 @@
 </section>
 
 <!-- Setup Guide Section -->
-<section class="py-32 px-6 border-t border-white/5" id="setup">
+<section class="py-32 px-6 border-t border-white/5 scroll-mt-24" id="setup">
     <div class="max-w-[1200px] mx-auto">
         <div class="text-center mb-20">
             <div class="mono-label mb-4 text-primary">Get Started</div>
@@ -402,9 +402,9 @@
             </div>
             <div class="p-8 rigid-border relative group">
                 <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">03</div>
-                <h4 class="font-bold mb-4 uppercase tracking-tight">Bind Key</h4>
+                <h4 class="font-bold mb-4 uppercase tracking-tight">Bind key</h4>
                 <p class="text-xs text-on-surface-variant leading-relaxed">
-                    Map <code class="bg-white/5 px-1 rounded">crest</code> to a shortcut like <kbd class="bg-white/10 px-1 rounded text-[10px]">Alt + Space</kbd> in settings.
+                    On <strong class="text-white/70">Wayland</strong>, add a desktop custom shortcut that runs <code class="bg-white/5 px-1 rounded">crest</code> — each launch toggles the palette (<strong class="text-white/70">v0.2.1+</strong>). On X11, the built-in <kbd class="bg-white/10 px-1 rounded text-[10px]">Super+Space</kbd> often works. See <a class="text-primary hover:underline" href="documentation.html#shortcut-wayland">docs → Shortcuts</a>.
                 </p>
                 <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">keyboard</span>
             </div>
@@ -413,7 +413,7 @@
 </section>
 
 <!-- Download & Roadmap Section -->
-<section class="py-32 px-6" id="download">
+<section class="py-32 px-6 scroll-mt-24" id="download">
     <div class="max-w-[1200px] mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
             <!-- Downloads -->
@@ -478,68 +478,45 @@
 <!-- Technical Footer -->
 <footer class="pt-32 pb-10 px-6 border-t border-white/10 bg-black">
     <div class="max-w-[1400px] mx-auto">
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-10 mb-24">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
             <div class="col-span-2">
-                <a class="flex items-center gap-2 font-headline-md font-bold text-xl tracking-tight mb-6" href="#">
-                    <span class="material-symbols-outlined text-primary text-2xl">command</span>
-                    <span>CREST</span>
-                </a>
-                <p class="text-white/40 text-xs leading-relaxed max-w-xs mb-8">
-                    A high-fidelity system utility for power users. Built for the Linux desktop with Rust, Tauri, and absolute intentionality.
+                <a class="font-headline-md font-bold text-xl tracking-tight mb-6 text-white no-underline block" href="index.html">CREST</a>
+                <p class="text-white/40 text-xs leading-relaxed max-w-md mb-6">
+                    Open-source Raycast-style launcher for <strong class="text-white/55">Linux only</strong>. Rust + Tauri, local-first, no accounts.
                 </p>
                 <div class="flex gap-4">
-                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="https://github.com/KOUSTAV2409/crest">
-                        <img alt="GitHub" class="w-4 h-4 invert opacity-40" src="https://www.svgrepo.com/show/512317/github-142.svg"/>
+                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener" aria-label="GitHub">
+                        <img alt="" class="w-4 h-4 invert opacity-40" src="https://www.svgrepo.com/show/512317/github-142.svg"/>
                     </a>
                 </div>
             </div>
             <div>
-                <h4 class="mono-label mb-6 text-white/80">Product</h4>
+                <h4 class="mono-label mb-6 text-white/80">Site</h4>
                 <ul class="space-y-4 text-xs text-white/40 font-semibold">
-                    <li><a class="hover:text-primary transition-colors" href="#">Features</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Store</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Themes</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Integrations</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="index.html#architecture">Architecture</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="index.html#features">Features</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="index.html#download">Download</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="documentation.html">Documentation</a></li>
                 </ul>
             </div>
             <div>
-                <h4 class="mono-label mb-6 text-white/80">Developer</h4>
+                <h4 class="mono-label mb-6 text-white/80">Project</h4>
                 <ul class="space-y-4 text-xs text-white/40 font-semibold">
-                    <li><a class="hover:text-primary transition-colors" href="#">Documentation</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">API Reference</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">SDK</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">GitHub</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/releases" target="_blank" rel="noopener">Releases</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
+                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
                 </ul>
-            </div>
-            <div>
-                <h4 class="mono-label mb-6 text-white/80">Company</h4>
-                <ul class="space-y-4 text-xs text-white/40 font-semibold">
-                    <li><a class="hover:text-primary transition-colors" href="#">Changelog</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Blog</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Press</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="#">Careers</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="mono-label mb-6 text-white/80">Status</h4>
-                <div class="flex items-center gap-2 text-[10px] font-bold text-green-500 mb-2">
-                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                    ALL SYSTEMS NOMINAL
-                </div>
-                <div class="text-[9px] text-white/20 font-mono-code">
-                    Uptime: 99.998%<br/>
-                    Response: 14ms
-                </div>
             </div>
         </div>
         <div class="flex flex-col md:flex-row justify-between items-center pt-10 border-t border-white/5 gap-6">
             <div class="text-[10px] font-mono-code text-white/20 tracking-wider">
-                © 2024 CREST PROTOCOL. MIT LICENSED. OPEN SOURCE FOREVER.
+                © 2026 Crest · MIT License · Community-built
             </div>
-            <div class="flex gap-8 text-[10px] font-mono-code text-white/20 uppercase tracking-widest">
-                <a class="hover:text-white transition-colors" href="#">Privacy Policy</a>
-                <a class="hover:text-white transition-colors" href="#">Terms of Service</a>
-                <a class="hover:text-white transition-colors" href="#">Cookies</a>
+            <div class="flex flex-wrap gap-6 text-[10px] font-mono-code text-white/20 uppercase tracking-widest">
+                <a class="hover:text-white transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/README.md" target="_blank" rel="noopener">README</a>
+                <a class="hover:text-white transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/DOCUMENTBOOK.md" target="_blank" rel="noopener">DOCUMENTBOOK.md</a>
+                <a class="hover:text-white transition-colors" href="https://github.com/KOUSTAV2409/crest/issues" target="_blank" rel="noopener">Issues</a>
             </div>
         </div>
     </div>

@@ -35,6 +35,8 @@
 
 ## 🚀 Installation & Setup
 
+Hosted user documentation mirrors this README and `DOCUMENTBOOK.md`: open [`website/documentation.html`](website/documentation.html) in the deployed site bundle (same path live on crest.run-style hosts).
+
 ### 1. Download
 Head to [GitHub Releases](https://github.com/KOUSTAV2409/crest/releases) and download the latest asset for your distribution:
 - **Debian/Ubuntu**: `.deb` package
