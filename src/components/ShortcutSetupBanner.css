@@ -1,0 +1,50 @@
+.shortcut-setup-banner {
+  flex-shrink: 0;
+  margin: 0 12px 8px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  background: rgba(251, 191, 36, 0.12);
+}
+
+.shortcut-setup-banner-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.shortcut-setup-banner-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.shortcut-setup-banner-title {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fde68a;
+  margin-bottom: 4px;
+}
+
+.shortcut-setup-banner-detail {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.shortcut-setup-banner-dismiss {
+  flex-shrink: 0;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid var(--border-strong);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.shortcut-setup-banner-dismiss:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

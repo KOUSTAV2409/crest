@@ -45,6 +45,7 @@ pub fn run() {
             commands::search::fetch_web_results,
             commands::search::quit_app,
             commands::system::get_system_actions,
+            commands::system::get_shortcut_setup_hint,
             commands::extensions::run_extension,
             commands::extensions::get_clipboard_history
         ])

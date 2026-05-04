@@ -6,7 +6,11 @@ use once_cell::sync::Lazy;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::path::PathBuf;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tauri::{AppHandle, Manager};
+
+/// Set to `true` only after [`GlobalHotKeyManager::register`] succeeds (startup).
+pub static GLOBAL_HOTKEY_GRAB_OK: AtomicBool = AtomicBool::new(false);
 
 // Keep the manager globally static to ensure it never drops.
 static MANAGER: Lazy<GlobalHotKeyManager> = Lazy::new(|| GlobalHotKeyManager::new().unwrap());
@@ -29,6 +33,13 @@ fn append_hotkey_log(message: &str) {
     }
 }
 
+/// True when `WAYLAND_DISPLAY` is set (typical GNOME/KDE defaults).
+pub fn detect_wayland_session() -> bool {
+    std::env::var("WAYLAND_DISPLAY")
+        .map(|v| !v.trim().is_empty())
+        .unwrap_or(false)
+}
+
 pub fn init(app: &AppHandle) {
     let cfg = crate::config::load_app_config();
     let hotkey_raw = cfg.global_shortcut.trim();
@@ -45,19 +56,24 @@ pub fn init(app: &AppHandle) {
         }
     };
 
-    if let Err(e) = MANAGER.register(hotkey) {
-        let msg = format!(
-            "Failed to register global shortcut {:?} -> {}: {}. \
+    match MANAGER.register(hotkey) {
+        Ok(()) => {
+            GLOBAL_HOTKEY_GRAB_OK.store(true, Ordering::Relaxed);
+        }
+        Err(e) => {
+            let msg = format!(
+                "Failed to register global shortcut {:?} -> {}: {}. \
 If you use Wayland (default on many distros), X11-style global grabs often do not work. \
 Fix: open System Settings → Keyboard → Custom Shortcuts and assign Super+Space (or another key) to run the `crest` command; a second press will hide the window. \
 You can also try `alt+Space` in ~/.config/crest/config.json. \
 This message is saved to your data directory as crest/hotkey.log.",
-            hotkey_raw,
-            hotkey,
-            e
-        );
-        eprintln!("Crest: {}", msg);
-        append_hotkey_log(&msg);
+                hotkey_raw,
+                hotkey,
+                e
+            );
+            eprintln!("Crest: {}", msg);
+            append_hotkey_log(&msg);
+        }
     }
 
     let app_handle = app.clone();

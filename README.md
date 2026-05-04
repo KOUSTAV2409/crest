@@ -41,7 +41,7 @@ Head to [GitHub Releases](https://github.com/KOUSTAV2409/crest/releases) and dow
 - **Generic Linux**: `.AppImage`
 
 ### 2. Install
-- **Debian/Ubuntu**: `sudo apt install ./crest_0.2.1_amd64.deb`
+- **Debian/Ubuntu**: `sudo apt install ./crest_0.2.2_amd64.deb`
 - **Generic Linux**: `chmod +x crest.AppImage && ./crest.AppImage`
 
 ### 3. Global shortcut
@@ -49,7 +49,7 @@ Crest registers a **global hotkey** from your config (default **`super+Space`**,
 
 **If Super+Space does nothing:** you may be on **Wayland**. Many desktops block the X11-style “global grab” Crest uses internally; failures are easy to miss (they’re not shown in the UI). Check **`~/.local/share/crest/hotkey.log`** (also printed to stderr if you launch `crest` from a terminal).
 
-**Recommended fix:** open **Settings → Keyboard → Custom Shortcuts**, add **Super+Space** (or another key), and set the command to **`crest`**. From **v0.2.1** onward Crest is a single instance — each extra run of **`crest`** **shows or hides** the palette (required for desktop shortcuts on Wayland). On older builds you may still need the built‑in grab or toggle from the dock. Alternatively use an **X11 session** (e.g. “Ubuntu on Xorg”), try **`alt+Space`** in `config.json`, or toggle by running **`crest`** again from a terminal.
+**Recommended fix:** open **Settings → Keyboard → Custom Shortcuts**, add **Super+Space** (or another key), and set the command to **`crest`**. Crest is a **single instance** (**v0.2.1+**): each extra run of **`crest`** **shows or hides** the palette — the reliable approach on Wayland. **v0.2.2+** also shows an in-app banner explaining this. Older builds may need the dock or a different `global_shortcut` in `config.json` (try **`alt+Space`**). Alternatively use an **X11 session** (e.g. “Ubuntu on Xorg”).
 
 ### 4. Plugins (extensions)
 By default **`plugin_policy` is `"manifest"`**: only entries in `~/.config/crest/plugins/manifest.json` run. Copy `configs/plugins.manifest.example.json` into that path, list your scripts with relative paths, and `chmod +x` them as needed. To opt back into the legacy “any file in the folder is runnable” model (full trust), set `"plugin_policy": "open"` in `config.json`.

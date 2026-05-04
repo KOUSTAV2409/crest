@@ -4,6 +4,7 @@ import { useAppStore } from '../store';
 import SearchInput from './SearchInput';
 import ResultList from './ResultList';
 import PreviewPanel from './PreviewPanel';
+import ShortcutSetupBanner from './ShortcutSetupBanner';
 import clsx from 'clsx';
 import './CommandPalette.css';
 
@@ -32,6 +33,7 @@ const CommandPalette: React.FC = () => {
         transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
         <SearchInput />
+        <ShortcutSetupBanner />
 
         <div className="palette-body">
           <div className={clsx('result-list-container', { 'full-width': results.length === 0 })}>

@@ -4,6 +4,12 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.2] - 2026-05-05
+
+### Added
+- **In-app shortcut help on Linux**: amber banner explains that **Wayland** often blocks in-app Win/Super shortcuts; directs you to bind **`crest`** in system keyboard settings or use Xorg / another key combo.
+- **`get_shortcut_setup_hint` IPC** and tracking of successful global hotkey registration.
+
 ## [0.2.1] - 2026-05-04
 
 ### Fixed
@@ -34,3 +40,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
 [0.2.0]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.0
 [0.2.1]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.1
+[0.2.2]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.2
