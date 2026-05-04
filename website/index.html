@@ -3,25 +3,25 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Crest — The Linux Power Launcher</title>
-    <meta name="description" content="A high-performance, Raycast-inspired productivity launcher for Linux. Built with Rust and Tauri.">
+    <title>Crest — Your shortcut to everything on Linux</title>
+    <meta name="description" content="Open-source launcher for Linux. Fast, ergonomic, extendable—with apps, files, clipboard, web, and manifest-only plugins under your control. MIT licensed; no cloud account.">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://crest.run/">
-    <meta property="og:title" content="Crest — The Linux Power Launcher">
-    <meta property="og:description" content="The Raycast experience, finally on Linux. Built in Rust for absolute performance.">
+    <meta property="og:title" content="Crest — Your shortcut to everything on Linux">
+    <meta property="og:description" content="The open-source, keyboard‑first launcher for Linux. Fast workflows, offline‑friendly clipboard, DuckDuckGo answers, audited extensions—inspect it all under MIT.">
     <meta property="og:image" content="assets/hero-mockup.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://crest.run/">
-    <meta property="twitter:title" content="Crest — The Linux Power Launcher">
-    <meta property="twitter:description" content="The Raycast experience, finally on Linux. Built in Rust for absolute performance.">
+    <meta property="twitter:title" content="Crest — Your shortcut to everything on Linux">
+    <meta property="twitter:description" content="Open-source launcher for Linux. Built for keyboards, Rust under the hood, nothing hidden in a closed app.">
     <meta property="twitter:image" content="assets/hero-mockup.png">
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
@@ -29,68 +29,30 @@
             theme: {
                 extend: {
                     "colors": {
-                        "surface-dim": "#141313",
-                        "surface-container-high": "#2a2a2a",
-                        "inverse-primary": "#4d49d7",
-                        "on-surface": "#e5e2e1",
-                        "on-tertiary-fixed": "#1a1c1c",
-                        "primary-fixed": "#e2dfff",
-                        "primary-fixed-dim": "#c2c1ff",
-                        "surface-tint": "#c2c1ff",
-                        "inverse-surface": "#e5e2e1",
-                        "on-primary-fixed": "#0c006a",
-                        "error-container": "#93000a",
-                        "on-primary-fixed-variant": "#332cbf",
-                        "outline": "#918fa0",
-                        "secondary-fixed": "#ffdad7",
-                        "on-error-container": "#ffdad6",
-                        "on-secondary-fixed": "#410006",
-                        "on-secondary-fixed-variant": "#8f0d1c",
-                        "surface-bright": "#3a3939",
-                        "on-tertiary-fixed-variant": "#454747",
-                        "outline-variant": "#464554",
-                        "background": "#141313",
-                        "on-primary": "#1900a7",
-                        "on-secondary": "#68000e",
-                        "surface-variant": "#353434",
-                        "secondary": "#ffb3af",
-                        "tertiary-fixed": "#e2e2e2",
-                        "tertiary": "#c6c6c7",
-                        "error": "#ffb4ab",
-                        "surface-container-lowest": "#0e0e0e",
-                        "inverse-on-surface": "#313030",
-                        "primary": "#c2c1ff",
-                        "on-error": "#690005",
-                        "on-surface-variant": "#c7c4d7",
-                        "secondary-fixed-dim": "#ffb3af",
-                        "surface-container": "#201f1f",
-                        "surface": "#141313",
-                        "surface-container-highest": "#353434",
-                        "on-background": "#e5e2e1",
-                        "primary-container": "#8382ff",
-                        "secondary-container": "#93111e",
-                        "tertiary-container": "#909191",
-                        "on-tertiary": "#2f3131",
-                        "on-secondary-container": "#ff9e9a",
-                        "on-primary-container": "#150093",
-                        "on-tertiary-container": "#282a2a",
-                        "tertiary-fixed-dim": "#c6c6c7",
-                        "surface-container-low": "#1c1b1b"
+                        background: "#070a0b",
+                        surface: "#151515",
+                        elevated: "#1b1c1e",
+                        primary: "#ff6363",
+                        muted: "#929292",
+                        "on-dark": "#f5f5f5",
+                        "on-surface": "#eaeaea",
+                        "on-surface-variant": "#b0b0b0"
                     },
                     "borderRadius": {
-                        "DEFAULT": "0.125rem",
-                        "lg": "0.25rem",
-                        "xl": "0.5rem",
-                        "full": "0.75rem"
+                        "DEFAULT": "0.375rem",
+                        "lg": "0.5rem",
+                        "xl": "0.625rem",
+                        "full": "9999px"
                     },
                     "fontFamily": {
-                        "display-xl": ["Space Grotesk"],
-                        "mono-code": ["Fira Code", "monospace"],
-                        "body-md": ["Inter"],
-                        "body-lg": ["Inter"],
-                        "headline-md": ["Space Grotesk"],
-                        "headline-lg": ["Space Grotesk"],
-                        "label-sm": ["Inter"]
+                        "sans": ["Inter", "system-ui", "sans-serif"],
+                        "mono-code": ["Fira Code", "ui-monospace", "monospace"],
+                        "body-md": ["Inter", "system-ui", "sans-serif"],
+                        "body-lg": ["Inter", "system-ui", "sans-serif"],
+                        "headline-md": ["Inter", "system-ui", "sans-serif"],
+                        "headline-lg": ["Inter", "system-ui", "sans-serif"],
+                        "display-xl": ["Inter", "system-ui", "sans-serif"],
+                        "label-sm": ["Inter", "system-ui", "sans-serif"]
                     }
                 }
             }
@@ -98,7 +60,7 @@
     </script>
     <style>
         body {
-            background-color: #0e0e0e;
+            background-color: #0a0a0b;
             -webkit-font-smoothing: antialiased;
         }
         .grain {
@@ -106,208 +68,203 @@
             top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
             z-index: 100;
-            opacity: 0.04;
+            opacity: 0.022;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
         .raycast-window {
-            background: rgba(20, 19, 19, 0.8);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+            background: rgba(18, 18, 20, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow:
+                0 1px 0 rgba(255, 255, 255, 0.06) inset,
+                0 24px 64px rgba(0, 0, 0, 0.45);
         }
         .technical-line {
-            background: linear-gradient(90deg, transparent, rgba(194, 193, 255, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 99, 99, 0.25), transparent);
             height: 1px;
             width: 100%;
         }
         .rigid-border {
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .mono-label {
             font-family: 'Fira Code', monospace;
             font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.06em;
+            color: rgba(255, 255, 255, 0.38);
         }
         .high-fi-hover:hover {
-            border-color: rgba(194, 193, 255, 0.4);
+            border-color: rgba(255, 99, 99, 0.35);
             background: rgba(255, 255, 255, 0.02);
         }
+        .divider-fade {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+            max-width: 120px;
+            margin: 0 auto;
+            transform-origin: center;
+        }
     </style>
+    <link rel="stylesheet" href="motion.css" />
 </head>
 <body class="font-body-md text-on-surface selection:bg-primary/30 selection:text-white">
 <div class="grain"></div>
 <!-- Navigation -->
-<nav class="fixed top-0 w-full z-[100] border-b border-white/5 bg-surface/80 backdrop-blur-md">
-    <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-10">
-            <a class="font-headline-md font-bold text-lg tracking-tight text-white no-underline" href="index.html">CREST</a>
-            <div class="hidden md:flex gap-8 text-[11px] font-semibold uppercase tracking-widest text-white/40">
-                <a class="hover:text-primary transition-colors" href="#architecture">Architecture</a>
-                <a class="hover:text-primary transition-colors" href="#features">Features</a>
-                <a class="hover:text-primary transition-colors" href="documentation.html">Documentation</a>
-                <a class="hover:text-primary transition-colors" href="#setup">Setup</a>
-                <a class="hover:text-primary transition-colors" href="#download">Download</a>
-                <a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
+<nav class="motion-nav-shell fixed top-0 w-full z-[100] border-b border-white/[0.06] bg-[#070a0b]/92 backdrop-blur-md" id="site-nav">
+    <div class="max-w-[1400px] mx-auto px-6 h-[52px] flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <a class="font-headline-md font-semibold text-[15px] tracking-[-0.02em] text-white no-underline" href="index.html">Crest</a>
+            <div class="hidden lg:flex gap-7 text-[12px] font-medium text-white/42">
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="#architecture">Stack</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="#features">Product</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="documentation.html">Docs</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="#setup">Setup</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="#download">Download</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <span class="mono-label text-primary/60 hidden sm:block">v0.2.2</span>
-            <a href="#download" class="bg-white text-black px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-primary transition-all">
-                Download
-            </a>
+            <span class="mono-label hidden sm:inline text-white/38">v0.2.2</span>
+            <a href="#download" class="motion-btn rounded-lg bg-white text-black px-[18px] py-2.5 text-[13px] font-semibold hover:bg-white/95 transition-colors no-underline tracking-tight">Download</a>
         </div>
     </div>
 </nav>
 
-<!-- Hero Section -->
-<section class="pt-40 pb-20 px-6 overflow-hidden">
-    <div class="max-w-[1200px] mx-auto text-center mb-24">
-        <div class="inline-flex items-center gap-4 mb-8">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-                <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                <span class="text-[10px] font-mono-code font-bold text-primary uppercase tracking-widest">Built for performance</span>
-            </div>
-            <div class="text-[10px] font-mono-code font-bold text-white/40 uppercase tracking-widest">Free &amp; Open Source</div>
-        </div>
-        <h1 class="font-display-xl text-5xl md:text-8xl mb-6 tracking-tight leading-none text-white">
-            The Raycast experience,<br/>
-            <span class="italic font-light text-primary">finally on Linux.</span>
-        </h1>
-        <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
-            Linux deserved this years ago. A keyboard-first powerhouse built in Rust for sub-50ms execution. Zero bloat. Just raw productivity.
+<!-- Hero -->
+<section class="pt-36 md:pt-40 pb-20 px-6 overflow-hidden border-b border-white/[0.06] bg-[radial-gradient(ellipse_85%_60%_at_50%_-10%,rgba(255,99,99,0.09),transparent_55%)]">
+    <div class="max-w-[820px] mx-auto text-center mb-16 md:mb-20 overflow-hidden px-1">
+        <p class="motion-rise text-[13px] text-muted mb-6 font-medium tracking-tight">
+            Open source launcher for Linux · MIT · inspect every line on GitHub
         </p>
-        <div class="flex items-center justify-center gap-4">
-            <a href="#download" class="bg-primary text-on-primary-container px-8 py-3 rounded-xl font-bold text-sm tracking-tight hover:scale-[1.02] active:scale-95 transition-all">
-                Get Started
+        <h1 class="motion-rise motion-d-1 font-display-xl font-semibold text-[clamp(2.125rem,5vw,3.85rem)] mb-8 tracking-[-0.038em] leading-[1.07] text-white">
+            Your shortcut to everything,<br/><span class="text-white">on&nbsp;Linux.</span>
+        </h1>
+        <p class="motion-rise motion-d-2 text-on-surface-variant text-[clamp(15px,1.9vw,18px)] leading-[1.65] max-w-[560px] mx-auto mb-10">
+            A fast, ergonomic, extendable launcher—apps, files, clipboard history, web answers, and manifest‑scoped plugins—all from the keyboard, without a cloud account tied to someone else&apos;s codebase.
+        </p>
+        <div class="motion-rise motion-d-3 flex flex-wrap items-center justify-center gap-[10px]">
+            <a href="#download" class="motion-btn rounded-lg bg-white text-black px-8 py-[11px] text-[15px] font-semibold hover:bg-white/95 transition-colors no-underline tracking-tight shadow-[0_16px_40px_-8px_rgba(0,0,0,0.55)]">
+                Download for Linux
             </a>
-            <a href="https://github.com/KOUSTAV2409/crest" target="_blank" class="px-8 py-3 rounded-xl font-bold text-sm tracking-tight border border-white/10 hover:bg-white/5 transition-all">
-                View on GitHub
+            <a href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener noreferrer" class="motion-btn rounded-lg px-8 py-[11px] text-[15px] font-semibold text-white border border-white/[0.12] hover:border-white/[0.22] hover:bg-white/[0.04] transition-all no-underline tracking-tight">
+                Source on GitHub
             </a>
         </div>
+        <p class="motion-rise motion-d-4 mt-8 text-[12px] text-muted font-medium tracking-wide">
+            v0.2.2 · x86_64 · .deb · AppImage · single-instance palette toggle <span class="text-white/30">(Wayland‑friendly)</span>
+        </p>
     </div>
 
-    <!-- Floating Window Mockup -->
-    <div class="max-w-[800px] mx-auto relative">
-        <div class="raycast-window rounded-xl overflow-hidden p-0 animate-in fade-in slide-in-from-bottom-10 duration-1000">
-            <div class="flex items-center px-6 py-5 border-b border-white/10">
-                <span class="material-symbols-outlined text-primary/80 mr-4 text-3xl">search</span>
-                <input class="bg-transparent border-none focus:ring-0 text-white/90 text-2xl w-full placeholder:text-white/20 font-light" placeholder="Search for anything..." readonly="" type="text"/>
+    <!-- Product preview -->
+    <div class="motion-rise motion-d-4 max-w-[720px] mx-auto relative">
+        <div class="motion-preview-wrap relative">
+        <div class="raycast-window rounded-xl overflow-hidden p-0">
+            <div class="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">
+                <span class="material-symbols-outlined text-white/35 shrink-0 text-[26px]" aria-hidden="true">search</span>
+                <input class="bg-transparent border-none focus:ring-0 text-white/92 text-xl flex-1 min-w-0 placeholder:text-white/22 font-normal" placeholder="Find an app or run a query…" readonly type="text"/>
+                <span class="motion-caret-blink w-[2px] h-5 shrink-0 rounded-[1px] bg-primary/50" aria-hidden="true"></span>
             </div>
             <div class="p-2">
-                <div class="bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-center justify-between">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                            <span class="material-symbols-outlined text-primary">terminal</span>
+                <div class="bg-white/[0.04] border border-white/[0.06] rounded-md p-3.5 flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-white/[0.06] rounded-md flex items-center justify-center">
+                            <span class="material-symbols-outlined text-white/65 text-xl" aria-hidden="true">widgets</span>
                         </div>
                         <div>
-                            <div class="text-sm font-semibold text-white">Open Alacritty</div>
-                            <div class="text-[10px] text-primary/60 font-mono-code">/usr/bin/alacritty</div>
+                            <div class="text-[13px] font-medium text-white/95">firefox</div>
+                            <div class="text-[11px] font-mono-code text-white/38">desktop entry</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">ALT</span>
-                        <span class="px-2 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">1</span>
-                    </div>
-                </div>
-                <div class="p-4 flex items-center justify-between opacity-40 grayscale">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center">
-                            <span class="material-symbols-outlined">description</span>
-                        </div>
-                        <div>
-                            <div class="text-sm font-semibold text-white">config.toml</div>
-                            <div class="text-[10px] text-white/60 font-mono-code">~/scripts/crest/</div>
-                        </div>
+                    <div class="flex items-center gap-1.5">
+                        <kbd class="px-2 py-0.5 rounded border border-white/[0.08] text-[10px] font-mono-code text-white/42">Enter</kbd>
                     </div>
                 </div>
-                <div class="p-4 flex items-center justify-between opacity-40 grayscale">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center">
-                            <span class="material-symbols-outlined">dns</span>
-                        </div>
+                <div class="px-4 py-3 flex items-center justify-between border-t border-white/[0.04]">
+                    <div class="flex items-center gap-3 opacity-55">
+                        <div class="w-9 h-9 rounded-md bg-white/[0.04] flex items-center justify-center"><span class="material-symbols-outlined text-white/45 text-lg" aria-hidden="true">draft</span></div>
                         <div>
-                            <div class="text-sm font-semibold text-white">Manage Docker Containers</div>
-                            <div class="text-[10px] text-white/60 font-mono-code">Extension</div>
+                            <div class="text-[13px] font-medium text-white/90">~/Documents · notes.md</div>
+                            <div class="text-[11px] font-mono-code text-white/32">File</div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="px-4 py-2 border-t border-white/5 flex justify-between items-center bg-white/5">
-                <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-xs text-white/30">settings</span>
-                    <span class="mono-label !text-[8px]">Crest Engine v0.2.2</span>
-                </div>
-                <div class="flex items-center gap-3">
-                    <span class="text-[10px] text-white/40">Actions</span>
-                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">Ctrl</span>
-                    <span class="px-1.5 py-0.5 rounded border border-white/10 text-[9px] font-mono-code text-white/40">K</span>
+            <div class="px-4 py-2 border-t border-white/[0.04] flex justify-between items-center bg-black/25">
+                <span class="text-[11px] font-mono-code text-white/32">clipboard · web · plugins</span>
+                <div class="flex items-center gap-2 text-white/38">
+                    <span class="text-[11px]">Actions</span>
+                    <kbd class="text-[10px] font-mono-code px-1.5 py-0.5 rounded border border-white/[0.08]">Ctrl</kbd>
+                    <kbd class="text-[10px] font-mono-code px-1.5 py-0.5 rounded border border-white/[0.08]">K</kbd>
                 </div>
             </div>
         </div>
-        <!-- Decorative glowing lines -->
-        <div class="absolute -z-10 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-primary/5 blur-[120px] rounded-full"></div>
+        </div>
+        <div class="motion-glow-breathe absolute -z-10 top-1/2 left-1/2 w-[115%] h-[115%] bg-primary/[0.045] blur-[100px] rounded-full" aria-hidden="true"></div>
     </div>
 </section>
 
-<!-- Proof of Work Section -->
-<section class="py-32 px-6 scroll-mt-24" id="architecture">
-    <div class="max-w-[1200px] mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-                <div class="mono-label mb-4 text-primary">Technical Proof</div>
-                <h2 class="font-headline-lg text-4xl mb-6">Zero latency by design.</h2>
-                <p class="text-on-surface-variant leading-relaxed mb-8">
-                    Crest is written in Rust with a tight Tauri shell over a native Linux WebView stack. That means no Electron Chromium bundle and predictable memory use for a keyboard-first launcher.
+<!-- Pillars → Raycast-style rhythm, Linux truth -->
+<section class="py-[4.25rem] px-6 bg-surface border-b border-white/[0.06]">
+    <div class="max-w-[1040px] mx-auto motion-rise grid sm:grid-cols-2 lg:grid-cols-4 gap-y-11 gap-x-10 lg:gap-x-12">
+        <p class="text-[14px] text-on-surface-variant leading-relaxed tracking-tight m-0">
+            <strong class="text-white font-semibold">Fast.</strong> Rust‑backed fuzzy search and local SQLite—you stay in milliseconds, not menu trees.
+        </p>
+        <p class="text-[14px] text-on-surface-variant leading-relaxed tracking-tight m-0">
+            <strong class="text-white font-semibold">Ergonomic.</strong> Arrow keys, Enter, actions menu—launcher flows that feel obvious on day one.
+        </p>
+        <p class="text-[14px] text-on-surface-variant leading-relaxed tracking-tight m-0">
+            <strong class="text-white font-semibold">Native.</strong> Tauri + system WebView, not Electron—lighter footprint across daily driver sessions.
+        </p>
+        <p class="text-[14px] text-on-surface-variant leading-relaxed tracking-tight m-0">
+            <strong class="text-white font-semibold">Transparent.</strong> MIT code and manifest‑listed plugins—you choose what executes, openly.
+        </p>
+    </div>
+</section>
+
+<!-- Stack -->
+<section class="py-24 px-6 scroll-mt-24 bg-background" id="architecture">
+    <div class="max-w-[1100px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14 items-start">
+            <div class="motion-rise">
+                <div class="mono-label mb-3">Implementation</div>
+                <h2 class="font-headline-lg text-3xl sm:text-[2rem] mb-5 tracking-[-0.02em] text-white">Rust commands, lightweight UI shell.</h2>
+                <p class="text-white/48 text-[15px] leading-relaxed mb-10">
+                    The heavy work runs in Rust: indexing, SQLite, clipboard, plugins, and scraping bridges. The window is <strong class="text-white/75 font-medium">Tauri 2</strong> with a small React UI—similar footprint to native tooling, unlike shipping a full browser runtime with every build.
                 </p>
-                <div class="space-y-4">
-                    <div class="flex items-start gap-4 p-4 rigid-border high-fi-hover transition-all">
-                        <span class="material-symbols-outlined text-primary">bolt</span>
+                <div class="space-y-3">
+                    <div class="flex gap-4 p-4 rigid-border rounded-md high-fi-hover motion-card transition-colors">
+                        <span class="material-symbols-outlined text-white/42 text-xl shrink-0" aria-hidden="true">deployed_code</span>
                         <div>
-                            <h4 class="text-sm font-bold mb-1 uppercase tracking-tight">Sub-1ms IPC</h4>
-                            <p class="text-xs text-white/40">Custom binary protocol between UI and core engine.</p>
+                            <h4 class="text-[13px] font-semibold text-white mb-1">Native IPC</h4>
+                            <p class="text-[13px] text-white/42 leading-snug">Tauri invokes Rust commands from the webview; no localhost HTTP server in the hot path.</p>
                         </div>
                     </div>
-                    <div class="flex items-start gap-4 p-4 rigid-border high-fi-hover transition-all">
-                        <span class="material-symbols-outlined text-primary">memory</span>
+                    <div class="flex gap-4 p-4 rigid-border rounded-md high-fi-hover motion-card transition-colors">
+                        <span class="material-symbols-outlined text-white/42 text-xl shrink-0" aria-hidden="true">database</span>
                         <div>
-                            <h4 class="text-sm font-bold mb-1 uppercase tracking-tight">Low Memory Footprint</h4>
-                            <p class="text-xs text-white/40">&lt; 40MB RAM usage in idle state.</p>
+                            <h4 class="text-[13px] font-semibold text-white mb-1">SQLite at the edges</h4>
+                            <p class="text-[13px] text-white/42 leading-snug">App metadata, clipboard history, and file index snapshots stay in local databases—not a vendor cloud.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="rigid-border bg-[#0a0a0a] overflow-hidden">
-                <div class="flex items-center gap-2 px-4 py-2 bg-white/5 border-b border-white/10">
-                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-white/10"></div>
-                    <span class="ml-2 text-[10px] font-mono-code text-white/20 uppercase tracking-tighter">crest-install.sh</span>
+            <div class="motion-rise motion-d-3 rigid-border rounded-lg bg-elevated overflow-hidden">
+                <div class="flex items-center gap-2 px-4 py-2 border-b border-white/[0.06] bg-white/[0.03]">
+                    <div class="w-2 h-2 rounded-full bg-white/12"></div>
+                    <div class="w-2 h-2 rounded-full bg-white/12"></div>
+                    <div class="w-2 h-2 rounded-full bg-white/12"></div>
+                    <span class="ml-2 text-[10px] font-mono-code text-white/28">releases · install</span>
                 </div>
-                <div class="p-6 font-mono-code text-[11px] leading-relaxed">
-                    <div class="text-white/40 mb-2"># Initializing installation...</div>
-                    <div class="flex gap-2">
-                        <span class="text-primary">$</span>
-                        <span class="text-white">curl -sSf https://crest.run/install.sh | sh</span>
-                    </div>
-                    <div class="text-white/40 mt-2">Checking architecture... x86_64</div>
-                    <div class="text-white/40">Checking window manager... Hyprland (Wayland)</div>
-                    <div class="flex gap-2 mt-2">
-                        <span class="text-green-500 font-bold">[OK]</span>
-                        <span class="text-white/80">Fetching crest-core-v0.2.2</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-green-500 font-bold">[OK]</span>
-                        <span class="text-white/80">Compiling native bindings</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-yellow-500 animate-pulse font-bold">[WAIT]</span>
-                        <span class="text-white/80">Linking system libraries...</span>
-                    </div>
-                    <div class="mt-6 p-3 bg-primary/5 border-l border-primary text-primary/80">
-                        Success. Crest is now ready. <br/>
-                        Bind [Mod+Space] to launch.
+                <div class="p-6 font-mono-code text-[12px] leading-[1.75] text-white/55">
+                    <p class="text-white/32 mb-4 text-[11px] uppercase tracking-wider">Install from GitHub (paths match current release).</p>
+                    <div><span class="text-primary">#</span> <span class="text-white/80">Debian / Ubuntu</span></div>
+                    <div class="mt-2 pl-0"><span class="text-white/38">wget</span> <span class="text-white/70">…/releases/…/crest_0.2.2_amd64.deb</span></div>
+                    <div class="text-white/38 mt-2">sudo apt install ./crest_0.2.2_amd64.deb</div>
+                    <div class="mt-5"><span class="text-primary">#</span> <span class="text-white/80">AppImage</span></div>
+                    <div class="text-white/38 mt-2">chmod +x crest_*_amd64.AppImage &amp;&amp; ./crest_*_amd64.AppImage</div>
+                    <div class="mt-6 pt-5 border-t border-white/[0.06] text-[11px] text-white/38 leading-relaxed">
+                        On Wayland, bind your compositor shortcut to run <span class="text-white/58">crest</span> so every launch toggles the window—the same flow recommended in Docs.
                     </div>
                 </div>
             </div>
@@ -315,60 +272,54 @@
     </div>
 </section>
 
-<!-- Refined Feature Grid -->
-<section class="py-32 px-6 bg-surface-container-low/30 scroll-mt-24" id="features">
-    <div class="max-w-[1200px] mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Feature 1: Clipboard -->
-            <div class="lg:col-span-8 rigid-border p-10 high-fi-hover transition-all relative overflow-hidden group">
-                <div class="mono-label mb-8">01 // Clipboard History</div>
-                <h3 class="font-display-xl text-4xl mb-6 text-white">Never lose a copy again.</h3>
-                <p class="text-on-surface-variant max-w-xl mb-12">
-                    Crest tracks your clipboard history in a secure, local SQLite database. Search back through days of copied text, code snippets, and links with instant filtering.
+<!-- Product -->
+<section class="py-24 px-6 bg-surface scroll-mt-24 border-y border-white/[0.06]" id="features">
+    <div class="max-w-[1100px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            <div class="lg:col-span-8 rigid-border rounded-lg p-9 high-fi-hover motion-card motion-rise motion-d-1 transition-colors relative overflow-hidden">
+                <div class="mono-label mb-6">Clipboard</div>
+                <h3 class="font-display-xl text-2xl sm:text-3xl mb-5 text-white tracking-[-0.02em]">History that stays offline.</h3>
+                <p class="text-white/48 text-[15px] leading-relaxed max-w-xl mb-9">
+                    Copies land in local SQLite—you can recall snippets and URLs without syncing to a vendor. Search is keyed to your keyboard flow, not upload queues.
                 </p>
-                <div class="flex gap-4">
-                    <div class="px-4 py-2 bg-primary/10 border border-primary/20 rounded text-[10px] font-mono-code text-primary">SQLITE_PERSISTENCE</div>
-                    <div class="px-4 py-2 bg-primary/10 border border-primary/20 rounded text-[10px] font-mono-code text-primary">AES_ENCRYPTED</div>
+                <div class="flex flex-wrap gap-2">
+                    <span class="px-3 py-1.5 rigid-border rounded text-[10px] font-mono-code text-white/42">SQLite</span>
+                    <span class="px-3 py-1.5 rigid-border rounded text-[10px] font-mono-code text-white/42">LOCAL ONLY</span>
                 </div>
-                <span class="material-symbols-outlined absolute -right-4 -bottom-4 text-9xl text-white/[0.02] group-hover:text-primary/[0.05] transition-all">content_paste</span>
+                <span class="material-symbols-outlined absolute -right-2 -bottom-2 text-[7rem] text-white/[0.03]" aria-hidden="true">content_paste</span>
             </div>
-            <!-- Feature 2: Privacy -->
-            <div class="lg:col-span-4 rigid-border p-8 high-fi-hover transition-all flex flex-col">
-                <div class="mono-label mb-4 text-primary">Philosophy</div>
-                <h3 class="text-xl font-bold mb-4">Zero Cloud.</h3>
-                <p class="text-sm text-on-surface-variant leading-relaxed flex-grow">
-                    Your data is your business. Crest works 100% offline. No telemetry, no account required, and definitely no cloud syncing.
+            <div class="lg:col-span-4 rigid-border rounded-lg p-8 high-fi-hover motion-card motion-rise motion-d-2 transition-colors flex flex-col">
+                <div class="mono-label mb-4">Privacy</div>
+                <h3 class="text-lg font-semibold mb-3 text-white tracking-tight">No account. No telemetry.</h3>
+                <p class="text-[14px] text-white/46 leading-relaxed flex-grow">
+                    Network use is deliberate (e.g. web answers when you pause typing). There is no sign-in sheet and no product analytics channel.
                 </p>
-                <span class="material-symbols-outlined text-4xl text-primary/30 mt-8">security</span>
+                <span class="material-symbols-outlined text-3xl text-white/08 mt-6" aria-hidden="true">lock</span>
             </div>
-            <!-- Feature 3: Web Results -->
-            <div class="lg:col-span-4 rigid-border p-8 high-fi-hover transition-all flex flex-col">
-                <div class="mono-label mb-4">Intelligence</div>
-                <h3 class="text-xl font-bold mb-4">Instant Answers.</h3>
-                <p class="text-sm text-on-surface-variant leading-relaxed flex-grow">
-                    Get Wikipedia summaries, currency conversions, and web results directly in the launcher via our privacy-respecting DuckDuckGo bridge.
+            <div class="lg:col-span-4 rigid-border rounded-lg p-8 high-fi-hover motion-card motion-rise motion-d-3 transition-colors flex flex-col">
+                <div class="mono-label mb-4">Web</div>
+                <h3 class="text-lg font-semibold mb-3 text-white tracking-tight">DuckDuckGo-backed answers.</h3>
+                <p class="text-[14px] text-white/46 leading-relaxed flex-grow">
+                    Wikipedia-style snippets and a “search the web” row when nothing local matches—with an explicit pause before outbound requests.
                 </p>
-                <span class="material-symbols-outlined text-4xl text-white/10 mt-8">auto_awesome</span>
+                <span class="material-symbols-outlined text-3xl text-white/08 mt-6" aria-hidden="true">travel_explore</span>
             </div>
-            <!-- Feature 4: Plugin SDK -->
-            <div class="lg:col-span-8 rigid-border p-1 p-1 bg-gradient-to-br from-white/10 to-transparent">
-                <div class="bg-black/80 h-full p-10 flex flex-col md:flex-row gap-10">
-                    <div class="md:w-1/2">
-                        <div class="mono-label mb-8 text-primary">Extensibility</div>
-                        <h3 class="font-display-xl text-3xl mb-4 text-white">Infinite Plugins.</h3>
-                        <p class="text-sm text-on-surface-variant leading-relaxed mb-6">
-                            Create your own commands in minutes. If it can write to stdout, Crest can display it. Support for JS, Python, and Bash scripts.
+            <div class="lg:col-span-8 rigid-border rounded-lg p-px bg-gradient-to-br from-white/[0.07] to-transparent motion-rise motion-d-4">
+                <div class="rounded-[calc(0.625rem-1px)] bg-background h-full p-9 flex flex-col md:flex-row gap-10">
+                    <div class="md:w-[52%]">
+                        <div class="mono-label mb-6">Extensions</div>
+                        <h3 class="font-display-xl text-2xl mb-4 text-white tracking-[-0.02em]">Manifest-driven scripts.</h3>
+                        <p class="text-[14px] text-white/46 leading-relaxed mb-6">
+                            Ship commands as small executables or scripts that print structured JSON. Default policy reads <code class="bg-white/[0.06] px-1 rounded text-[12px]">manifest.json</code> so arbitrary files in <code class="bg-white/[0.06] px-1 rounded text-[12px]">~/.config/crest/plugins</code> are never auto-loaded.
                         </p>
-                        <div class="flex items-center gap-2">
-                             <span class="material-symbols-outlined text-sm text-primary">code</span>
-                             <span class="text-[10px] font-mono-code text-white/40">~/.config/crest/plugins/</span>
+                        <div class="flex items-center gap-2 text-[11px] font-mono-code text-white/38">
+                            <span class="material-symbols-outlined text-sm text-white/30" aria-hidden="true">folder</span>
+                            ~/.config/crest/plugins/
                         </div>
                     </div>
-                    <div class="md:w-1/2 rigid-border bg-[#111] p-4 font-mono-code text-[10px] text-primary/70 leading-tight flex items-center justify-center">
-                        <div class="text-center">
-                            <div class="text-white font-bold mb-2">PLUGIN_READY</div>
-                            <div class="text-[9px] text-white/30">Listening for commands...</div>
-                        </div>
+                    <div class="md:flex-1 rigid-border rounded-md bg-black/55 p-5 font-mono-code text-[11px] leading-relaxed flex flex-col justify-center min-h-[120px]">
+                        <span class="text-white/52">manifest.json lists allowed paths;</span><br/>
+                        <span class="text-white/32 mt-3 block">stdin/argv documented in repo · no shell injection by default.</span>
                     </div>
                 </div>
             </div>
@@ -376,116 +327,109 @@
     </div>
 </section>
 
-<!-- Setup Guide Section -->
-<section class="py-32 px-6 border-t border-white/5 scroll-mt-24" id="setup">
-    <div class="max-w-[1200px] mx-auto">
-        <div class="text-center mb-20">
-            <div class="mono-label mb-4 text-primary">Get Started</div>
-            <h2 class="font-display-xl text-4xl">Setup in 60 seconds.</h2>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div class="p-8 rigid-border relative group">
-                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">01</div>
-                <h4 class="font-bold mb-4 uppercase tracking-tight">Download</h4>
-                <p class="text-xs text-on-surface-variant leading-relaxed">
-                    Grab the <code class="bg-white/5 px-1 rounded">.deb</code> or <code class="bg-white/5 px-1 rounded">.AppImage</code> from our GitHub Releases.
+<!-- Setup -->
+<section class="py-24 px-6 scroll-mt-24" id="setup">
+    <div class="max-w-[1100px] mx-auto">
+        <header class="text-center mb-14 max-w-lg mx-auto overflow-hidden px-4">
+            <div class="mono-label mb-3 motion-rise">Onboarding</div>
+            <h2 class="font-display-xl text-2xl md:text-[1.85rem] text-white tracking-[-0.02em] motion-rise motion-d-1">Three steps.</h2>
+            <div class="mt-6 mx-auto divider-fade motion-divider overflow-hidden"></div>
+        </header>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-7 rigid-border rounded-lg relative overflow-hidden bg-white/[0.01] motion-card motion-rise motion-d-2">
+                <h4 class="text-[15px] font-semibold mb-3 text-white">Download</h4>
+                <p class="text-[13px] text-white/45 leading-relaxed">
+                    Pick <code class="bg-white/[0.06] px-1 rounded text-[11px]">.deb</code> or <code class="bg-white/[0.06] px-1 rounded text-[11px]">AppImage</code> from Releases—pinned versions are linked below.
                 </p>
-                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">download</span>
             </div>
-            <div class="p-8 rigid-border relative group">
-                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">02</div>
-                <h4 class="font-bold mb-4 uppercase tracking-tight">Install</h4>
-                <p class="text-xs text-on-surface-variant leading-relaxed">
-                    Run the installer or make the AppImage executable with <code class="bg-white/5 px-1 rounded">chmod +x</code>.
+            <div class="p-7 rigid-border rounded-lg relative overflow-hidden bg-white/[0.01] motion-card motion-rise motion-d-3">
+                <h4 class="text-[15px] font-semibold mb-3 text-white">Install</h4>
+                <p class="text-[13px] text-white/45 leading-relaxed">
+                    <code class="bg-white/[0.06] px-1 rounded text-[11px]">sudo apt install ./crest_*.deb</code> or mark the AppImage executable and run it.
                 </p>
-                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">install_desktop</span>
             </div>
-            <div class="p-8 rigid-border relative group">
-                <div class="text-4xl font-display-xl text-white/10 mb-6 group-hover:text-primary/20 transition-all">03</div>
-                <h4 class="font-bold mb-4 uppercase tracking-tight">Bind key</h4>
-                <p class="text-xs text-on-surface-variant leading-relaxed">
-                    On <strong class="text-white/70">Wayland</strong>, add a desktop custom shortcut that runs <code class="bg-white/5 px-1 rounded">crest</code> — each launch toggles the palette (<strong class="text-white/70">v0.2.1+</strong>). On X11, the built-in <kbd class="bg-white/10 px-1 rounded text-[10px]">Super+Space</kbd> often works. See <a class="text-primary hover:underline" href="documentation.html#shortcut-wayland">docs → Shortcuts</a>.
+            <div class="p-7 rigid-border rounded-lg relative overflow-hidden bg-white/[0.01] motion-card motion-rise motion-d-4">
+                <h4 class="text-[15px] font-semibold mb-3 text-white">Shortcut</h4>
+                <p class="text-[13px] text-white/45 leading-relaxed">
+                    Wayland users: bind a desktop key to run <code class="bg-white/[0.06] px-1 rounded text-[11px]">crest</code> (<span class="text-white/58">single-instance toggle</span> since v0.2.1). X11 often accepts in-app <kbd class="bg-white/[0.08] px-1 rounded text-[11px]">Super+Space</kbd>. Details: <a class="text-primary hover:underline" href="documentation.html#shortcut-wayland">docs</a>.
                 </p>
-                <span class="material-symbols-outlined absolute right-8 top-8 text-white/5">keyboard</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Download & Roadmap Section -->
-<section class="py-32 px-6 scroll-mt-24" id="download">
-    <div class="max-w-[1200px] mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16">
-            <!-- Downloads -->
-            <div>
-                <div class="mono-label mb-8">Installation</div>
-                <h2 class="font-display-xl text-4xl mb-12">Deploy to your distro.</h2>
-                <div class="space-y-4">
-                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.deb" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+<!-- Download & roadmap -->
+<section class="py-24 px-6 scroll-mt-24 border-t border-white/[0.04]" id="download">
+    <div class="max-w-[1100px] mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-14">
+            <div class="motion-rise">
+                <div class="mono-label mb-3">Artifacts</div>
+                <h2 class="font-display-xl text-2xl md:text-[1.85rem] text-white mb-10 tracking-[-0.02em]">Release artifacts on GitHub.</h2>
+                <div class="space-y-3">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.deb" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
                         <div class="flex items-center gap-4">
-                            <span class="material-symbols-outlined text-primary">download</span>
+                            <span class="material-symbols-outlined text-white/35 text-xl" aria-hidden="true">package_2</span>
                             <div>
-                                <h4 class="font-bold">Debian / Ubuntu</h4>
-                                <p class="text-xs text-white/40">v0.2.2 • .deb bundle</p>
+                                <h4 class="text-[15px] font-semibold text-white">Debian / Ubuntu</h4>
+                                <p class="text-[12px] text-white/38">.deb · v0.2.2 · x86_64</p>
                             </div>
                         </div>
-                        <span class="mono-label text-primary">Download</span>
+                        <span class="text-[11px] font-mono-code text-white/45 group-hover:text-primary transition-colors motion-caret-shift">→</span>
                     </a>
-                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.AppImage" class="flex items-center justify-between p-6 rigid-border high-fi-hover transition-all">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.AppImage" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
                         <div class="flex items-center gap-4">
-                            <span class="material-symbols-outlined text-primary">box</span>
+                            <span class="material-symbols-outlined text-white/35 text-xl" aria-hidden="true">deployed_code</span>
                             <div>
-                                <h4 class="font-bold">Generic Linux</h4>
-                                <p class="text-xs text-white/40">v0.2.2 • .AppImage</p>
+                                <h4 class="text-[15px] font-semibold text-white">AppImage</h4>
+                                <p class="text-[12px] text-white/38">Portable · v0.2.2 · x86_64</p>
                             </div>
                         </div>
-                        <span class="mono-label text-primary">Download</span>
+                        <span class="text-[11px] font-mono-code text-white/45 group-hover:text-primary transition-colors motion-caret-shift">→</span>
                     </a>
                 </div>
             </div>
-            <!-- Roadmap -->
-            <div>
-                <div class="mono-label mb-8">Roadmap</div>
-                <h2 class="font-display-xl text-4xl mb-12">The future of Crest.</h2>
-                <div class="space-y-6">
-                    <div class="flex gap-4">
-                        <div class="text-primary font-mono-code text-xs">01</div>
+            <div class="motion-rise motion-d-2">
+                <div class="mono-label mb-3">Direction</div>
+                <h2 class="font-display-xl text-2xl md:text-[1.85rem] text-white mb-10 tracking-[-0.02em]">What we are working toward.</h2>
+                <ul class="space-y-6 list-none p-0 m-0">
+                    <li class="flex gap-4">
+                        <span class="font-mono-code text-[12px] text-white/26 w-8 shrink-0">01</span>
                         <div>
-                            <h4 class="text-sm font-bold uppercase mb-1">Deep AI Integration</h4>
-                            <p class="text-xs text-white/40 leading-relaxed">Local LLM support for context-aware commands and coding assistance.</p>
+                            <h4 class="text-[14px] font-semibold text-white mb-1">Composable shortcuts</h4>
+                            <p class="text-[13px] text-white/42 leading-relaxed">Better ergonomics where Wayland restricts global grabs (portals where viable, sharper docs).</p>
                         </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="text-primary font-mono-code text-xs">02</div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="font-mono-code text-[12px] text-white/26 w-8 shrink-0">02</span>
                         <div>
-                            <h4 class="text-sm font-bold uppercase mb-1">Plugin Marketplace</h4>
-                            <p class="text-xs text-white/40 leading-relaxed">A central registry for community-driven Rust and JS extensions.</p>
+                            <h4 class="text-[14px] font-semibold text-white mb-1">Plugins you can audit</h4>
+                            <p class="text-[13px] text-white/42 leading-relaxed">Templates, versioning, and a discoverable manifest story so first-party/community tools are easy to vet.</p>
                         </div>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="text-primary font-mono-code text-xs">03</div>
+                    </li>
+                    <li class="flex gap-4">
+                        <span class="font-mono-code text-[12px] text-white/26 w-8 shrink-0">03</span>
                         <div>
-                            <h4 class="text-sm font-bold uppercase mb-1">Mobile Remote</h4>
-                            <p class="text-xs text-white/40 leading-relaxed">Control your Linux workstation via encrypted local network from your phone.</p>
+                            <h4 class="text-[14px] font-semibold text-white mb-1">Distribution</h4>
+                            <p class="text-[13px] text-white/42 leading-relaxed">Broader packaging (community AUR / Flatpak interest) tracked with issues—no walled store.</p>
                         </div>
-                    </div>
-                </div>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Technical Footer -->
-<footer class="pt-32 pb-10 px-6 border-t border-white/10 bg-black">
+<footer class="pt-24 pb-10 px-6 border-t border-white/[0.06] bg-[#050708]">
     <div class="max-w-[1400px] mx-auto">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-10 mb-16">
             <div class="col-span-2">
-                <a class="font-headline-md font-bold text-xl tracking-tight mb-6 text-white no-underline block" href="index.html">CREST</a>
-                <p class="text-white/40 text-xs leading-relaxed max-w-md mb-6">
-                    Open-source Raycast-style launcher for <strong class="text-white/55">Linux only</strong>. Rust + Tauri, local-first, no accounts.
+                <a class="font-semibold text-lg tracking-tight mb-6 text-white no-underline block" href="index.html">Crest</a>
+                <p class="text-white/38 text-[13px] leading-relaxed max-w-md mb-6">
+                    Open-source launcher for Linux. Rust application layer, small web UI, local data on disk—no signup wall.
                 </p>
                 <div class="flex gap-4">
-                    <a class="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-primary transition-all" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener" aria-label="GitHub">
+                    <a class="motion-icon-btn w-8 h-8 rounded-full border border-white/10 flex items-center justify-center hover:border-white/22 transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener" aria-label="GitHub">
                         <img alt="" class="w-4 h-4 invert opacity-40" src="https://www.svgrepo.com/show/512317/github-142.svg"/>
                     </a>
                 </div>
@@ -493,19 +437,19 @@
             <div>
                 <h4 class="mono-label mb-6 text-white/80">Site</h4>
                 <ul class="space-y-4 text-xs text-white/40 font-semibold">
-                    <li><a class="hover:text-primary transition-colors" href="index.html#architecture">Architecture</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="index.html#features">Features</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="index.html#download">Download</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="documentation.html">Documentation</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="index.html#architecture">Stack</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="index.html#features">Product</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="index.html#download">Download</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="documentation.html">Documentation</a></li>
                 </ul>
             </div>
             <div>
                 <h4 class="mono-label mb-6 text-white/80">Project</h4>
                 <ul class="space-y-4 text-xs text-white/40 font-semibold">
-                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/releases" target="_blank" rel="noopener">Releases</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
-                    <li><a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="https://github.com/KOUSTAV2409/crest/releases" target="_blank" rel="noopener">Releases</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
+                    <li><a class="hover:text-white text-white/45 transition-colors" href="https://github.com/KOUSTAV2409/crest/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
                 </ul>
             </div>
         </div>
@@ -521,5 +465,6 @@
         </div>
     </div>
 </footer>
+<script src="motion-init.js" defer></script>
 </body>
 </html>

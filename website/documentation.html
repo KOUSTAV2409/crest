@@ -3,46 +3,38 @@
 <head>
     <meta charset="utf-8"/>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Documentation — Crest</title>
-    <meta name="description" content="Install Crest on Linux, fix global shortcuts on Wayland, configure plugins and privacy — user documentation.">
+    <title>Documentation · Crest</title>
+    <meta name="description" content="Crest for Linux — install, shortcuts, plugins, troubleshooting. Open source and keyboard-first like familiar launchers—but yours to fork.">
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     "colors": {
-                        "surface-dim": "#141313",
-                        "inverse-primary": "#4d49d7",
-                        "on-surface": "#e5e2e1",
-                        "outline": "#918fa0",
-                        "outline-variant": "#464554",
-                        "background": "#141313",
-                        "surface": "#141313",
-                        "surface-container": "#201f1f",
-                        "surface-container-low": "#1c1b1b",
-                        "surface-container-lowest": "#0e0e0e",
-                        "surface-variant": "#353434",
-                        "primary": "#c2c1ff",
-                        "on-primary-container": "#150093",
-                        "on-surface-variant": "#c7c4d7"
+                        background: "#070a0b",
+                        surface: "#151515",
+                        muted: "#929292",
+                        "on-surface": "#eaeaea",
+                        "on-surface-variant": "#b0b0b0",
+                        primary: "#ff6363",
                     },
                     "fontFamily": {
-                        "display-xl": ["Space Grotesk"],
-                        "mono-code": ["Fira Code", "monospace"],
-                        "body-md": ["Inter"],
-                        "headline-lg": ["Space Grotesk"]
+                        sans: ["Inter", "system-ui", "sans-serif"],
+                        mono: ["Fira Code", "ui-monospace", "monospace"],
+                        body: ["Inter", "system-ui", "sans-serif"],
+                        headline: ["Inter", "system-ui", "sans-serif"],
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #0e0e0e; -webkit-font-smoothing: antialiased; }
+        body { background-color: #0a0a0b; -webkit-font-smoothing: antialiased; }
         .grain {
-            position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.035;
+            position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.022;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
         }
         .rigid-border { border: 1px solid rgba(255, 255, 255, 0.1); }
@@ -51,7 +43,7 @@
             letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.45);
         }
         .docs-prose h2 {
-            font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700;
+            font-family: 'Inter', system-ui, sans-serif; font-size: 1.5rem; font-weight: 700;
             color: #fff; margin: 2.5rem 0 1rem;
             scroll-margin-top: 5.5rem;
         }
@@ -65,57 +57,58 @@
         .docs-prose ul li { margin: 0.35rem 0; }
         .docs-prose code, .docs-prose kbd {
             font-family: 'Fira Code', monospace; font-size: 0.8rem;
-            background: rgba(194, 193, 255, 0.09); border: 1px solid rgba(194, 193, 255, 0.22);
-            border-radius: 0.25rem; padding: 0.1rem 0.4rem; color: #dcdaff;
+            background: rgba(255, 99, 99, 0.06); border: 1px solid rgba(255, 99, 99, 0.22);
+            border-radius: 0.25rem; padding: 0.1rem 0.4rem; color: #ffb4ae;
         }
         .docs-prose kbd { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
         .docs-callout {
-            border-left: 3px solid rgba(194, 193, 255, 0.65); padding: 0.875rem 1rem 0.875rem 1.125rem;
-            background: rgba(194, 193, 255, 0.06); margin: 1rem 0; border-radius: 0 0.375rem 0.375rem 0;
+            border-left: 3px solid rgba(255, 99, 99, 0.55); padding: 0.875rem 1rem 0.875rem 1.125rem;
+            background: rgba(255, 99, 99, 0.055); margin: 1rem 0; border-radius: 0 0.375rem 0.375rem 0;
         }
         .docs-callout.warn {
             border-color: rgba(251,191,36,0.7); background: rgba(251,191,36,0.07);
         }
         .toc a { transition: color 0.15s; }
-        .toc a:hover { color: rgb(194, 193, 255); }
+        .toc a:hover { color: #ff7979; }
     </style>
+    <link rel="stylesheet" href="motion.css" />
 </head>
-<body class="font-body-md text-on-surface selection:bg-primary/30 selection:text-white">
+<body class="font-sans text-on-surface selection:bg-primary/30 selection:text-white">
 <div class="grain"></div>
 
-<nav class="fixed top-0 w-full z-[100] border-b border-white/5 bg-surface/80 backdrop-blur-md">
-    <div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
-        <div class="flex items-center gap-10">
-            <a class="font-headline-lg font-bold text-lg tracking-tight text-white no-underline" href="index.html">CREST</a>
-            <div class="hidden md:flex gap-8 text-[11px] font-semibold uppercase tracking-widest text-white/45">
-                <a class="hover:text-primary transition-colors" href="index.html#architecture">Architecture</a>
-                <a class="hover:text-primary transition-colors" href="index.html#features">Features</a>
-                <a class="hover:text-primary transition-colors" href="index.html#download">Download</a>
-                <a class="text-primary" href="documentation.html">Documentation</a>
-                <a class="hover:text-primary transition-colors" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
+<nav class="motion-nav-shell fixed top-0 w-full z-[100] border-b border-white/[0.06] bg-[#070a0b]/92 backdrop-blur-md" id="site-nav">
+    <div class="max-w-[1400px] mx-auto px-6 h-[52px] flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <a class="font-semibold text-[15px] tracking-[-0.02em] text-white no-underline" href="index.html">Crest</a>
+            <div class="hidden lg:flex gap-6 text-[12px] font-medium text-white/42">
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#architecture">Stack</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#features">Product</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#download">Download</a>
+                <span class="text-[12px] font-medium text-white/92">Documentation</span>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <span class="mono-label text-primary/60 hidden sm:block">Docs · v0.2.2</span>
-            <a href="index.html#download" class="bg-white text-black px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-wider hover:bg-primary transition-all no-underline">Download</a>
+            <span class="mono-label hidden sm:block text-white/30">v0.2.2</span>
+            <a href="index.html#download" class="motion-btn rounded-lg bg-white text-black px-4 py-2.5 text-[12px] font-semibold hover:bg-white/95 transition-colors no-underline">Download</a>
         </div>
     </div>
 </nav>
 
 <main class="pt-28 pb-24 px-6 max-w-[1200px] mx-auto">
-    <header class="mb-14 max-w-2xl">
-        <div class="mono-label mb-3 text-primary">User guide</div>
-        <h1 class="font-display-xl text-4xl md:text-5xl text-white tracking-tight mb-4">Documentation</h1>
-        <p class="text-on-surface-variant text-lg leading-relaxed">
-            Crest is an open-source, Linux-only productivity launcher (Rust + Tauri). Use this page to install, tune shortcuts (especially on Wayland), configure plugins, and understand how search and privacy behave.
+    <header class="mb-14 max-w-2xl motion-rise motion-d-1">
+        <div class="mono-label mb-3 text-white/45">Operators</div>
+        <h1 class="text-4xl md:text-5xl text-white tracking-tight mb-4 font-bold">Documentation</h1>
+        <p class="text-white/48 text-[17px] leading-relaxed font-normal">
+            Crest is open source and Linux-only—Rust responsibilities behind a thin Tauri + React palette. Install paths, shortcuts, and plugin policy are spelled out below.
         </p>
-        <p class="text-white/35 text-sm mt-4 font-mono-code">
+        <p class="text-white/32 text-[13px] mt-5 font-mono">
             Mirrors the long-form FAQ in the repo (<code class="text-white/50">DOCUMENTBOOK.md</code>) — check GitHub if you prefer Markdown.
         </p>
     </header>
 
     <div class="lg:grid lg:grid-cols-[minmax(0,210px)_minmax(0,1fr)] gap-14 items-start">
-        <aside class="toc rigid-border rounded-lg p-5 bg-black/40 mb-10 lg:mb-0 lg:sticky lg:top-24 text-[13px] text-white/50">
+        <aside class="toc rigid-border rounded-lg p-5 bg-black/40 mb-10 lg:mb-0 lg:sticky lg:top-28 text-[13px] text-white/50 motion-rise motion-d-2 transition-[transform,box-shadow,border-color] duration-300 hover:border-white/[0.12]">
             <div class="mono-label mb-4 text-white/60">On this page</div>
             <ul class="space-y-2.5 list-none p-0 m-0">
                 <li><a href="#install" class="text-white/65 no-underline">Installation</a></li>
@@ -128,7 +121,7 @@
             </ul>
         </aside>
 
-        <article class="docs-prose min-w-0">
+        <article class="docs-prose min-w-0 motion-rise motion-d-3">
             <section id="install" class="scroll-mt-[5.5rem]">
                 <h2>Installation</h2>
                 <p>Grab the latest <strong class="text-white">.deb</strong> or <strong class="text-white">.AppImage</strong> from <a href="https://github.com/KOUSTAV2409/crest/releases" class="text-primary underline-offset-4 hover:underline" target="_blank" rel="noopener">GitHub Releases</a>.</p>
@@ -158,7 +151,7 @@
                 <ul>
                     <li>Type to fuzzy-search apps and other sources.</li>
                     <li><kbd>↑</kbd> / <kbd>↓</kbd> to move selection; <kbd>Enter</kbd> to run the primary action.</li>
-                    <li>Secondary actions: <kbd>Ctrl</kbd> + <kbd>K</kbd> (shown in the footer as ⌘ where macOS idioms slipped through — on Linux use <kbd>Ctrl</kbd>).</li>
+                    <li>Secondary actions: <kbd>Ctrl</kbd> + <kbd>K</kbd>.</li>
                     <li>With an <strong class="text-white">empty</strong> search field, <kbd>Backspace</kbd> cycles modes (clipboard, search, file mode, …).</li>
                 </ul>
             </section>
@@ -202,17 +195,18 @@
     </div>
 </main>
 
-<footer class="pt-16 pb-10 px-6 border-t border-white/10 bg-black mt-16">
+<footer class="pt-16 pb-10 px-6 border-t border-white/[0.06] bg-black mt-16">
     <div class="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between gap-8 items-start sm:items-center">
-        <a class="font-headline-lg font-bold text-white no-underline" href="index.html">Crest</a>
-        <div class="flex flex-wrap gap-6 text-[11px] font-mono-code uppercase tracking-widest text-white/35">
+        <a class="font-semibold text-white no-underline" href="index.html">Crest</a>
+        <div class="flex flex-wrap gap-6 text-[11px] font-mono text-white/32">
             <a href="index.html#download" class="hover:text-primary transition-colors no-underline">Download</a>
-            <a href="documentation.html" class="text-primary no-underline">Documentation</a>
+            <a href="documentation.html" class="text-white/55 no-underline">Documentation</a>
             <a href="https://github.com/KOUSTAV2409/crest/blob/master/DOCUMENTBOOK.md" target="_blank" rel="noopener" class="hover:text-primary transition-colors no-underline">DOCUMENTBOOK.md</a>
             <a href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener" class="hover:text-primary transition-colors no-underline">GitHub</a>
         </div>
-        <div class="text-[10px] font-mono-code text-white/25 tracking-wider">Linux · MIT</div>
+        <div class="text-[10px] font-mono text-white/25 tracking-wider">Linux · MIT</div>
     </div>
 </footer>
+<script src="motion-init.js" defer></script>
 </body>
 </html>
