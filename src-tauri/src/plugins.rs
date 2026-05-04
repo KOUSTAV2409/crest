@@ -3,8 +3,12 @@ use serde::Deserialize;
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 
 use serde::Serialize;
+
+static LOGGED_MISSING_MANIFEST: AtomicBool = AtomicBool::new(false);
+static LOGGED_OPEN_POLICY_WARNING: AtomicBool = AtomicBool::new(false);
 
 #[derive(Clone, Serialize)]
 pub struct Plugin {
@@ -76,10 +80,15 @@ fn load_manifest() -> Result<PluginManifestFile, String> {
 pub fn list_plugins_manifest_only() -> Vec<Plugin> {
     let plugins_dir = get_plugins_dir();
     if !manifest_path().exists() {
-        eprintln!(
-            "Crest plugins: manifest missing at {:?}. Create one (see configs/plugins.manifest.example.json). Manifest mode does not execute loose files.",
-            manifest_path()
-        );
+        if LOGGED_MISSING_MANIFEST
+            .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+        {
+            eprintln!(
+                "Crest plugins: no manifest.json at {:?} — extensions disabled until you add one in the same folder. See configs/plugins.manifest.example.json in the Crest repo (use version 1 and an empty entries list if you don't use plugins).",
+                manifest_path()
+            );
+        }
         return vec![];
     }
 
@@ -172,10 +181,15 @@ pub fn list_plugins() -> Vec<Plugin> {
     match crate::config::load_app_config().plugin_policy {
         crate::config::PluginPolicy::Manifest => list_plugins_manifest_only(),
         crate::config::PluginPolicy::Open => {
-            eprintln!(
-                "Crest plugins: plugin_policy=open trusts every executable/script in {:?}. Prefer \"manifest\" in config.",
-                get_plugins_dir()
-            );
+            if LOGGED_OPEN_POLICY_WARNING
+                .compare_exchange(false, true, Ordering::Relaxed, Ordering::Relaxed)
+                .is_ok()
+            {
+                eprintln!(
+                    "Crest plugins: plugin_policy=open trusts every executable/script in {:?}. Prefer \"manifest\" in config.",
+                    get_plugins_dir()
+                );
+            }
             list_plugins_open_policy()
         }
     }
