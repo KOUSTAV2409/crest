@@ -725,11 +725,12 @@ dependencies = [
 
 [[package]]
 name = "crest"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "arboard",
  "dirs 5.0.1",
  "fend-core",
+ "freedesktop-icons",
  "freedesktop_entry_parser",
  "global-hotkey",
  "image",
@@ -1405,6 +1406,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb4cb245038516f5f85277875cdaa4f7d2c9a0fa0468de06ed190163b1581fcf"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "freedesktop-icons"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95f87364ea709292a3b3f74014ce3ee78412c89807eea75a358c8e029b000994"
+dependencies = [
+ "dirs 5.0.1",
+ "ini_core",
+ "once_cell",
+ "thiserror 1.0.69",
+ "tracing",
+ "xdg",
 ]
 
 [[package]]
@@ -2320,6 +2335,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a588916bfdfd92e71cacef98a63d9b1f0d74d6599980d11894290e7ddefffcf7"
 dependencies = [
  "cfb",
+]
+
+[[package]]
+name = "ini_core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a467a31a9f439b5262fa99c17084537bff57f24703d5a09a2b5c9657ec73a61"
+dependencies = [
+ "cfg-if",
 ]
 
 [[package]]

@@ -1,17 +1,20 @@
 import React from 'react';
 import { useAppStore } from '../store';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { motion } from 'framer-motion';
 import clsx from 'clsx';
 import { ChevronRight } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import type { SearchResult } from '../types/ipc';
+import { categorySlug } from '../categorySlug';
+import { AppIcon } from './AppIcon';
 import './ResultList.css';
 
-const ITEM_HEIGHT = 72; // Increased for multi-line support
+const ITEM_HEIGHT = 62; // Must match .result-item height in CSS
 
 const ResultList: React.FC = () => {
-  const { results, activeIndex, setActiveIndex } = useAppStore();
+  const results = useAppStore((s) => s.results);
+  const activeIndex = useAppStore((s) => s.activeIndex);
+  const setActiveIndex = useAppStore((s) => s.setActiveIndex);
   const parentRef = React.useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -107,10 +110,12 @@ const ResultList: React.FC = () => {
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const item = results[virtualRow.index];
           const isActive = activeIndex === virtualRow.index;
+          const shortcut = item.actions?.[0]?.shortcut ?? null;
           return (
             <div
               key={item.id}
               className={clsx('result-item', { active: isActive })}
+              data-category={categorySlug(item.category)}
               style={{
                 position: 'absolute',
                 top: 0,
@@ -130,27 +135,13 @@ const ResultList: React.FC = () => {
                 }
               }}
             >
-              {isActive && (
-                <motion.div
-                  layoutId="active-selection"
-                  className="active-bg"
-                  initial={false}
-                  transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                />
-              )}
+              {isActive && <div className="active-bg" />}
               <div className="item-content">
+                <span className="category-marker" aria-hidden />
                 <div className="item-icon">
-                  {item.icon.kind === 'emoji' ? (
-                    <span className="emoji-icon">{item.icon.value}</span>
-                  ) : item.icon.kind === 'file' ? (
-                    <span className="file-ext-badge">
-                      {item.icon.value ? item.icon.value.toUpperCase().slice(0, 3) : '📄'}
-                    </span>
-                  ) : (
-                    <div className="placeholder-icon">🚀</div>
-                  )}
+                  <AppIcon icon={item.icon} variant="row" />
                 </div>
-                
+
                 <div className="item-text">
                   <span className="item-title">{item.title}</span>
                   {item.subtitle && <span className="item-subtitle truncate">{item.subtitle}</span>}
@@ -162,11 +153,13 @@ const ResultList: React.FC = () => {
                 </div>
 
                 <div className="item-actions">
-                   {!isActive && <span className="item-category-label">{item.category}</span>}
-                   {isActive && item.actions?.[0]?.shortcut && (
-                     <span className="item-shortcut">{item.actions[0].shortcut}</span>
-                   )}
-                   {isActive && <ChevronRight size={14} className="chevron" />}
+                  {shortcut && !isActive && (
+                    <span className="item-shortcut">{shortcut}</span>
+                  )}
+                  {shortcut && isActive && (
+                    <span className="item-shortcut item-shortcut--active">Enter {shortcut}</span>
+                  )}
+                  {isActive && <ChevronRight size={15} className="chevron" strokeWidth={2.25} />}
                 </div>
               </div>
             </div>

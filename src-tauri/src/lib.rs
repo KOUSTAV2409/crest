@@ -47,7 +47,8 @@ pub fn run() {
             commands::system::get_system_actions,
             commands::system::get_shortcut_setup_hint,
             commands::extensions::run_extension,
-            commands::extensions::get_clipboard_history
+            commands::extensions::get_clipboard_history,
+            commands::icons::resolve_desktop_icon_path
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

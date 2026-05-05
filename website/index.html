@@ -11,14 +11,14 @@
     <meta property="og:url" content="https://crest.run/">
     <meta property="og:title" content="Crest — Your shortcut to everything on Linux">
     <meta property="og:description" content="The open-source, keyboard‑first launcher for Linux. Fast workflows, offline‑friendly clipboard, DuckDuckGo answers, audited extensions—inspect it all under MIT.">
-    <meta property="og:image" content="assets/hero-mockup.png">
+    <meta property="og:image" content="https://crest.run/assets/hero-mockup.png">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://crest.run/">
     <meta property="twitter:title" content="Crest — Your shortcut to everything on Linux">
     <meta property="twitter:description" content="Open-source launcher for Linux. Built for keyboards, Rust under the hood, nothing hidden in a closed app.">
-    <meta property="twitter:image" content="assets/hero-mockup.png">
+    <meta property="twitter:image" content="https://crest.run/assets/hero-mockup.png">
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
@@ -71,14 +71,6 @@
             opacity: 0.022;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
-        .raycast-window {
-            background: rgba(18, 18, 20, 0.92);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow:
-                0 1px 0 rgba(255, 255, 255, 0.06) inset,
-                0 24px 64px rgba(0, 0, 0, 0.45);
-        }
         .technical-line {
             background: linear-gradient(90deg, transparent, rgba(255, 99, 99, 0.25), transparent);
             height: 1px;
@@ -105,6 +97,29 @@
             margin: 0 auto;
             transform-origin: center;
         }
+        /* Floating hero screenshot frame (marketing asset → assets/hero-mockup.png) */
+        .hero-showcase {
+            transform-style: preserve-3d;
+        }
+        .hero-showcase-frame {
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 0.8125rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            background: #0e0f12;
+            box-shadow:
+                0 1px 0 rgba(255, 255, 255, 0.07) inset,
+                0 32px 80px rgba(0, 0, 0, 0.55),
+                0 0 0 1px rgba(0, 0, 0, 0.55);
+            max-width: min(940px, calc(100vw - 48px));
+        }
+        .hero-showcase-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            vertical-align: middle;
+        }
     </style>
     <link rel="stylesheet" href="motion.css" />
 </head>
@@ -125,7 +140,7 @@
             </div>
         </div>
         <div class="flex items-center gap-4">
-            <span class="mono-label hidden sm:inline text-white/38">v0.2.2</span>
+            <span class="mono-label hidden sm:inline text-white/38">v0.2.3</span>
             <a href="#download" class="motion-btn rounded-lg bg-white text-black px-[18px] py-2.5 text-[13px] font-semibold hover:bg-white/95 transition-colors no-underline tracking-tight">Download</a>
         </div>
     </div>
@@ -152,55 +167,28 @@
             </a>
         </div>
         <p class="motion-rise motion-d-4 mt-8 text-[12px] text-muted font-medium tracking-wide">
-            v0.2.2 · x86_64 · .deb · AppImage · single-instance palette toggle <span class="text-white/30">(Wayland‑friendly)</span>
+            v0.2.3 · x86_64 · .deb · AppImage · single-instance palette toggle <span class="text-white/30">(Wayland‑friendly)</span>
         </p>
     </div>
 
-    <!-- Product preview -->
-    <div class="motion-rise motion-d-4 max-w-[720px] mx-auto relative">
-        <div class="motion-preview-wrap relative">
-        <div class="raycast-window rounded-xl overflow-hidden p-0">
-            <div class="flex items-center gap-3 px-5 py-4 border-b border-white/[0.06]">
-                <span class="material-symbols-outlined text-white/35 shrink-0 text-[26px]" aria-hidden="true">search</span>
-                <input class="bg-transparent border-none focus:ring-0 text-white/92 text-xl flex-1 min-w-0 placeholder:text-white/22 font-normal" placeholder="Find an app or run a query…" readonly type="text"/>
-                <span class="motion-caret-blink w-[2px] h-5 shrink-0 rounded-[1px] bg-primary/50" aria-hidden="true"></span>
-            </div>
-            <div class="p-2">
-                <div class="bg-white/[0.04] border border-white/[0.06] rounded-md p-3.5 flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-white/[0.06] rounded-md flex items-center justify-center">
-                            <span class="material-symbols-outlined text-white/65 text-xl" aria-hidden="true">widgets</span>
-                        </div>
-                        <div>
-                            <div class="text-[13px] font-medium text-white/95">firefox</div>
-                            <div class="text-[11px] font-mono-code text-white/38">desktop entry</div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <kbd class="px-2 py-0.5 rounded border border-white/[0.08] text-[10px] font-mono-code text-white/42">Enter</kbd>
-                    </div>
-                </div>
-                <div class="px-4 py-3 flex items-center justify-between border-t border-white/[0.04]">
-                    <div class="flex items-center gap-3 opacity-55">
-                        <div class="w-9 h-9 rounded-md bg-white/[0.04] flex items-center justify-center"><span class="material-symbols-outlined text-white/45 text-lg" aria-hidden="true">draft</span></div>
-                        <div>
-                            <div class="text-[13px] font-medium text-white/90">~/Documents · notes.md</div>
-                            <div class="text-[11px] font-mono-code text-white/32">File</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="px-4 py-2 border-t border-white/[0.04] flex justify-between items-center bg-black/25">
-                <span class="text-[11px] font-mono-code text-white/32">clipboard · web · plugins</span>
-                <div class="flex items-center gap-2 text-white/38">
-                    <span class="text-[11px]">Actions</span>
-                    <kbd class="text-[10px] font-mono-code px-1.5 py-0.5 rounded border border-white/[0.08]">Ctrl</kbd>
-                    <kbd class="text-[10px] font-mono-code px-1.5 py-0.5 rounded border border-white/[0.08]">K</kbd>
-                </div>
-            </div>
+    <!-- Floating product screenshot (update assets/hero-mockup.png to refresh OG + README too) -->
+    <div class="motion-rise motion-d-4 hero-showcase max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 relative pb-6 sm:pb-10">
+        <div class="motion-preview-wrap hero-showcase-frame relative">
+            <img
+                class="hero-showcase-img select-none pointer-events-none"
+                src="assets/hero-mockup.png"
+                width="1536"
+                height="1024"
+                alt="Crest launcher on Linux — dark palette with search field, blurred result rows, dual-pane preview, and Ctrl+K actions hint."
+                decoding="async"
+                fetchpriority="high"
+                loading="eager"
+            />
         </div>
-        </div>
-        <div class="motion-glow-breathe absolute -z-10 top-1/2 left-1/2 w-[115%] h-[115%] bg-primary/[0.045] blur-[100px] rounded-full" aria-hidden="true"></div>
+        <div class="motion-glow-breathe absolute -z-10 top-1/2 left-1/2 w-[118%] h-[118%] max-w-[980px] bg-primary/[0.055] blur-[120px] rounded-full pointer-events-none" aria-hidden="true"></div>
+        <p class="text-center mt-5 sm:mt-6 text-[12px] text-muted max-w-xl mx-auto leading-relaxed relative z-[1]">
+            Showing <span class="font-mono-code text-white/42 text-[11px]">assets/hero-mockup.png</span> · replace it with your own launcher screenshot anytime (same filename updates OG + README).
+        </p>
     </div>
 </section>
 
@@ -259,8 +247,8 @@
                 <div class="p-6 font-mono-code text-[12px] leading-[1.75] text-white/55">
                     <p class="text-white/32 mb-4 text-[11px] uppercase tracking-wider">Install from GitHub (paths match current release).</p>
                     <div><span class="text-primary">#</span> <span class="text-white/80">Debian / Ubuntu</span></div>
-                    <div class="mt-2 pl-0"><span class="text-white/38">wget</span> <span class="text-white/70">…/releases/…/crest_0.2.2_amd64.deb</span></div>
-                    <div class="text-white/38 mt-2">sudo apt install ./crest_0.2.2_amd64.deb</div>
+                    <div class="mt-2 pl-0"><span class="text-white/38">wget</span> <span class="text-white/70">…/releases/…/crest_0.2.3_amd64.deb</span></div>
+                    <div class="text-white/38 mt-2">sudo apt install ./crest_0.2.3_amd64.deb</div>
                     <div class="mt-5"><span class="text-primary">#</span> <span class="text-white/80">AppImage</span></div>
                     <div class="text-white/38 mt-2">chmod +x crest_*_amd64.AppImage &amp;&amp; ./crest_*_amd64.AppImage</div>
                     <div class="mt-6 pt-5 border-t border-white/[0.06] text-[11px] text-white/38 leading-relaxed">
@@ -366,22 +354,22 @@
                 <div class="mono-label mb-3">Artifacts</div>
                 <h2 class="font-display-xl text-2xl md:text-[1.85rem] text-white mb-10 tracking-[-0.02em]">Release artifacts on GitHub.</h2>
                 <div class="space-y-3">
-                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.deb" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.3_amd64.deb" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-white/35 text-xl" aria-hidden="true">package_2</span>
                             <div>
                                 <h4 class="text-[15px] font-semibold text-white">Debian / Ubuntu</h4>
-                                <p class="text-[12px] text-white/38">.deb · v0.2.2 · x86_64</p>
+                                <p class="text-[12px] text-white/38">.deb · v0.2.3 · x86_64</p>
                             </div>
                         </div>
                         <span class="text-[11px] font-mono-code text-white/45 group-hover:text-primary transition-colors motion-caret-shift">→</span>
                     </a>
-                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.2_amd64.AppImage" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
+                    <a href="https://github.com/KOUSTAV2409/crest/releases/latest/download/crest_0.2.3_amd64.AppImage" class="flex items-center justify-between p-5 rigid-border rounded-lg high-fi-hover motion-card transition-colors duration-300 no-underline group">
                         <div class="flex items-center gap-4">
                             <span class="material-symbols-outlined text-white/35 text-xl" aria-hidden="true">deployed_code</span>
                             <div>
                                 <h4 class="text-[15px] font-semibold text-white">AppImage</h4>
-                                <p class="text-[12px] text-white/38">Portable · v0.2.2 · x86_64</p>
+                                <p class="text-[12px] text-white/38">Portable · v0.2.3 · x86_64</p>
                             </div>
                         </div>
                         <span class="text-[11px] font-mono-code text-white/45 group-hover:text-primary transition-colors motion-caret-shift">→</span>

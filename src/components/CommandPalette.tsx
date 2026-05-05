@@ -17,7 +17,8 @@ const modeLabel: Record<string, string> = {
 };
 
 const CommandPalette: React.FC = () => {
-  const { results, mode } = useAppStore();
+  const results = useAppStore((s) => s.results);
+  const mode = useAppStore((s) => s.mode);
 
   useEffect(() => {
     // Keyboard navigation handled in ResultList
@@ -33,6 +34,12 @@ const CommandPalette: React.FC = () => {
         transition={{ duration: 0.1, ease: [0.16, 1, 0.3, 1] }}
       >
         <SearchInput />
+        <div
+          className="palette-drag-rail"
+          data-tauri-drag-region
+          aria-hidden
+          title="Drag to move window"
+        />
         <ShortcutSetupBanner />
 
         <div className="palette-body">
@@ -47,7 +54,7 @@ const CommandPalette: React.FC = () => {
           )}
         </div>
 
-        <div className="status-bar">
+        <div className="status-bar" data-tauri-drag-region>
           <div className="status-left">
             <div className="status-category-chip">
               {modeLabel[mode] ?? mode}
@@ -55,7 +62,10 @@ const CommandPalette: React.FC = () => {
             <div className="status-divider" />
             <div className="status-action-hint">
               <span className="action-text">Actions</span>
-              <kbd className="status-kbd">⌘K</kbd>
+              <span className="status-kbd-group">
+                <kbd className="status-kbd">Ctrl</kbd>
+                <kbd className="status-kbd">K</kbd>
+              </span>
             </div>
           </div>
           <div className="status-right">

@@ -1,101 +1,113 @@
 import React from 'react';
 import { useAppStore } from '../store';
-import { motion } from 'framer-motion';
+import { AppIcon } from './AppIcon';
 import './PreviewPanel.css';
 
 const getCategoryClass = (category: string) => {
   const c = category.toLowerCase();
   if (c === 'applications') return 'cat-app';
-  if (c === 'files') return 'cat-file';
+  if (c === 'files' || c === 'file') return 'cat-file';
   if (c === 'calculator') return 'cat-calc';
-  if (c === 'internet') return 'cat-web';
+  if (c === 'internet' || c.includes('web')) return 'cat-web';
+  if (c === 'system') return 'cat-system';
+  if (c === 'extension' || c === 'extensions') return 'cat-extension';
+  if (c === 'commands') return 'cat-cmds';
+  if (c === 'clipboard') return 'cat-clipboard';
   return '';
 };
 
+function resultSourceLabel(category: string): string {
+  const c = category.toLowerCase();
+  if (c === 'internet' || c.includes('web')) return 'Web';
+  return 'Local';
+}
+
 const PreviewPanel: React.FC = () => {
-  const { results, activeIndex } = useAppStore();
+  const results = useAppStore((s) => s.results);
+  const activeIndex = useAppStore((s) => s.activeIndex);
   const activeItem = results[activeIndex];
 
-  if (!activeItem) return (
-    <div className="preview-panel empty">
-      <div className="empty-state">
-        <div className="empty-icon">🏔️</div>
-        <h3>Crest Launcher</h3>
-        <p>Type to search apps, files, and more</p>
+  if (!activeItem) {
+    return (
+      <div className="preview-panel empty">
+        <div className="empty-state">
+          <div className="empty-icon">🏔️</div>
+          <h3>Crest</h3>
+          <p>Search apps, files, and commands</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-  const isFile = activeItem.icon.kind === 'file';
-  const isEmoji = activeItem.icon.kind === 'emoji';
+  const catClass = getCategoryClass(activeItem.category);
+  const source = (() => {
+    // Some rows use "Internet" category for an action that opens browser; treat those as Web.
+    const c = activeItem.category.toLowerCase();
+    if (c === 'internet' || c.includes('web')) return 'Web';
+    if (
+      activeItem.id.startsWith('web-') ||
+      activeItem.id.startsWith('open-url-') ||
+      activeItem.id.startsWith('open-url') ||
+      activeItem.id.startsWith('wiki-')
+    ) {
+      return 'Web';
+    }
+    return resultSourceLabel(activeItem.category);
+  })();
 
   return (
-    <motion.div
-      key={activeItem.id}
-      className="preview-panel"
-      initial={{ opacity: 0, x: 5 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.15 }}
-    >
+    <div key={activeItem.id} className="preview-panel preview-panel--enter">
       <div className="preview-content">
-        {/* Large Hero Icon */}
         <div className="preview-hero">
-          <div className={`hero-icon-container ${getCategoryClass(activeItem.category)}`}>
-            {isEmoji ? (
-              <span className="hero-emoji">{activeItem.icon.value}</span>
-            ) : isFile ? (
-              <span className="hero-file-type">{activeItem.icon.value.toUpperCase().slice(0, 3)}</span>
-            ) : (
-              <div className="hero-icon-app">
-                <span className="hero-emoji">🚀</span>
-              </div>
-            )}
+          <div className={`hero-icon-container ${catClass}`}>
+            <AppIcon icon={activeItem.icon} variant="hero" />
           </div>
           <h2 className="hero-title">{activeItem.title}</h2>
-          <span className={`hero-badge ${getCategoryClass(activeItem.category)}`}>
-            {activeItem.category}
-          </span>
+          {activeItem.subtitle && (
+            <p className="hero-subtitle">{activeItem.subtitle}</p>
+          )}
         </div>
 
         <div className="preview-divider" />
 
-        {/* Metadata Section */}
-        <div className="preview-metadata-list">
-          {activeItem.subtitle && (
-            <div className="metadata-row">
-              <span className="metadata-label">{isFile ? 'Location' : 'Subtitle'}</span>
-              <span className="metadata-value truncate">{activeItem.subtitle}</span>
-            </div>
-          )}
-          
+        <div className="preview-body">
           {activeItem.preview?.description && (
-            <div className="metadata-row vertical">
-              <span className="metadata-label">Description</span>
-              <p className="metadata-text">{activeItem.preview.description}</p>
+            <p className="preview-description-text">
+              {activeItem.preview.description}
+            </p>
+          )}
+
+          <div className="preview-metadata-block">
+            <div className="meta-line">
+              <span className="meta-label">Category</span>
+              <span className={`meta-value ${catClass}`}>
+                {activeItem.category === 'Applications' ? 'App' : activeItem.category}
+              </span>
             </div>
-          )}
+            <div className="meta-line">
+              <span className="meta-label">Source</span>
+            <span
+              className={
+                source === 'Local'
+                  ? 'meta-value accent-amber'
+                  : 'meta-value meta-value--muted'
+              }
+            >
+              {source}
+            </span>
+            </div>
+          </div>
+        </div>
 
-          {activeItem.category === 'Internet' && (
-             <div className="metadata-row">
-                <span className="metadata-label">Search</span>
-                <span className="metadata-value">DuckDuckGo (browser + in-app)</span>
-             </div>
-          )}
+        <div className="preview-hint-box">
+          <div className="hint-prompt">&gt;_</div>
+          <div className="hint-content">
+            <div className="hint-line">Type to filter results</div>
+            <div className="hint-line">Use <span className="hint-key">↑↓</span> to navigate</div>
+          </div>
         </div>
       </div>
-
-      {/* Action Footer */}
-      <div className="preview-footer">
-        <div className="footer-action primary">
-          <span className="action-key">↵</span>
-          <span className="action-text">{activeItem.actions?.[0]?.title || 'Open'}</span>
-        </div>
-        <div className="footer-action secondary">
-          <span className="action-key">⌘K</span>
-          <span className="action-text">Actions</span>
-        </div>
-      </div>
-    </motion.div>
+    </div>
   );
 };
 

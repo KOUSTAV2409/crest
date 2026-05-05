@@ -1,57 +1,70 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* Background layers - Premium Glassmorphism */
-  --bg:              rgba(20, 20, 26, 0.88);
-  --bg-elevated:     rgba(28, 28, 34, 0.98);
-  --bg-hover:        rgba(255, 255, 255, 0.05);
-  --bg-selected:     rgba(124, 107, 255, 0.12);
-  --bg-sidebar:      rgba(15, 15, 20, 0.4);
+  /* High-Fidelity Mockup Palette */
+  --bg:              rgba(15, 15, 20, 0.88);
+  --bg-deep:         #0d0d11;
+  --bg-elevated:     rgba(28, 28, 35, 0.98);
+  --bg-sidebar:      rgba(10, 10, 14, 0.45);
+  --bg-hover:        rgba(255, 255, 255, 0.03);
 
-  /* Borders - Ultra Sharp 0.5px style */
-  --border:          rgba(255, 255, 255, 0.06);
-  --border-strong:   rgba(255, 255, 255, 0.1);
-  --border-active:   rgba(124, 107, 255, 0.4);
+  /* The exact purple-gradient selection from the mockup */
+  --bg-selected-fill: linear-gradient(90deg, rgba(65, 61, 125, 0.7) 0%, rgba(54, 51, 102, 0.5) 100%);
+  --bg-selected-border: rgba(168, 85, 247, 0.3);
 
-  /* Text - High Legibility */
-  --text-primary:    #ffffff;
-  --text-secondary:  rgba(255, 255, 255, 0.6);
-  --text-tertiary:   rgba(255, 255, 255, 0.35);
+  /* Precise hairline borders */
+  --border:           rgba(255, 255, 255, 0.05);
+  --border-strong:    rgba(255, 255, 255, 0.08);
+  --border-active:    rgba(139, 92, 246, 0.4);
 
-  /* Accent - Vibrant Indigo */
-  --accent:          #8b5cf6; /* Indigo 500 */
-  --accent-hover:    #a78bfa; /* Indigo 400 */
-  --accent-glow:     rgba(139, 92, 246, 0.25);
+  --text-primary:     #f8fafc;
+  --text-secondary:   rgba(248, 250, 252, 0.65);
+  --text-tertiary:    rgba(248, 250, 252, 0.35);
 
-  /* Category colors - Refined Pastel/Neon */
-  --color-app:       #fbbf24; /* Amber 400 */
-  --color-file:      #3b82f6; /* Blue 500 */
-  --color-calc:      #10b981; /* Emerald 500 */
-  --color-web:       #06b6d4; /* Cyan 500 */
-  --color-system:    #f43f5e; /* Rose 500 */
+  /* Branding accents */
+  --accent:           #8b5cf6;
+  --accent-muted:     rgba(139, 92, 246, 0.7);
+  --accent-glow:      rgba(139, 92, 246, 0.2);
 
-  /* Radii - Modern & Soft */
-  --radius-window:   18px;
-  --radius-item:     10px;
-  --radius-badge:    6px;
-  --radius-icon:     12px;
+  --color-app:        #fbbf24; /* Amber dot */
+  --color-file:       #38bdf8; /* Blue dot */
+  --color-calc:       #34d399; /* Green dot */
+  --color-web:        #22d3ee;
+  
+  --radius-window:   24px;
+  --radius-item:     12px;
+  --radius-badge:    8px;
+  --radius-icon:     16px;
+
+  --ease-snappy:     cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   width: 100%;
   height: 100%;
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Inter',
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
   color: var(--text-primary);
-  background-color: #1a1a1e; /* Fallback dark color */
+  background-color: var(--bg-deep);
   overflow: hidden;
   user-select: none;
   -webkit-font-smoothing: antialiased;
@@ -64,43 +77,61 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #1a1a1e;
+  background-color: transparent;
 }
 
 .window-container {
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at 50% -20%, rgba(255, 255, 255, 0.03), transparent), var(--bg);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -30%, rgba(168, 85, 247, 0.11), transparent 55%),
+    radial-gradient(ellipse 90% 50% at 80% 100%, rgba(6, 182, 212, 0.05), transparent 45%),
+    var(--bg);
+  backdrop-filter: blur(48px) saturate(165%);
+  -webkit-backdrop-filter: blur(48px) saturate(165%);
   border-radius: var(--radius-window);
   border: 1px solid var(--border-strong);
   box-shadow:
-    0 24px 80px rgba(0, 0, 0, 0.7),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    0 28px 90px rgba(0, 0, 0, 0.78),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* ── Animations ── */
-.fade-in { animation: fadeIn 120ms ease-out; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.985); }
-  to   { opacity: 1; transform: scale(1); }
+.fade-in {
+  animation: fadeIn 140ms var(--ease-snappy);
 }
 
-input { font-family: inherit; }
-input:focus { outline: none; }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.986);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+input {
+  font-family: inherit;
+}
+input:focus {
+  outline: none;
+}

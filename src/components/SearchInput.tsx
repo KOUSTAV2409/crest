@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, startTransition } from 'react';
 import { Search } from 'lucide-react';
 import { invoke } from '@tauri-apps/api/core';
 import { useAppStore } from '../store';
@@ -7,6 +7,20 @@ import './SearchInput.css';
 
 const WEB_SEARCH_DEBOUNCE_MS = 600;
 
+/** Minimum delay before kicking off IPC so bursts like "CEO" do not overlap heavy work every key. */
+const MIN_SEARCH_DEBOUNCE_MS = 64;
+
+/** Steady-state debounce once the query is longer. */
+const DEFAULT_SEARCH_DEBOUNCE_MS = 105;
+
+/** Avoid `calculate` IPC for arbitrary short strings like "c" or app names. */
+function mightBeQuickCalc(expr: string): boolean {
+  const t = expr.trim();
+  if (t.length === 0) return false;
+  if (t.length === 1) return /\d/.test(t);
+  return /^[\d\s+\-*/().,]+$/.test(t);
+}
+
 const WEB_RESULT_CATEGORIES = new Set(['Web Result', 'Web Answer']);
 
 function asSearchResults(value: unknown): SearchResult[] {
@@ -14,9 +28,27 @@ function asSearchResults(value: unknown): SearchResult[] {
 }
 
 const SearchInput: React.FC = () => {
-  const { query, setQuery, setMode, setResults, mode } = useAppStore();
+  const setQuery = useAppStore((s) => s.setQuery);
+  const setMode = useAppStore((s) => s.setMode);
+  const setResults = useAppStore((s) => s.setResults);
+  const mode = useAppStore((s) => s.mode);
+
   const inputRef = useRef<HTMLInputElement>(null);
   const webSearchTimeoutRef = useRef<number | null>(null);
+  const defaultSearchTimeoutRef = useRef<number | null>(null);
+
+  const [defaultValue] = React.useState(() => useAppStore.getState().query);
+
+  useEffect(() => {
+    return useAppStore.subscribe((state) => {
+      const el = inputRef.current;
+      if (!el) return;
+      const q = state.query;
+      if (el.value !== q) {
+        el.value = q;
+      }
+    });
+  }, []);
 
   const modeLabel: Record<string, string> = {
     default: 'apps and commands',
@@ -28,6 +60,17 @@ const SearchInput: React.FC = () => {
 
   useEffect(() => {
     inputRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (webSearchTimeoutRef.current !== null) {
+        window.clearTimeout(webSearchTimeoutRef.current);
+      }
+      if (defaultSearchTimeoutRef.current !== null) {
+        window.clearTimeout(defaultSearchTimeoutRef.current);
+      }
+    };
   }, []);
 
   const currentPlaceholder =
@@ -48,78 +91,95 @@ const SearchInput: React.FC = () => {
     }
   };
 
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
+  const runAfterInput = (val: string) => {
     setQuery(val);
 
+    const cancelDefaultSearchDebounce = () => {
+      if (defaultSearchTimeoutRef.current !== null) {
+        window.clearTimeout(defaultSearchTimeoutRef.current);
+        defaultSearchTimeoutRef.current = null;
+      }
+    };
+
     if (val.startsWith('=')) {
+      cancelDefaultSearchDebounce();
       setMode('calculator');
       if (val.length > 1) {
-        try {
-          const res = await invoke<string>('calculate', { expr: val.substring(1) });
-          const row: SearchResult = {
-            id: 'calc',
-            title: res,
-            subtitle: 'Result',
-            category: 'Calculator',
-            icon: { kind: 'emoji', value: '🧮' },
-            score: 1,
-            actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }],
-          };
-          setResults([row]);
-        } catch {
-          /* invalid expression */
-        }
+        void (async () => {
+          try {
+            const res = await invoke<string>('calculate', { expr: val.substring(1) });
+            const row: SearchResult = {
+              id: 'calc',
+              title: res,
+              subtitle: 'Result',
+              category: 'Calculator',
+              icon: { kind: 'emoji', value: '🧮' },
+              score: 1,
+              actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }],
+            };
+            startTransition(() => setResults([row]));
+          } catch {
+            /* invalid expression */
+          }
+        })();
       } else {
-        setResults([]);
+        startTransition(() => setResults([]));
       }
       return;
     }
 
     if (val.startsWith('>')) {
+      cancelDefaultSearchDebounce();
       setMode('command');
       return;
     }
 
     if (val.startsWith('/')) {
+      cancelDefaultSearchDebounce();
       setMode('file');
-      try {
-        const queryStr = val === '/' ? '' : val.substring(1);
-        const res = asSearchResults(
-          await invoke<unknown>('search_files', { query: queryStr })
-        );
-        setResults(res);
-      } catch (e) {
-        console.error('File search error', e);
-      }
+      void (async () => {
+        try {
+          const queryStr = val === '/' ? '' : val.substring(1);
+          const res = asSearchResults(
+            await invoke<unknown>('search_files', { query: queryStr })
+          );
+          startTransition(() => setResults(res));
+        } catch (e) {
+          console.error('File search error', e);
+        }
+      })();
       return;
     }
 
     if (mode === 'clipboard') {
-      try {
-        const res = asSearchResults(
-          await invoke<unknown>('get_clipboard_history')
-        );
-        const v = val.toLowerCase();
-        const filtered = res.filter(
-          (item) =>
-            item.title.toLowerCase().includes(v) ||
-            (item.preview?.description?.toLowerCase().includes(v) ?? false)
-        );
-        setResults(filtered);
-      } catch (e) {
-        console.error('Clipboard fetch error', e);
-      }
+      cancelDefaultSearchDebounce();
+      void (async () => {
+        try {
+          const res = asSearchResults(
+            await invoke<unknown>('get_clipboard_history')
+          );
+          const v = val.toLowerCase();
+          const filtered = res.filter(
+            (item) =>
+              item.title.toLowerCase().includes(v) ||
+              (item.preview?.description?.toLowerCase().includes(v) ?? false)
+          );
+          startTransition(() => setResults(filtered));
+        } catch (e) {
+          console.error('Clipboard fetch error', e);
+        }
+      })();
       return;
     }
 
     setMode('default');
     if (val.trim() === '') {
+      cancelDefaultSearchDebounce();
       if (webSearchTimeoutRef.current !== null) {
         window.clearTimeout(webSearchTimeoutRef.current);
         webSearchTimeoutRef.current = null;
       }
-      setResults([]);
+      startTransition(() => setResults([]));
       return;
     }
 
@@ -128,131 +188,169 @@ const SearchInput: React.FC = () => {
       webSearchTimeoutRef.current = null;
     }
 
-    try {
-      let res = asSearchResults(await invoke<unknown>('search', { query: val, category: null }));
+    cancelDefaultSearchDebounce();
+    const capturedQuery = val;
+    const debounceMs =
+      capturedQuery.trim().length <= 2
+        ? MIN_SEARCH_DEBOUNCE_MS
+        : DEFAULT_SEARCH_DEBOUNCE_MS;
 
-      try {
-        const calcRes = await invoke<string>('calculate', { expr: val });
-        let calcResStr = calcRes.replace(/(\.\d{2})\d+/, '$1');
+    defaultSearchTimeoutRef.current = window.setTimeout(() => {
+      defaultSearchTimeoutRef.current = null;
+      void (async () => {
+        try {
+          if (useAppStore.getState().query !== capturedQuery) return;
 
-        const row: SearchResult = {
-          id: 'calc',
-          title: calcResStr,
-          subtitle: 'Calculator Result',
-          category: 'Calculator',
-          icon: { kind: 'emoji', value: '🧮' },
-          score: 1.1,
-          actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }],
-        };
-        res = [row, ...res];
-      } catch {
-        /* not a calculator query */
-      }
+          let res = asSearchResults(
+            await invoke<unknown>('search', { query: capturedQuery, category: null })
+          );
 
-      const webRow: SearchResult = {
-        id: `web-search-${val}`,
-        title: `Search DuckDuckGo for "${val}"`,
-        subtitle: 'Opens in your default browser',
-        category: 'Internet',
-        icon: { kind: 'emoji', value: '🔍' },
-        score: 0.1,
-        actions: [{ id: 'search_web', title: 'Search DuckDuckGo', shortcut: '↵' }],
-      };
-      res = [...res, webRow];
+          if (useAppStore.getState().query !== capturedQuery) return;
 
-      if (isUrl(val)) {
-        const url = val.startsWith('http') ? val : `https://${val}`;
-        const openRow: SearchResult = {
-          id: `open-url-${url}`,
-          title: `Open ${url}`,
-          subtitle: 'Web Browser',
-          category: 'Internet',
-          icon: { kind: 'emoji', value: '🌐' },
-          score: 1.2,
-          actions: [{ id: 'open_url', title: 'Open in Browser', shortcut: '↵' }],
-        };
-        res = [openRow, ...res];
-      }
+          if (mightBeQuickCalc(capturedQuery)) {
+            try {
+              const calcRes = await invoke<string>('calculate', { expr: capturedQuery });
+              if (useAppStore.getState().query !== capturedQuery) return;
 
-      setResults(res);
+              let calcResStr = calcRes.replace(/(\.\d{2})\d+/, '$1');
 
-      if (val.length > 2) {
-        const currentQuery = val;
-        if (webSearchTimeoutRef.current !== null) {
-          window.clearTimeout(webSearchTimeoutRef.current);
-        }
-        webSearchTimeoutRef.current = window.setTimeout(async () => {
-          try {
-            const webResults = asSearchResults(
-              await invoke<unknown>('fetch_web_results', { query: currentQuery })
-            );
-
-            const { query: latestQuery, results: currentResults } = useAppStore.getState();
-
-            if (webResults.length > 0 && latestQuery === currentQuery) {
-              const nonWebResults = currentResults.filter(
-                (r) => !WEB_RESULT_CATEGORIES.has(r.category)
-              );
-              setResults([...nonWebResults, ...webResults]);
+              const row: SearchResult = {
+                id: 'calc',
+                title: calcResStr,
+                subtitle: 'Calculator Result',
+                category: 'Calculator',
+                icon: { kind: 'emoji', value: '🧮' },
+                score: 1.1,
+                actions: [{ id: 'copy', title: 'Copy Result', shortcut: '↵' }],
+              };
+              res = [row, ...res];
+            } catch {
+              /* not a calculator query */
             }
-          } catch (e) {
-            console.error('Web fetch error', e);
           }
-        }, WEB_SEARCH_DEBOUNCE_MS);
-      }
-    } catch (err) {
-      console.error('Search error', err);
-    }
+
+          if (useAppStore.getState().query !== capturedQuery) return;
+
+          const webRow: SearchResult = {
+            id: `web-search-${capturedQuery}`,
+            title: `Search DuckDuckGo for "${capturedQuery}"`,
+            subtitle: 'Opens in your default browser',
+            category: 'Internet',
+            icon: { kind: 'emoji', value: '🔍' },
+            score: 0.1,
+            actions: [{ id: 'search_web', title: 'Search DuckDuckGo', shortcut: '↵' }],
+          };
+          res = [...res, webRow];
+
+          if (isUrl(capturedQuery)) {
+            const url = capturedQuery.startsWith('http')
+              ? capturedQuery
+              : `https://${capturedQuery}`;
+            const openRow: SearchResult = {
+              id: `open-url-${url}`,
+              title: `Open ${url}`,
+              subtitle: 'Web Browser',
+              category: 'Internet',
+              icon: { kind: 'emoji', value: '🌐' },
+              score: 1.2,
+              actions: [{ id: 'open_url', title: 'Open in Browser', shortcut: '↵' }],
+            };
+            res = [openRow, ...res];
+          }
+
+          startTransition(() => setResults(res));
+
+          if (capturedQuery.length > 2) {
+            const currentQuery = capturedQuery;
+            if (webSearchTimeoutRef.current !== null) {
+              window.clearTimeout(webSearchTimeoutRef.current);
+            }
+            webSearchTimeoutRef.current = window.setTimeout(async () => {
+              try {
+                const webResults = asSearchResults(
+                  await invoke<unknown>('fetch_web_results', { query: currentQuery })
+                );
+
+                const { query: latestQuery, results: currentResults } = useAppStore.getState();
+
+                if (webResults.length > 0 && latestQuery === currentQuery) {
+                  const nonWebResults = currentResults.filter(
+                    (r) => !WEB_RESULT_CATEGORIES.has(r.category)
+                  );
+                  startTransition(() => {
+                    setResults([...nonWebResults, ...webResults]);
+                  });
+                }
+              } catch (e) {
+                console.error('Web fetch error', e);
+              }
+            }, WEB_SEARCH_DEBOUNCE_MS);
+          }
+        } catch (err) {
+          console.error('Search error', err);
+        }
+      })();
+    }, debounceMs);
   };
 
   return (
     <div className="search-input-container">
-      <div className="search-icon">
-        <Search size={16} />
+      <div className="search-field">
+        <div className="search-icon" aria-hidden="true">
+          <Search size={18} strokeWidth={2.5} />
+        </div>
+        <input
+          ref={inputRef}
+          type="text"
+          defaultValue={defaultValue}
+          onChange={(e) => runAfterInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Backspace' && mode !== 'default') {
+              requestAnimationFrame(() => {
+                const v = inputRef.current?.value ?? '';
+                if (v !== '') return;
+                startTransition(() => setMode('default'));
+                startTransition(() => setResults([]));
+              });
+            } else if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+              if (results.length > 0) {
+                setActiveIndex((activeIndex + 1) % results.length);
+              }
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              const { results, activeIndex, setActiveIndex } = useAppStore.getState();
+              if (results.length > 0) {
+                setActiveIndex((activeIndex - 1 + results.length) % results.length);
+              }
+            } else if (e.key === 'Enter') {
+              const { results, activeIndex } = useAppStore.getState();
+              const item = results[activeIndex];
+              if (item) {
+                const activeEl = document.querySelector('.result-item.active') as HTMLElement;
+                activeEl?.click();
+              }
+            }
+          }}
+          placeholder={currentPlaceholder}
+          className="search-input"
+          spellCheck={false}
+          autoComplete="off"
+          autoCorrect="off"
+        />
+        <div className="search-badges" aria-hidden="true">
+          <div className="search-kbd-group">
+            <kbd className="search-kbd-badge">Ctrl</kbd>
+            <kbd className="search-kbd-badge">K</kbd>
+          </div>
+        </div>
       </div>
+
       {mode === 'file' && <span className="search-mode-pill mode-file">📂 Files</span>}
       {mode === 'calculator' && <span className="search-mode-pill mode-calc">🧮 Calc</span>}
-      {mode === 'command' && <span className="search-mode-pill mode-cmd">⌘ CMD</span>}
+      {mode === 'command' && <span className="search-mode-pill mode-cmd">Commands</span>}
       {mode === 'clipboard' && <span className="search-mode-pill mode-clip">📋 Clip</span>}
-      <input
-        ref={inputRef}
-        type="text"
-        value={query}
-        onChange={handleChange}
-        onKeyDown={(e) => {
-          if (e.key === 'Backspace' && query === '' && mode !== 'default') {
-            setMode('default');
-            setResults([]);
-          } else if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
-            if (results.length > 0) {
-              setActiveIndex((activeIndex + 1) % results.length);
-            }
-          } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            const { results, activeIndex, setActiveIndex } = useAppStore.getState();
-            if (results.length > 0) {
-              setActiveIndex((activeIndex - 1 + results.length) % results.length);
-            }
-          } else if (e.key === 'Enter') {
-            const { results, activeIndex } = useAppStore.getState();
-            const item = results[activeIndex];
-            if (item) {
-              const activeEl = document.querySelector('.result-item.active') as HTMLElement;
-              activeEl?.click();
-            }
-          }
-        }}
-        placeholder={currentPlaceholder}
-        className="search-input"
-        spellCheck={false}
-        autoComplete="off"
-        autoCorrect="off"
-      />
-      <div className="search-badges">
-        <kbd className="search-kbd-badge">⌘K</kbd>
-      </div>
     </div>
   );
 };

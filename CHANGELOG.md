@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
+## [0.2.3] - 2026-05-05
+
+### Added
+- **Freedesktop icon resolution** (theme-aware) with non-blocking IPC and UI-side idle scheduling so icons don’t stall typing.
+- **Web results fallback**: when DuckDuckGo returns a bot challenge page, Crest augments results using Wikipedia’s search API.
+
+### Fixed
+- **Input lag on first character**: heavy search/icon work no longer blocks the UI event loop; keystrokes render immediately.
+
+### Changed
+- **UI polish**: search field, result shortcuts, and preview panel updated to match the hero mockup styling.
+
 ## [0.2.2] - 2026-05-05
 
 ### Added
@@ -41,3 +53,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 [0.2.0]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.0
 [0.2.1]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.1
 [0.2.2]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.2
+[0.2.3]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.3

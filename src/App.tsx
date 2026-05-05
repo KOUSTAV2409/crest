@@ -28,7 +28,7 @@ function App() {
   }, []);
 
   return (
-    <div className="window-container" data-tauri-drag-region>
+    <div className="window-container">
       <CommandPalette />
     </div>
   );

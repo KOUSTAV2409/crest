@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
+use std::collections::{HashMap, HashSet};
 use std::sync::RwLock;
-use std::collections::HashMap;
 use once_cell::sync::Lazy;
 
 static EXCHANGE_RATES: Lazy<RwLock<HashMap<String, f64>>> = Lazy::new(|| RwLock::new(HashMap::new()));
@@ -82,8 +82,18 @@ fn sqlite_like_pattern_contains(raw: &str) -> String {
     )
 }
 
-#[tauri::command]
-pub async fn search(query: String, _category: Option<String>) -> Result<Vec<SearchResult>, String> {
+fn nucleo_run_to_idle<T: Sync + Send + 'static>(matcher: &mut nucleo::Nucleo<T>) {
+    // tick may return before the worker finishes; read snapshot only after idle.
+    let mut guard = 0u32;
+    while matcher.tick(50).running {
+        guard += 1;
+        if guard >= 500 {
+            break;
+        }
+    }
+}
+
+fn search_blocking(query: String, _category: Option<String>) -> Result<Vec<SearchResult>, String> {
     use nucleo::{Config, Nucleo};
     use rusqlite::Connection;
     use std::path::PathBuf;
@@ -141,16 +151,27 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
     }
 
     let pat = sqlite_like_pattern_contains(&query);
+    // One-letter queries match almost every app via `%c%`, which used to load thousands of rows
+    // and make Nucleo + IPC feel like a multi-second freeze. Cap + ORDER BY keeps work bounded
+    // while still ranking the most relevant slice (name-sorted, then fuzzy on that set).
+    let q_chars = query.trim().chars().count() as i64;
+    let row_cap: i64 = match q_chars {
+        1 => 450,
+        2 => 1700,
+        _ => 4000,
+    };
+
     let mut stmt = conn
         .prepare(
             r#"SELECT id, name, exec, icon, comment FROM apps
                WHERE lower(name) LIKE ?1 ESCAPE '\'
                   OR lower(COALESCE(comment, '')) LIKE ?1 ESCAPE '\'
-               LIMIT 4000"#,
+               ORDER BY name COLLATE NOCASE
+               LIMIT ?2"#,
         )
         .map_err(|e| e.to_string())?;
     let mut apps: Vec<AppEntry> = stmt
-        .query_map([&pat], |row| {
+        .query_map(rusqlite::params![pat, row_cap], |row| {
             Ok(AppEntry {
                 id: row.get(0)?,
                 name: row.get(1)?,
@@ -199,7 +220,7 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
         nucleo::pattern::Normalization::Smart,
         false,
     );
-    matcher.tick(10);
+    nucleo_run_to_idle(&mut matcher);
 
     let snapshot = matcher.snapshot();
     let count = snapshot.matched_item_count();
@@ -277,6 +298,13 @@ pub async fn search(query: String, _category: Option<String>) -> Result<Vec<Sear
 }
 
 #[tauri::command]
+pub async fn search(query: String, category: Option<String>) -> Result<Vec<SearchResult>, String> {
+    tokio::task::spawn_blocking(move || search_blocking(query, category))
+        .await
+        .map_err(|e| format!("search task join failed: {}", e))?
+}
+
+#[tauri::command]
 pub async fn launch_app(app_id: String) -> Result<(), String> {
     use std::process::Command;
     use rusqlite::Connection;
@@ -341,8 +369,7 @@ pub async fn calculate(expr: String) -> Result<String, String> {
     }
 }
 
-#[tauri::command]
-pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
+fn search_files_blocking(query: String) -> Result<Vec<SearchResult>, String> {
     use nucleo::{Config, Nucleo};
     use rusqlite::Connection;
     use std::path::PathBuf;
@@ -451,7 +478,7 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
         nucleo::pattern::Normalization::Smart,
         false,
     );
-    matcher.tick(10);
+    nucleo_run_to_idle(&mut matcher);
 
     let snapshot = matcher.snapshot();
     let count = snapshot.matched_item_count();
@@ -485,6 +512,13 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
 }
 
 #[tauri::command]
+pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
+    tokio::task::spawn_blocking(move || search_files_blocking(query))
+        .await
+        .map_err(|e| format!("search_files task join failed: {}", e))?
+}
+
+#[tauri::command]
 pub async fn open_file(path: String) -> Result<(), String> {
     use std::process::Command;
     Command::new("xdg-open")
@@ -512,6 +546,493 @@ pub async fn search_web(query: String) -> Result<(), String> {
         .spawn()
         .map_err(|e| format!("xdg-open failed: {}", e))?;
     Ok(())
+}
+
+/// Resolves DuckDuckGo redirect URLs (`uddg=` or protocol-relative links) to a real HTTPS URL for `xdg-open`.
+fn decode_duckduckgo_redirect_href(href: &str) -> String {
+    let href = href.trim();
+    let absolute = if href.starts_with('/') && !href.starts_with("//") {
+        format!("https://duckduckgo.com{href}")
+    } else if href.starts_with("//") {
+        format!("https:{href}")
+    } else {
+        href.to_string()
+    };
+
+    if absolute.contains("uddg=") {
+        return absolute
+            .split("uddg=")
+            .nth(1)
+            .and_then(|s| s.split('&').next())
+            .map(|s| urlencoding::decode(s).unwrap_or_else(|_| s.into()).into_owned())
+            .filter(|u| !u.is_empty())
+            .unwrap_or(absolute);
+    }
+
+    absolute
+}
+
+fn scrape_ddg_static_html(html: &str, max_results: usize) -> Vec<SearchResult> {
+    use scraper::{Html, Selector};
+
+    let result_blocks =
+        Selector::parse("#links .result").expect("selector #links .result");
+    let title_sel = Selector::parse(".result__a").expect("selector .result__a");
+    let snippet_sel = Selector::parse(".result__snippet").expect("selector .result__snippet");
+
+    let document = Html::parse_document(html);
+    let mut out = Vec::new();
+
+    for block in document.select(&result_blocks).take(max_results) {
+        let Some(title_el) = block.select(&title_sel).next() else {
+            continue;
+        };
+        let title = title_el.text().collect::<String>().trim().to_string();
+        if title.is_empty() {
+            continue;
+        }
+
+        let href = title_el.value().attr("href").unwrap_or("");
+        let real_url = decode_duckduckgo_redirect_href(href);
+        if real_url.is_empty() {
+            continue;
+        }
+
+        let snippet = block
+            .select(&snippet_sel)
+            .next()
+            .map(|s| s.text().collect::<String>().trim().to_string())
+            .unwrap_or_default();
+
+        out.push(SearchResult {
+            id: format!("web-html-{real_url}"),
+            title,
+            subtitle: if snippet.is_empty() {
+                "Web result".into()
+            } else {
+                snippet.clone()
+            },
+            icon: ResultIcon {
+                kind: "emoji".into(),
+                value: "🌐".into(),
+            },
+            category: "Web Result".into(),
+            score: 0.06,
+            actions: vec![Action {
+                id: "open_url".into(),
+                title: "Open in Browser".into(),
+                shortcut: Some("↵".into()),
+            }],
+            preview: Some(Preview {
+                title: "Web Result".into(),
+                subtitle: Some(real_url.clone()),
+                description: Some(if snippet.is_empty() {
+                    real_url.clone()
+                } else {
+                    snippet
+                }),
+            }),
+        });
+    }
+
+    out
+}
+
+/// Lite / refreshed DDG markup often lays out organic links as `<tr>… <a href="…uddg…">`.
+fn scrape_ddg_lite_table_rows(html: &str, max_results: usize) -> Vec<SearchResult> {
+    use scraper::{Html, Selector};
+
+    let Ok(tr_sel) = Selector::parse("tr") else {
+        return vec![];
+    };
+    let Ok(a_sel) = Selector::parse(r#"a[href*="uddg"]"#) else {
+        return vec![];
+    };
+
+    let document = Html::parse_document(html);
+    let mut seen_url: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+
+    for tr in document.select(&tr_sel) {
+        if out.len() >= max_results {
+            break;
+        }
+        let Some(anchor) = tr.select(&a_sel).next() else {
+            continue;
+        };
+        let title = anchor.text().collect::<String>().trim().to_string();
+        if title.len() < 2 {
+            continue;
+        }
+        let href = anchor.value().attr("href").unwrap_or("");
+        let real_url = decode_duckduckgo_redirect_href(href);
+        if real_url.is_empty()
+            || !real_url.starts_with("http")
+            || !seen_url.insert(real_url.clone())
+        {
+            continue;
+        }
+
+        let row_full = tr.text().collect::<String>();
+        let mut snippet = row_full.replace(&title, "");
+        snippet = snippet.split_whitespace().collect::<Vec<_>>().join(" ");
+        snippet = snippet.trim().trim_matches('|').trim().chars().take(260).collect();
+        if snippet.len() < 12 {
+            snippet = "Web result".into();
+        }
+
+        out.push(SearchResult {
+            id: format!("web-ddg-{real_url}"),
+            title,
+            subtitle: snippet.clone(),
+            icon: ResultIcon {
+                kind: "emoji".into(),
+                value: "🌐".into(),
+            },
+            category: "Web Result".into(),
+            score: 0.055,
+            actions: vec![Action {
+                id: "open_url".into(),
+                title: "Open in Browser".into(),
+                shortcut: Some("↵".into()),
+            }],
+            preview: Some(Preview {
+                title: "Web Result".into(),
+                subtitle: Some(real_url.clone()),
+                description: Some(snippet.clone()),
+            }),
+        });
+    }
+
+    out
+}
+
+/// Collect `uddg` links when markup has no recognizable table / `.result__a` wrappers.
+fn scrape_ddg_fallback_anchors(html: &str, max_results: usize) -> Vec<SearchResult> {
+    use scraper::{Html, Selector};
+
+    let Ok(a_sel) = Selector::parse(r#"a[href*="uddg"]"#) else {
+        return vec![];
+    };
+    let document = Html::parse_document(html);
+    let mut seen_url: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+
+    for a in document.select(&a_sel).take(max_results * 4) {
+        if out.len() >= max_results {
+            break;
+        }
+        let title = a.text().collect::<String>().trim().to_string();
+        if title.len() < 3 {
+            continue;
+        }
+        let href = a.value().attr("href").unwrap_or("");
+        let real_url = decode_duckduckgo_redirect_href(href);
+        if real_url.is_empty()
+            || !real_url.starts_with("http")
+            || !seen_url.insert(real_url.clone())
+        {
+            continue;
+        }
+        out.push(SearchResult {
+            id: format!("web-a-{real_url}"),
+            title,
+            subtitle: "Web result".into(),
+            icon: ResultIcon {
+                kind: "emoji".into(),
+                value: "🌐".into(),
+            },
+            category: "Web Result".into(),
+            score: 0.048,
+            actions: vec![Action {
+                id: "open_url".into(),
+                title: "Open in Browser".into(),
+                shortcut: Some("↵".into()),
+            }],
+            preview: Some(Preview {
+                title: "Web Result".into(),
+                subtitle: Some(real_url.clone()),
+                description: Some(real_url.clone()),
+            }),
+        });
+    }
+
+    out
+}
+
+fn scrape_ddg_html_bundle(html: &str, max_results: usize) -> Vec<SearchResult> {
+    let strategies: [fn(&str, usize) -> Vec<SearchResult>; 3] = [
+        scrape_ddg_lite_table_rows,
+        scrape_ddg_static_html,
+        scrape_ddg_fallback_anchors,
+    ];
+    let mut seen: HashSet<String> = HashSet::new();
+    let mut out = Vec::new();
+    for strat in strategies {
+        for row in strat(html, max_results) {
+            if row.category != "Web Result" {
+                continue;
+            }
+            let Some(url) = row.preview.as_ref().and_then(|p| p.subtitle.as_deref()) else {
+                continue;
+            };
+            if url.len() < 8 || !seen.insert(url.to_string()) {
+                continue;
+            }
+            out.push(row);
+            if out.len() >= max_results {
+                return out;
+            }
+        }
+    }
+    out
+}
+
+fn merge_web_unique(target: &mut Vec<SearchResult>, add: Vec<SearchResult>) {
+    let mut seen: HashSet<String> = target
+        .iter()
+        .filter(|r| r.category == "Web Result")
+        .filter_map(|r| r.preview.as_ref()?.subtitle.clone())
+        .collect();
+
+    for row in add {
+        if row.category != "Web Result" {
+            continue;
+        }
+        let Some(url) = row.preview.as_ref().and_then(|p| p.subtitle.clone()) else {
+            continue;
+        };
+        if url.len() < 8 || !seen.insert(url) {
+            continue;
+        }
+        target.push(row);
+    }
+}
+
+/// DuckDuckGo serves a CAPTCHA (“bots use DuckDuckGo too”) instead of SERP HTML for many non-browser clients.
+fn ddg_html_looks_like_challenge(html: &str) -> bool {
+    html.contains("anomaly-modal")
+        || html.contains("bots use DuckDuckGo")
+        || html.contains("challenge-form")
+}
+
+fn strip_html_tags_light(input: &str) -> String {
+    let mut out = String::with_capacity(input.len());
+    let mut in_tag = false;
+    for ch in input.chars() {
+        match ch {
+            '<' => in_tag = true,
+            '>' => {
+                in_tag = false;
+            }
+            _ if !in_tag => out.push(ch),
+            _ => {}
+        }
+    }
+    out.replace("&#039;", "'")
+        .replace("&quot;", "\"")
+        .replace("&amp;", "&")
+        .replace("&ndash;", "–")
+        .split_whitespace()
+        .collect::<Vec<_>>()
+        .join(" ")
+}
+
+/// MediaWiki [`list=search`](https://www.mediawiki.org/wiki/API:Search) — works when DDG HTML is bot-blocked.
+async fn fetch_wikipedia_search_results(
+    client: &reqwest::Client,
+    query: &str,
+    max: usize,
+) -> Vec<SearchResult> {
+    let lim = max.clamp(1, 15);
+    let url = format!(
+        "https://en.wikipedia.org/w/api.php?action=query&format=json&list=search&utf8=1&srlimit={lim}&srsearch={}",
+        urlencoding::encode(query)
+    );
+
+    let Ok(resp) = client
+        .get(&url)
+        .header(reqwest::header::ACCEPT, "application/json")
+        .header(
+            reqwest::header::USER_AGENT,
+            concat!(
+                "Crest/",
+                env!("CARGO_PKG_VERSION"),
+                " (Tauri launcher; https://tauri.app)"
+            ),
+        )
+        .send()
+        .await
+    else {
+        return Vec::new();
+    };
+    if !resp.status().is_success() {
+        return Vec::new();
+    }
+    let Ok(json) = resp.json::<serde_json::Value>().await else {
+        return Vec::new();
+    };
+
+    let Some(arr) = json
+        .get("query")
+        .and_then(|q| q.get("search"))
+        .and_then(|s| s.as_array())
+    else {
+        return Vec::new();
+    };
+
+    let mut out = Vec::new();
+    for item in arr.iter().take(lim) {
+        let Some(title) = item.get("title").and_then(|v| v.as_str()).map(str::trim) else {
+            continue;
+        };
+        if title.is_empty() {
+            continue;
+        }
+        let snippet_raw = item.get("snippet").and_then(|v| v.as_str()).unwrap_or("");
+        let snippet = strip_html_tags_light(snippet_raw);
+        let subtitle = if snippet.len() >= 16 {
+            snippet.clone()
+        } else {
+            "Wikipedia article".into()
+        };
+
+        let Some(pageid) = item.get("pageid").and_then(|v| v.as_u64()).or_else(|| {
+            item.get("pageid")
+                .and_then(|v| v.as_i64())
+                .filter(|&p| p > 0)
+                .map(|p| p as u64)
+        }) else {
+            continue;
+        };
+
+        let page_url = format!("https://en.wikipedia.org/?curid={pageid}");
+
+        out.push(SearchResult {
+            id: format!("wiki-{pageid}"),
+            title: title.to_string(),
+            subtitle,
+            icon: ResultIcon {
+                kind: "emoji".into(),
+                value: "📚".into(),
+            },
+            category: "Web Result".into(),
+            score: 0.07,
+            actions: vec![Action {
+                id: "open_url".into(),
+                title: "Open in Browser".into(),
+                shortcut: Some("↵".into()),
+            }],
+            preview: Some(Preview {
+                title: "Wikipedia".into(),
+                subtitle: Some(page_url.clone()),
+                description: Some(if snippet.len() >= 16 {
+                    snippet
+                } else {
+                    title.to_string()
+                }),
+            }),
+        });
+    }
+
+    if !out.is_empty() {
+        println!(
+            "(wikipedia) added {} encyclopedia hits",
+            out.len()
+        );
+    }
+
+    out
+}
+
+fn append_related_topics_from_api(json: &serde_json::Value, results: &mut Vec<SearchResult>, budget: usize) {
+    fn walk(value: &serde_json::Value, results: &mut Vec<SearchResult>, budget: usize) {
+        if results.len() >= budget {
+            return;
+        }
+
+        match value {
+            serde_json::Value::Array(arr) => {
+                for item in arr {
+                    walk(item, results, budget);
+                    if results.len() >= budget {
+                        return;
+                    }
+                }
+            }
+            serde_json::Value::Object(map) => {
+                if let Some(nested) = map.get("Topics").and_then(|v| v.as_array()) {
+                    for item in nested {
+                        walk(item, results, budget);
+                        if results.len() >= budget {
+                            return;
+                        }
+                    }
+                }
+
+                let Some(text) = map.get("Text").and_then(|v| v.as_str()).map(str::trim) else {
+                    return;
+                };
+                if text.is_empty() {
+                    return;
+                }
+                let Some(url) = map.get("FirstURL").and_then(|v| v.as_str()).map(str::trim) else {
+                    return;
+                };
+                if url.is_empty() {
+                    return;
+                }
+
+                let id = format!("web-topic-{url}");
+                if results.iter().any(|r| r.id == id) {
+                    return;
+                }
+
+                let (title, subtitle) = if let Some(idx) = text.find(" - ") {
+                    let t = text[..idx].trim();
+                    let s = text[idx + 3..].trim();
+                    if t.is_empty() {
+                        (text.to_string(), String::new())
+                    } else {
+                        (t.to_string(), s.to_string())
+                    }
+                } else {
+                    (text.to_string(), String::new())
+                };
+
+                results.push(SearchResult {
+                    id,
+                    title,
+                    subtitle: if subtitle.is_empty() {
+                        "Related topic".into()
+                    } else {
+                        subtitle
+                    },
+                    icon: ResultIcon {
+                        kind: "emoji".into(),
+                        value: "💡".into(),
+                    },
+                    category: "Web Answer".into(),
+                    score: 0.72,
+                    actions: vec![Action {
+                        id: "open_url".into(),
+                        title: "Open Link".into(),
+                        shortcut: Some("↵".into()),
+                    }],
+                    preview: Some(Preview {
+                        title: "Related".into(),
+                        subtitle: Some(url.to_string()),
+                        description: Some(text.to_string()),
+                    }),
+                });
+            }
+            _ => {}
+        }
+    }
+
+    if let Some(topics) = json.get("RelatedTopics") {
+        walk(topics, results, budget);
+    }
 }
 
 #[tauri::command]
@@ -552,74 +1073,126 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
                     })
                 });
             }
+
+            append_related_topics_from_api(&json, &mut results, 8);
         }
     }
 
-    // 2. Fallback to scraping DuckDuckGo Lite for organic results
-    if results.len() < 3 {
-        println!("Falling back to Lite scraping for: {}", query);
-        // DDG Lite often prefers + for spaces
-        let safe_query = query.replace(" ", "+");
-        let lite_url = format!("https://duckduckgo.com/lite/?q={}", urlencoding::encode(&safe_query));
-        if let Ok(resp) = client.get(&lite_url).send().await {
-            if let Ok(html) = resp.text().await {
-                // Scope the document to ensure it's dropped before the function ends
-                // This satisfies the 'Send' requirement for the async future.
-                let mut scraped_results = Vec::new();
-                {
-                    let document = scraper::Html::parse_document(&html);
-                    let title_selector = scraper::Selector::parse(".result-link").unwrap();
-                    let snippet_selector = scraper::Selector::parse(".result-snippet").unwrap();
-                    
-                    let titles: Vec<_> = document.select(&title_selector).collect();
-                    let snippets: Vec<_> = document.select(&snippet_selector).collect();
-                    
-                    println!("Scraped {} titles and {} snippets from Lite", titles.len(), snippets.len());
-                    
-                    if titles.is_empty() {
-                        println!("HTML Snippet (first 500 chars): {}", &html[..html.len().min(500)]);
-                    }
+    // 2. DuckDuckGo HTML SERP (GET + POST) — parsers include lite-style `<tr>` rows with `uddg` links.
+    if results.iter().filter(|r| r.category == "Web Result").count() < 3 {
+        const MAX_ORGANIC: usize = 10;
+        let html_url = format!(
+            "https://html.duckduckgo.com/html/?q={}&kl=us-en",
+            urlencoding::encode(&query)
+        );
+        println!("Fetching DuckDuckGo HTML SERP (GET)…");
 
-                    for (i, title_node) in titles.into_iter().take(5).enumerate() {
-                        let title = title_node.text().collect::<String>().trim().to_string();
-                        let href = title_node.value().attr("href").unwrap_or("");
-                        
-                        let real_url = if href.contains("uddg=") {
-                            href.split("uddg=").nth(1)
-                                .and_then(|s| s.split("&").next())
-                                .map(|s| urlencoding::decode(s).unwrap_or(s.into()).into_owned())
-                                .unwrap_or_else(|| href.to_string())
-                        } else {
-                            href.to_string()
-                        };
-
-                        let snippet = snippets.get(i)
-                            .map(|s| s.text().collect::<String>().trim().to_string())
-                            .unwrap_or_else(|| "No description available".to_string());
-
-                        scraped_results.push(SearchResult {
-                            id: format!("web-lite-{}", real_url),
-                            title,
-                            subtitle: snippet.clone(),
-                            icon: ResultIcon { kind: "emoji".into(), value: "🌐".into() },
-                            category: "Web Result".into(),
-                            score: 0.05,
-                            actions: vec![
-                                Action { id: "open_url".into(), title: "Open in Browser".into(), shortcut: Some("↵".into()) }
-                            ],
-                            preview: Some(Preview {
-                                title: "Web Result".into(),
-                                subtitle: Some(real_url),
-                                description: Some(snippet),
-                            })
-                        });
+        match client
+            .get(&html_url)
+            .header("Accept-Language", "en-US,en;q=0.9")
+            .header(
+                reqwest::header::ACCEPT,
+                "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            )
+            .send()
+            .await
+        {
+            Ok(resp) if resp.status().is_success() => {
+                if let Ok(html) = resp.text().await {
+                    if ddg_html_looks_like_challenge(&html) {
+                        println!(
+                            "(html GET) DuckDuckGo returned a bot challenge page; skipping HTML scrape"
+                        );
+                    } else {
+                        let scraped = scrape_ddg_html_bundle(&html, MAX_ORGANIC);
+                        println!(
+                            "(html GET) organic bundle scraped {} hits",
+                            scraped.len()
+                        );
+                        if scraped.is_empty() {
+                            let sample: String =
+                                html.chars().take(520).collect::<String>().replace('\n', " ");
+                            println!("(html GET) diagnostic (trimmed): {sample}");
+                        }
+                        merge_web_unique(&mut results, scraped);
                     }
                 }
-                results.extend(scraped_results);
             }
+            Ok(resp) => println!("(html GET) HTTP {}", resp.status()),
+            Err(e) => println!("(html GET) request failed: {}", e),
         }
     }
-    
+
+    if results.iter().filter(|r| r.category == "Web Result").count() < 2 {
+        println!("Fetching DuckDuckGo HTML SERP (POST fallback)…");
+        match client
+            .post("https://html.duckduckgo.com/html/")
+            .header(reqwest::header::REFERER, "https://html.duckduckgo.com/")
+            .header("Accept-Language", "en-US,en;q=0.9")
+            .form(&[("q", query.as_str()), ("b", "")])
+            .send()
+            .await
+        {
+            Ok(resp) if resp.status().is_success() => {
+                if let Ok(html) = resp.text().await {
+                    if !ddg_html_looks_like_challenge(&html) {
+                        merge_web_unique(&mut results, scrape_ddg_html_bundle(&html, 10));
+                    } else {
+                        println!("(html POST) bot challenge page; skipping scrape");
+                    }
+                }
+            }
+            Err(e) => println!("(html POST) failed: {}", e),
+            Ok(resp) => println!("(html POST) HTTP {}", resp.status()),
+        }
+    }
+
+    // 3. `/lite` table SERP
+    if results.iter().filter(|r| r.category == "Web Result").count() < 3 {
+        let lite_url = format!(
+            "https://duckduckgo.com/lite/?q={}",
+            urlencoding::encode(&query)
+        );
+        println!("Fetching duckduckgo.com/lite…");
+        match client
+            .get(&lite_url)
+            .header("Accept-Language", "en-US,en;q=0.9")
+            .send()
+            .await
+        {
+            Ok(resp) if resp.status().is_success() => {
+                if let Ok(html) = resp.text().await {
+                    if ddg_html_looks_like_challenge(&html) {
+                        println!("(lite) bot challenge page; skipping scrape");
+                    } else {
+                        let scraped = scrape_ddg_html_bundle(&html, 10);
+                        let organic_hits = scraped.len();
+                        println!("(lite) organic bundle scraped {organic_hits} hits");
+                        merge_web_unique(&mut results, scraped);
+                        if organic_hits == 0 && !html.is_empty() {
+                            let sample: String =
+                                html.chars().take(520).collect::<String>().replace('\n', " ");
+                            println!("(lite) diagnostic (trimmed): {sample}");
+                        }
+                    }
+                }
+            }
+            Ok(resp) => println!("(lite) HTTP {}", resp.status()),
+            Err(e) => println!("(lite) request failed: {}", e),
+        }
+    }
+
+    let organic_web = results.iter().filter(|r| r.category == "Web Result").count();
+    if organic_web < 3 {
+        println!(
+            "Augmenting with Wikipedia site search (organic DuckDuckGo rows: {organic_web})…"
+        );
+        merge_web_unique(
+            &mut results,
+            fetch_wikipedia_search_results(&client, &query, 10).await,
+        );
+    }
+
     if results.is_empty() {
         println!("No results found even with fallback for: {}", query);
     } else {
