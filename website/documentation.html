@@ -144,6 +144,24 @@
                 <p><strong class="text-white">What to do on Wayland (recommended)</strong>: open your desktop <strong class="text-white">Settings → Keyboard → Custom shortcuts</strong>, bind your preferred chord, and set the command to <code>crest</code>. From <strong class="text-white">v0.2.1+</strong>, Crest is single-instance: each launch toggles show/hide. That mimics Raycast-style behavior reliably.</p>
                 <p>From <strong class="text-white">v0.2.2+</strong>, Crest may show a <strong class="text-white">yellow hint banner</strong> inside the window when shortcuts are unlikely to work, with the same guidance.</p>
                 <p><strong class="text-white">Debugging</strong>: see <code>~/.local/share/crest/hotkey.log</code> or run <code>crest</code> from a terminal for stderr.</p>
+
+                <h3>Advanced: Setup via Terminal (GNOME)</h3>
+                <p>If you're automating your setup or prefer the command line, you can register the shortcut directly into the GNOME GSettings database:</p>
+                <div class="bg-black/40 rounded-lg p-5 border border-white/[0.08] my-6 overflow-x-auto">
+                    <pre class="text-[13px] font-mono text-white/70 leading-relaxed">
+<span class="text-white/30"># 1. Register the custom shortcut path</span>
+gsettings set org.gnome.settings-daemon.plugins.media-keys \
+  custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+
+<span class="text-white/30"># 2. Configure Name, Command, and Key Binding</span>
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+  name "Crest"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+  command "crest"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+  binding "&lt;Super&gt;space"</pre>
+                </div>
+                <p class="text-[13px] text-white/40 italic">* Note: Replace <code>custom0</code> with <code>custom1</code>, <code>custom2</code>, etc., if that slot is already taken.</p>
             </section>
 
             <section id="daily-use" class="scroll-mt-[5.5rem]">
