@@ -1,0 +1,49 @@
+name: Feature request
+description: Suggest an idea for Crest
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion — high-signal requests help a lot.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem / motivation
+      description: What problem are you trying to solve?
+      placeholder: "Example: I want to quickly search browser tabs from the launcher…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What would you like Crest to do?
+      placeholder: "Example: Add a 'Tabs' mode that…"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other ways you’ve tried to solve it.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - UI/UX
+        - Search
+        - Web results
+        - Clipboard
+        - Plugins
+        - Hotkey / Wayland
+        - Packaging / Releases
+        - Other
+    validations:
+      required: true
+

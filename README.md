@@ -15,7 +15,14 @@
 
 ---
 
-**Crest** is a high-performance, keyboard-first productivity launcher for the Linux desktop. Built with **Rust** and **Tauri**, it delivers a sub-50ms execution speed and a premium design language inspired by Raycast.
+**Crest** is a high-performance, keyboard-first productivity launcher for the Linux desktop — a Raycast-style launcher built with **Rust** + **Tauri**.
+
+It started as a **personal tool** (I felt the gap on Linux and built the launcher I wanted). It’s now packaged so others can use it too — with a focus on **performance**, **privacy**, and a **premium UI**.
+
+### Trust & safety
+- **Local-first**: no accounts, no telemetry, no cloud sync.
+- **Plugins are manifest-scoped by default**: only explicitly listed scripts run.
+- **Transparent**: MIT licensed and built in the open.
 
 ## ✨ Key Features
 
@@ -32,6 +39,15 @@
 - **UI**: React + TypeScript + Vite, with component-scoped CSS and shared variables in `index.css` (no Tailwind in this repo).
 - **Database**: Local SQLite for high-speed metadata and history storage.
 - **Footprint**: < 40MB RAM idle usage.
+
+## 🧠 How it works (high level)
+
+- **App search**: `.desktop` entries are indexed into a local SQLite database, then filtered + ranked with a fuzzy matcher for fast “type to launch” workflows.
+- **Freedesktop icons**: app icons are resolved via the system’s icon theme (e.g. Adwaita/Yaru/Papirus/hicolor) and cached; the UI loads them lazily to keep typing smooth.
+- **Wayland hotkeys**: on some Wayland desktops, global “Super/Meta” grabs are restricted. Crest supports a single-instance toggle so a system shortcut can simply run `crest` to show/hide the palette.
+- **Clipboard history**: captured locally, searchable instantly; nothing leaves your machine.
+- **Plugins**: extensions run as separate processes. By default, Crest only runs scripts listed in `~/.config/crest/plugins/manifest.json` (manifest-scoped for safety).
+- **Web answers**: uses DuckDuckGo instant answers where available and falls back when SERP HTML is blocked (bot checks can happen).
 
 ## 🚀 Installation & Setup
 

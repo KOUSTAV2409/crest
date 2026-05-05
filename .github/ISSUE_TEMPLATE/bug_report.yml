@@ -1,0 +1,66 @@
+name: Bug report
+description: Report a problem with Crest
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug.
+
+        If this is a security issue, please do **not** file an issue — follow `SECURITY.md` instead.
+
+  - type: input
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Tell us what you saw and what you expected.
+      placeholder: "Example: Typing 'c' freezes for 4s, then results appear."
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to reproduce the issue.
+      placeholder: |
+        1. Open Crest
+        2. Type "ceo of google"
+        3. Observe…
+    validations:
+      required: true
+
+  - type: dropdown
+    id: session
+    attributes:
+      label: Display server
+      options:
+        - Wayland
+        - Xorg/X11
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: distro
+    attributes:
+      label: Distro / Desktop
+      placeholder: "Example: Ubuntu 24.04 + GNOME"
+    validations:
+      required: true
+
+  - type: input
+    id: crest-version
+    attributes:
+      label: Crest version
+      placeholder: "Example: v0.2.3"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (optional)
+      description: Paste relevant logs (if any). On Linux, hotkey failures can be in `~/.local/share/crest/hotkey.log`.
+      render: shell
+
