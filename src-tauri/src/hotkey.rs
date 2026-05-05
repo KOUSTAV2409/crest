@@ -13,7 +13,8 @@ use tauri::{AppHandle, Manager};
 pub static GLOBAL_HOTKEY_GRAB_OK: AtomicBool = AtomicBool::new(false);
 
 // Keep the manager globally static to ensure it never drops.
-static MANAGER: Lazy<GlobalHotKeyManager> = Lazy::new(|| GlobalHotKeyManager::new().unwrap());
+static MANAGER: Lazy<Result<GlobalHotKeyManager, String>> =
+    Lazy::new(|| GlobalHotKeyManager::new().map_err(|e| format!("{}", e)));
 
 fn append_hotkey_log(message: &str) {
     let dir = dirs::data_dir()
@@ -41,6 +42,19 @@ pub fn detect_wayland_session() -> bool {
 }
 
 pub fn init(app: &AppHandle) {
+    let manager = match &*MANAGER {
+        Ok(m) => m,
+        Err(e) => {
+            let msg = format!(
+                "Failed to initialize GlobalHotKeyManager: {}. Hotkeys disabled; use a system shortcut to run `crest` (single-instance toggle).",
+                e
+            );
+            eprintln!("Crest: {}", msg);
+            append_hotkey_log(&msg);
+            return;
+        }
+    };
+
     let cfg = crate::config::load_app_config();
     let hotkey_raw = cfg.global_shortcut.trim();
     let hotkey: HotKey = match hotkey_raw.parse::<HotKey>() {
@@ -56,7 +70,7 @@ pub fn init(app: &AppHandle) {
         }
     };
 
-    match MANAGER.register(hotkey) {
+    match manager.register(hotkey) {
         Ok(()) => {
             GLOBAL_HOTKEY_GRAB_OK.store(true, Ordering::Relaxed);
         }

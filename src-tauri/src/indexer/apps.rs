@@ -7,11 +7,23 @@ pub fn init() {
     
     // Use system data directory to prevent Tauri watcher from triggering rebuilds
     let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
-    std::fs::create_dir_all(&db_dir).unwrap();
+    if let Err(e) = std::fs::create_dir_all(&db_dir) {
+        eprintln!("App indexer: failed to create db dir {:?}: {}", db_dir, e);
+        return;
+    }
     let db_path = db_dir.join("crest_index.db");
-    let conn = Connection::open(db_path).unwrap();
+    let conn = match Connection::open(db_path) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("App indexer: failed to open db: {}", e);
+            return;
+        }
+    };
     
-    setup_db(&conn).expect("Failed to setup DB");
+    if let Err(e) = setup_db(&conn) {
+        eprintln!("App indexer: failed to setup DB: {}", e);
+        return;
+    }
     
     let app_dirs = vec![
         "/usr/share/applications",
@@ -39,7 +51,9 @@ fn setup_db(conn: &Connection) -> SqlResult<()> {
 }
 
 fn index_apps(conn: &Connection, dirs: Vec<PathBuf>) {
-    conn.execute("DELETE FROM apps", []).unwrap();
+    if let Err(e) = conn.execute("DELETE FROM apps", []) {
+        eprintln!("App indexer: failed to clear apps table: {}", e);
+    }
     
     for dir in dirs {
         if !dir.exists() { continue; }

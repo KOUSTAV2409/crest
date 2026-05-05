@@ -45,8 +45,7 @@ pub async fn get_clipboard_history() -> Result<Vec<SearchResult>, String> {
             category: "Clipboard".into(),
             score: 0.1,
             actions: vec![
-                Action { id: "copy".into(), title: "Copy to Clipboard".into(), shortcut: Some("↵".into()) },
-                Action { id: "open_url".into(), title: "Open in Browser".into(), shortcut: Some("⌘↵".into()) }
+                Action { id: "copy".into(), title: "Copy to Clipboard".into(), shortcut: Some("↵".into()) }
             ],
             preview: Some(Preview {
                 title: "Clipboard History".into(),

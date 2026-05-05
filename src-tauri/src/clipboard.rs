@@ -8,26 +8,44 @@ pub fn init() {
     println!("Initializing Clipboard Listener...");
     
     let db_dir = dirs::data_dir().unwrap_or_else(|| PathBuf::from("/tmp")).join("crest");
-    std::fs::create_dir_all(&db_dir).unwrap();
+    if let Err(e) = std::fs::create_dir_all(&db_dir) {
+        eprintln!("Clipboard: failed to create db dir {:?}: {}", db_dir, e);
+        return;
+    }
     let db_path = db_dir.join("crest_index.db");
     
     // Setup table
     {
-        let conn = Connection::open(&db_path).unwrap();
-        conn.execute(
+        let conn = match Connection::open(&db_path) {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("Clipboard: failed to open db {:?}: {}", db_path, e);
+                return;
+            }
+        };
+        if let Err(e) = conn.execute(
             "CREATE TABLE IF NOT EXISTS clipboard_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 content TEXT UNIQUE NOT NULL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
             [],
-        ).expect("Failed to create clipboard table");
+        ) {
+            eprintln!("Clipboard: failed to create clipboard table: {}", e);
+            return;
+        }
     }
 
     // Start background thread
     thread::spawn(move || {
         let mut last_content = String::new();
-        let mut clipboard = Clipboard::new().expect("Failed to initialize clipboard");
+        let mut clipboard = match Clipboard::new() {
+            Ok(c) => c,
+            Err(e) => {
+                eprintln!("Clipboard: failed to initialize clipboard: {}", e);
+                return;
+            }
+        };
         
         loop {
             if let Ok(content) = clipboard.get_text() {

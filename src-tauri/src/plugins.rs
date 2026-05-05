@@ -4,6 +4,7 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::{Component, Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::time::Duration;
 
 use serde::Serialize;
 
@@ -209,50 +210,67 @@ pub fn run_plugin(command_abs: &str, query: &str) -> Vec<crate::commands::search
         }
 
         let is_executable = (meta.permissions().mode() & 0o111) != 0;
-        let output = if command_abs.ends_with(".sh") || !is_executable {
-            Command::new("/bin/sh")
-                .arg(command_abs)
-                .arg(query)
-                .stdin(Stdio::null())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .output()
+        let mut cmd = if command_abs.ends_with(".sh") || !is_executable {
+            let mut c = Command::new("/bin/sh");
+            c.arg(command_abs);
+            c
         } else {
             Command::new(command_abs)
-                .arg(query)
-                .stdin(Stdio::null())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .output()
         };
+        cmd.arg(query)
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
 
-        return parse_plugin_output(output);
+        let output = run_with_timeout(cmd, Duration::from_secs(2));
+        return parse_plugin_output_limited(output, 1_000_000);
     }
 
     #[cfg(target_os = "windows")]
     {
-        let output =
-            Command::new("cmd")
-                .args(["/C", command_abs, query])
-                .stdin(Stdio::null())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .output();
-
-        parse_plugin_output(output)
+        let mut cmd = Command::new("cmd");
+        cmd.args(["/C", command_abs, query])
+            .stdin(Stdio::null())
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        parse_plugin_output_limited(run_with_timeout(cmd, Duration::from_secs(2)), 1_000_000)
     }
 }
 
-fn parse_plugin_output(
-    output: Result<std::process::Output, std::io::Error>,
-) -> Vec<crate::commands::search::SearchResult> {
-    if let Ok(out) = output {
-        let stdout = String::from_utf8_lossy(&out.stdout);
-        if let Ok(results) =
-            serde_json::from_str::<Vec<crate::commands::search::SearchResult>>(&stdout)
-        {
-            return results;
-        }
+fn run_with_timeout(
+    mut command: Command,
+    timeout: Duration,
+) -> Result<std::process::Output, std::io::Error> {
+    // Use a join timeout so plugins can’t hang the launcher.
+    let child = command.spawn()?;
+    let (tx, rx) = std::sync::mpsc::channel();
+    std::thread::spawn(move || {
+        let out = child.wait_with_output();
+        let _ = tx.send(out);
+    });
+    match rx.recv_timeout(timeout) {
+        Ok(out) => out,
+        Err(std::sync::mpsc::RecvTimeoutError::Timeout) => Err(std::io::Error::new(
+            std::io::ErrorKind::TimedOut,
+            "plugin execution timed out",
+        )),
+        Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            "plugin execution channel disconnected",
+        )),
     }
-    vec![]
+}
+
+fn parse_plugin_output_limited(
+    output: Result<std::process::Output, std::io::Error>,
+    max_stdout_bytes: usize,
+) -> Vec<crate::commands::search::SearchResult> {
+    let Ok(out) = output else {
+        return vec![];
+    };
+    if out.stdout.len() > max_stdout_bytes {
+        return vec![];
+    }
+    let stdout = String::from_utf8_lossy(&out.stdout);
+    serde_json::from_str::<Vec<crate::commands::search::SearchResult>>(&stdout).unwrap_or_default()
 }

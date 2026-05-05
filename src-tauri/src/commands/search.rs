@@ -521,8 +521,19 @@ pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
 #[tauri::command]
 pub async fn open_file(path: String) -> Result<(), String> {
     use std::process::Command;
+    let p = std::path::PathBuf::from(path.trim());
+    if p.as_os_str().is_empty() {
+        return Err("Empty path".into());
+    }
+    if !p.is_absolute() {
+        return Err("Only absolute paths are allowed".into());
+    }
+    if !p.exists() {
+        return Err("Path does not exist".into());
+    }
+
     Command::new("xdg-open")
-        .arg(&path)
+        .arg(&p)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
@@ -1204,8 +1215,22 @@ pub async fn fetch_web_results(query: String) -> Result<Vec<SearchResult>, Strin
 #[tauri::command]
 pub async fn open_url(url: String) -> Result<(), String> {
     use std::process::Command;
+    let u = url.trim();
+    if u.is_empty() {
+        return Err("Empty URL".into());
+    }
+    // Basic scheme allowlist. Avoids opening `file:`, `smb:`, `data:`, etc.
+    // Prefer handling broader cases via `tauri-plugin-opener` scopes.
+    let u_lc = u.to_ascii_lowercase();
+    if !(u_lc.starts_with("https://") || u_lc.starts_with("http://")) {
+        return Err("Only http(s) URLs are allowed".into());
+    }
+    if u_lc.chars().any(|c| c.is_control()) {
+        return Err("URL contains invalid control characters".into());
+    }
+
     Command::new("xdg-open")
-        .arg(&url)
+        .arg(u)
         .stdin(std::process::Stdio::null())
         .stdout(std::process::Stdio::null())
         .stderr(std::process::Stdio::null())
