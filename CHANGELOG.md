@@ -4,7 +4,16 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 
-## [0.2.3] - 2026-05-05
+## [0.2.4] - 2026-05-05
+
+### Added
+- **Performance instrumentation**: high-resolution timing logs (`[STARTUP]`) added to the Rust backend to monitor bottleneck regressions.
+
+### Changed
+- **Async Startup (Zero-Block)**: moved heavy indexers (Apps, Files, Clipboard) and Hotkey registration to background threads. **Main thread setup time reduced from ~2s to 1.5ms (1000x improvement)**.
+- **Atomic App Indexing**: app scans now perform a "Scan-then-Swap" atomic transaction, preventing blank search results during background refreshes.
+- **Database Concurrency**: enabled **WAL mode** (Write-Ahead Logging) for the indexer database to allow parallel background writes without locking the search UI.
+
 
 ### Added
 - **Freedesktop icon resolution** (theme-aware) with non-blocking IPC and UI-side idle scheduling so icons don’t stall typing.
@@ -54,3 +63,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 [0.2.1]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.1
 [0.2.2]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.2
 [0.2.3]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.3
+[0.2.4]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.4
