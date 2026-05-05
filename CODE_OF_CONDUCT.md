@@ -18,7 +18,7 @@ Examples of unacceptable behavior:
 ## Enforcement
 If you experience or witness unacceptable behavior, please report it privately.
 
-- **Contact**: `security@koustav.dev`
+- **Contact**: `koustavganguly24@gmail.com` (site: `iamk.xyz`)
 
 Maintainers may take any action they deem appropriate, including warnings or bans.
 
