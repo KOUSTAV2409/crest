@@ -24,14 +24,39 @@ pub fn run() {
         }))
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {
-            hotkey::init(app.handle());
+            let start = std::time::Instant::now();
+            println!("[STARTUP] Setup hook started");
+
             window::setup_window_events(app.handle());
-            indexer::apps::init();
-            indexer::files::init();
-            clipboard::init();
+            println!("[STARTUP] setup_window_events took {:?}", start.elapsed());
+            
+            // Spawn background initializers to prevent blocking startup
+            let handle = app.handle().clone();
+            tauri::async_runtime::spawn(async move {
+                let s = std::time::Instant::now();
+                hotkey::init(&handle);
+                println!("[STARTUP_BG] hotkey::init took {:?}", s.elapsed());
+            });
+            tauri::async_runtime::spawn(async move {
+                let s = std::time::Instant::now();
+                indexer::apps::init();
+                println!("[STARTUP_BG] indexer::apps::init took {:?}", s.elapsed());
+            });
+            tauri::async_runtime::spawn(async move {
+                let s = std::time::Instant::now();
+                indexer::files::init();
+                println!("[STARTUP_BG] indexer::files::init took {:?}", s.elapsed());
+            });
+            tauri::async_runtime::spawn(async move {
+                let s = std::time::Instant::now();
+                clipboard::init();
+                println!("[STARTUP_BG] clipboard::init took {:?}", s.elapsed());
+            });
             
             // Initialize currency rates in background
             tauri::async_runtime::spawn(commands::search::fetch_exchange_rates());
+            
+            println!("[STARTUP] Setup hook completed in {:?}", start.elapsed());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

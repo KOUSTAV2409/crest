@@ -23,15 +23,15 @@ pub fn init() {
                 return;
             }
         };
-        if let Err(e) = conn.execute(
-            "CREATE TABLE IF NOT EXISTS clipboard_history (
+        if let Err(e) = conn.execute_batch(
+            "PRAGMA journal_mode=WAL;
+             CREATE TABLE IF NOT EXISTS clipboard_history (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 content TEXT UNIQUE NOT NULL,
                 timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
             )",
-            [],
         ) {
-            eprintln!("Clipboard: failed to create clipboard table: {}", e);
+            eprintln!("Clipboard: failed to setup clipboard DB: {}", e);
             return;
         }
     }
