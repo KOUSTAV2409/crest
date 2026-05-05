@@ -67,7 +67,33 @@ Crest registers a **global hotkey** from your config (default **`super+Space`**,
 
 **If Super+Space does nothing:** you may be on **Wayland**. Many desktops block the X11-style “global grab” Crest uses internally; failures are easy to miss (they’re not shown in the UI). Check **`~/.local/share/crest/hotkey.log`** (also printed to stderr if you launch `crest` from a terminal).
 
-**Recommended fix:** open **Settings → Keyboard → Custom Shortcuts**, add **Super+Space** (or another key), and set the command to **`crest`**. Crest is a **single instance** (**v0.2.1+**): each extra run of **`crest`** **shows or hides** the palette — the reliable approach on Wayland. **v0.2.2+** also shows an in-app banner explaining this. Older builds may need the dock or a different `global_shortcut` in `config.json` (try **`alt+Space`**). Alternatively use an **X11 session** (e.g. “Ubuntu on Xorg”).
+**Recommended fix:** open **Settings → Keyboard → Custom Shortcuts**, add **Super+Space** (or another key), and set the command to **`crest`**. Crest is a **single instance** (**v0.2.1+**): each extra run of **`crest`** **shows or hides** the palette — the reliable approach on Wayland. **v0.2.2+** also shows an in-app banner explaining this.
+
+#### 🐧 Advanced: Setup via Terminal (GNOME/Ubuntu)
+If you prefer the command line or are automating your setup, you can register the shortcut directly into the GNOME dconf database:
+
+1. **Register the path**:
+   ```bash
+   gsettings set org.gnome.settings-daemon.plugins.media-keys \
+     custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+   ```
+
+2. **Configure the shortcut**:
+   ```bash
+   # Set the Name
+   gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+     name "Crest"
+
+   # Set the Command (ensure 'crest' is in your /usr/bin or use full path)
+   gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+     command "crest"
+
+   # Set the Binding (<Super>space for Windows+Space)
+   gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ \
+     binding "<Super>space"
+   ```
+
+*Note: Replace `custom0` with `custom1`, `custom2`, etc., if you already have other custom shortcuts.*
 
 ### 4. Plugins (extensions)
 By default **`plugin_policy` is `"manifest"`**: only entries in `~/.config/crest/plugins/manifest.json` run. Copy `configs/plugins.manifest.example.json` into that path, list your scripts with relative paths, and `chmod +x` them as needed. To opt back into the legacy “any file in the folder is runnable” model (full trust), set `"plugin_policy": "open"` in `config.json`.

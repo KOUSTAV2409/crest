@@ -69,7 +69,17 @@ Crest **does not** track your searches. Web results are fetched anonymously usin
 ## ⚙️ Global shortcut & extensions
 **Hotkey**: `~/.config/crest/config.json` exposes `global_shortcut` (default `super+Space`). Parsing matches the `global-hotkey` crate (`alt+Esc`, `control+shift+KeyK`, …).
 
-**Super+Space not working on Linux?** If you log in with **Wayland**, the compositor usually does **not** allow the **X11-style global grabs** Crest uses internally. Crest never shows that error as a popup; check **`~/.local/share/crest/hotkey.log`** or launch `crest` from a terminal. **Recommended:** add a desktop shortcut (**Settings → Keyboard → Custom shortcuts**) whose command is **`crest`**. From **v0.2.1** on, Crest is a single instance — each time **`crest`** runs it **toggles** the palette (ideal for Wayland). You can also try **`alt+Space`** in `config.json`, or use an **X11** session (“Ubuntu on Xorg”, etc.), where grabs often succeed.
+**Super+Space not working on Linux?** If you log in with **Wayland**, the compositor usually does **not** allow the **X11-style global grabs** Crest uses internally. Crest never shows that error as a popup; check **`~/.local/share/crest/hotkey.log`** or launch `crest` from a terminal. **Recommended:** add a desktop shortcut (**Settings → Keyboard → Custom shortcuts**) whose command is **`crest`**. From **v0.2.1** on, Crest is a single instance — each time **`crest`** runs it **toggles** the palette (ideal for Wayland).
+
+**Terminal Setup (GNOME/Ubuntu):**
+```bash
+gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/']"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ name "Crest"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ command "crest"
+gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/ binding "<Super>space"
+```
+
+Alternatively, try **`alt+Space`** in `config.json`, or use an **X11** session (“Ubuntu on Xorg”, etc.), where grabs often succeed.
 
 From **v0.2.2** on, Crest also shows a **yellow hint bar** at the top of the window on affected setups with the same recommendation.
 
