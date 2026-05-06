@@ -47,7 +47,7 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Crest ${{ github.ref_name }}'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
+          bodyPath: './release_notes.md'
+          releaseDraft: false
           prerelease: false
           args: ${{ matrix.target != '' && format('--target {0}', matrix.target) || '' }}
