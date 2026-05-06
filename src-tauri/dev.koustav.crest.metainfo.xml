@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.koustav.crest</id>
+  <metadata_license>MIT</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Crest</name>
+  <summary>A Raycast-equivalent launcher for Linux</summary>
+
+  <description>
+    <p>
+      Crest is a high-performance, keyboard-first launcher for Linux. Built with Rust and Tauri,
+      it provides a fast, ergonomic, and extensible interface for your daily workflows.
+    </p>
+    <ul>
+      <li>High-performance startup (under 2ms)</li>
+      <li>Fuzzy-search for apps and files</li>
+      <li>Privacy-first: everything stays local</li>
+      <li>Extensible via manifest-driven plugins</li>
+      <li>Integrated clipboard history and web answers</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">dev.koustav.crest.desktop</launchable>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>The main command palette with high-fidelity UI and results split-view.</caption>
+      <image type="source">https://crest.run/assets/hero-mockup.png</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">https://crest.run/</url>
+  <url type="bugtracker">https://github.com/KOUSTAV2409/crest/issues</url>
+  <url type="vcs-browser">https://github.com/KOUSTAV2409/crest</url>
+
+  <branding>
+    <color type="primary" scheme_preference="dark">#12121e</color>
+    <color type="primary" scheme_preference="light">#7c4dff</color>
+  </branding>
+
+  <releases>
+    <release version="0.2.5" date="2026-05-06">
+      <description>
+        <p>The Visual Revolution Update.</p>
+        <ul>
+          <li>Integrated Stitch High-Fidelity UI Overhaul</li>
+          <li>New 50/50 balanced split-view layout</li>
+          <li>Glassy command palette aesthetic with refined borders</li>
+          <li>New HUD-style shortcut hint box in the preview panel</li>
+        </ul>
+      </description>
+    </release>
+    <release version="0.2.4" date="2026-05-05">
+      <description>
+        <p>Radical performance improvements and async startup architecture.</p>
+      </description>
+    </release>
+  </releases>
+
+  <content_rating type="oars-1.1" />
+  
+  <provides>
+    <binary>crest</binary>
+  </provides>
+</component>
