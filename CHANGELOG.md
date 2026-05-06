@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
  
+## [0.2.6] - 2026-05-06
+
+### Added
+- **AppStream Metadata**: integrated `metainfo.xml` for professional presentation in Linux software stores (GNOME Software, Discover).
+- **DEB Bundling**: configured Tauri to officially package the metadata file into `/usr/share/metainfo/`.
+
+### Changed
+- **Branding**: refined primary colors for high-fidelity carousel tiles in app stores.
+ 
 ## [0.2.5] - 2026-05-06
 
 ### Changed
@@ -72,3 +81,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 [0.2.3]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.3
 [0.2.4]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.4
 [0.2.5]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.5
+[0.2.6]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.6

@@ -39,6 +39,16 @@
   </branding>
 
   <releases>
+    <release version="0.2.6" date="2026-05-06">
+      <description>
+        <p>AppStream Integration Update.</p>
+        <ul>
+          <li>Added AppStream metainfo for professional GNOME Software and Linux app store presence</li>
+          <li>Bundled metadata into the official Linux .deb package</li>
+          <li>Refined branding colors for software center carousels</li>
+        </ul>
+      </description>
+    </release>
     <release version="0.2.5" date="2026-05-06">
       <description>
         <p>The Visual Revolution Update.</p>
