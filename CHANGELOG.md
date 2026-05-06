@@ -3,8 +3,15 @@
 All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
+ 
+## [0.2.5] - 2026-05-06
 
-## [0.2.4] - 2026-05-05
+### Changed
+- **Stitch High-Fidelity UI**: migrated the entire launcher aesthetic to match the premium "Web Page Replicator" design from Stitch.
+- **50/50 Split Layout**: redesigned the command palette container for a balanced 50/50 split between results and the preview panel.
+- **Glassy Command Palette**: updated background colors (`#12121e`), borders (`#2d2d3d`), and accents (`#7c4dff`) for a more professional, "command center" feel.
+- **Refined Preview Panel**: implemented a left-aligned hero section, glassy icon wrappers, and a HUD-style shortcut tip box.
+- **Minimalist Search Header**: simplified the search field with borderless inputs and larger typography for better readability.
 
 ### Added
 - **Performance instrumentation**: high-resolution timing logs (`[STARTUP]`) added to the Rust backend to monitor bottleneck regressions.
@@ -64,3 +71,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 [0.2.2]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.2
 [0.2.3]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.3
 [0.2.4]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.4
+[0.2.5]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.5

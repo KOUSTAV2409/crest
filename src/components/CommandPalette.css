@@ -23,14 +23,14 @@
 }
 
 .result-list-container {
-  width: 62%;
-  min-width: 62%;
-  max-width: 62%;
-  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  width: 50%;
+  min-width: 50%;
+  max-width: 50%;
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: rgba(6, 6, 10, 0.28);
+  background: transparent;
 }
 
 .result-list-container.full-width {
@@ -56,8 +56,8 @@
   padding: 0 20px;
   height: 44px;
   flex-shrink: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid var(--border);
+  background: var(--bg-elevated);
 }
 
 .status-left {

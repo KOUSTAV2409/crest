@@ -40,11 +40,10 @@
 
 .active-bg {
   position: absolute;
-  inset: 2px 6px;
-  background: var(--bg-selected-fill);
+  inset: 1px 8px;
+  background: var(--bg-selected);
   border-radius: var(--radius-item);
-  border: 1px solid var(--bg-selected-border);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(124, 77, 255, 0.25);
   z-index: 0;
 }
 
@@ -69,14 +68,15 @@
 
 .result-item[data-category='applications'] .category-marker,
 .result-item[data-category='Applications'] .category-marker {
-  background: var(--color-app);
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.4);
+  background: #ffb86c;
+  box-shadow: 0 0 8px rgba(255, 184, 108, 0.4);
 }
 
 .result-item[data-category='files'] .category-marker,
-.result-item[data-category='Files'] .category-marker {
-  background: var(--color-file);
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+.result-item[data-category='Files'] .category-marker,
+.result-item[data-category='internet'] .category-marker {
+  background: #8be9fd;
+  box-shadow: 0 0 8px rgba(139, 233, 253, 0.4);
 }
 
 .item-icon {
@@ -127,6 +127,7 @@
   text-overflow: ellipsis;
   opacity: 0.6;
 }
+
 
 .item-actions {
   display: flex;

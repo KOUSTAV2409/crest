@@ -1,10 +1,11 @@
 .search-input-container {
   display: flex;
   align-items: center;
-  min-height: 84px;
-  padding: 24px 20px 12px;
+  min-height: 72px;
+  padding: 0 12px;
   gap: 12px;
   background: transparent;
+  border-bottom: 1px solid var(--border);
   -webkit-app-region: no-drag;
   app-region: no-drag;
 }
@@ -14,15 +15,10 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   padding: 0 16px;
-  height: 48px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  box-shadow: 
-    0 1px 1px rgba(0, 0, 0, 0.2) inset,
-    0 0 0 1px rgba(0, 0, 0, 0.1) inset;
+  height: 100%;
+  background: transparent;
 }
 
 .search-icon {
@@ -40,10 +36,10 @@
   min-height: 20px;
   background: transparent;
   border: none;
-  color: var(--text-primary);
-  font-size: 15px;
-  font-weight: 560;
-  letter-spacing: -0.02em;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   min-width: 0;
   user-select: text;
   -webkit-user-select: text;

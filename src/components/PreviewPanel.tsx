@@ -59,13 +59,15 @@ const PreviewPanel: React.FC = () => {
     <div key={activeItem.id} className="preview-panel preview-panel--enter">
       <div className="preview-content">
         <div className="preview-hero">
-          <div className={`hero-icon-container ${catClass}`}>
+          <div className="hero-icon-wrapper">
             <AppIcon icon={activeItem.icon} variant="hero" />
           </div>
-          <h2 className="hero-title">{activeItem.title}</h2>
-          {activeItem.subtitle && (
-            <p className="hero-subtitle">{activeItem.subtitle}</p>
-          )}
+          <div className="hero-text-stack">
+            <h2 className="hero-title">{activeItem.title}</h2>
+            {activeItem.subtitle && (
+              <p className="hero-subtitle">{activeItem.subtitle}</p>
+            )}
+          </div>
         </div>
 
         <div className="preview-divider" />
@@ -100,10 +102,19 @@ const PreviewPanel: React.FC = () => {
         </div>
 
         <div className="preview-hint-box">
-          <div className="hint-prompt">&gt;_</div>
-          <div className="hint-content">
-            <div className="hint-line">Type to filter results</div>
-            <div className="hint-line">Use <span className="hint-key">↑↓</span> to navigate</div>
+          <div className="hint-stack">
+            <div className="hint-line">
+              <span className="hint-prompt">›_</span>
+              <span>Type to filter results</span>
+            </div>
+            <div className="hint-line">
+              <span className="hint-icon">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                </svg>
+              </span>
+              <span>Use arrows to navigate</span>
+            </div>
           </div>
         </div>
       </div>

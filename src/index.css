@@ -1,40 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  /* High-Fidelity Mockup Palette */
-  --bg:              rgba(15, 15, 20, 0.88);
-  --bg-deep:         #0d0d11;
-  --bg-elevated:     rgba(28, 28, 35, 0.98);
-  --bg-sidebar:      rgba(10, 10, 14, 0.45);
-  --bg-hover:        rgba(255, 255, 255, 0.03);
-
-  /* The exact purple-gradient selection from the mockup */
-  --bg-selected-fill: linear-gradient(90deg, rgba(65, 61, 125, 0.7) 0%, rgba(54, 51, 102, 0.5) 100%);
-  --bg-selected-border: rgba(168, 85, 247, 0.3);
-
-  /* Precise hairline borders */
-  --border:           rgba(255, 255, 255, 0.05);
+  /* High-Fidelity Mockup Palette (Stitch) */
+  --bg:              #12121e;
+  --bg-deep:         #0f0f17;
+  --bg-elevated:     #1a1a2e;
+  --bg-selected:     #2a2a4a;
+  --bg-hover:        #252538;
+  
+  --border:           #2d2d3d;
   --border-strong:    rgba(255, 255, 255, 0.08);
-  --border-active:    rgba(139, 92, 246, 0.4);
+  --border-active:    rgba(124, 77, 255, 0.4);
 
   --text-primary:     #f8fafc;
-  --text-secondary:   rgba(248, 250, 252, 0.65);
-  --text-tertiary:    rgba(248, 250, 252, 0.35);
+  --text-secondary:   #9499b0;
+  --text-tertiary:    rgba(148, 153, 176, 0.6);
 
   /* Branding accents */
-  --accent:           #8b5cf6;
-  --accent-muted:     rgba(139, 92, 246, 0.7);
-  --accent-glow:      rgba(139, 92, 246, 0.2);
+  --accent:           #7c4dff;
+  --accent-muted:     rgba(124, 77, 255, 0.7);
+  --accent-glow:      rgba(124, 77, 255, 0.2);
 
-  --color-app:        #fbbf24; /* Amber dot */
-  --color-file:       #38bdf8; /* Blue dot */
-  --color-calc:       #34d399; /* Green dot */
-  --color-web:        #22d3ee;
+  --color-app:        #ffb86c; /* Status Orange */
+  --color-file:       #8be9fd; /* Status Blue */
+  --color-calc:       #34d399; 
+  --color-web:        #8be9fd;
   
-  --radius-window:   24px;
-  --radius-item:     12px;
-  --radius-badge:    8px;
-  --radius-icon:     16px;
+  --radius-window:   14px;
+  --radius-item:     10px;
+  --radius-badge:    6px;
+  --radius-icon:     12px;
 
   --ease-snappy:     cubic-bezier(0.19, 1, 0.22, 1);
 }
