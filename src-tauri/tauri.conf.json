@@ -43,7 +43,7 @@
     "linux": {
       "deb": {
         "files": {
-          "dev.koustav.crest.metainfo.xml": "/usr/share/metainfo/dev.koustav.crest.metainfo.xml"
+          "/usr/share/metainfo/dev.koustav.crest.metainfo.xml": "dev.koustav.crest.metainfo.xml"
         }
       }
     }
