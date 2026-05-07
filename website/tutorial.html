@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Tutorial · Architecture Deep-Dive · Crest</title>
+    <meta name="description" content="A step-by-step technical deep-dive into the Crest architecture. Learn how the global hotkeys, search engine, and plugin system work under the hood.">
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        background: "#070a0b",
+                        surface: "#151515",
+                        muted: "#929292",
+                        "on-surface": "#eaeaea",
+                        "on-surface-variant": "#b0b0b0",
+                        primary: "#ff6363",
+                    },
+                    "fontFamily": {
+                        sans: ["Inter", "system-ui", "sans-serif"],
+                        mono: ["Fira Code", "ui-monospace", "monospace"],
+                        body: ["Inter", "system-ui", "sans-serif"],
+                        headline: ["Inter", "system-ui", "sans-serif"],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0a0a0b; -webkit-font-smoothing: antialiased; }
+        .grain {
+            position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0.022;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+        .rigid-border { border: 1px solid rgba(255, 255, 255, 0.1); }
+        .mono-label {
+            font-family: 'Fira Code', monospace; font-size: 10px; text-transform: uppercase;
+            letter-spacing: 0.1em; color: rgba(255, 255, 255, 0.45);
+        }
+        .docs-prose h2 {
+            font-family: 'Inter', system-ui, sans-serif; font-size: 1.5rem; font-weight: 700;
+            color: #fff; margin: 2.5rem 0 1rem;
+            scroll-margin-top: 5.5rem;
+        }
+        .docs-prose h3 {
+            font-size: 1.05rem; font-weight: 600; color: rgba(255,255,255,0.92); margin: 1.75rem 0 0.6rem;
+        }
+        .docs-prose p, .docs-prose li {
+            font-size: 0.9375rem; line-height: 1.7; color: rgba(229,226,225,0.85);
+        }
+        .docs-prose ul { list-style: disc; padding-left: 1.25rem; margin: 0.75rem 0 1rem; }
+        .docs-prose ul li { margin: 0.35rem 0; }
+        .docs-prose code, .docs-prose kbd {
+            font-family: 'Fira Code', monospace; font-size: 0.8rem;
+            background: rgba(255, 99, 99, 0.06); border: 1px solid rgba(255, 99, 99, 0.22);
+            border-radius: 0.25rem; padding: 0.1rem 0.4rem; color: #ffb4ae;
+        }
+        .docs-prose kbd { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+        .docs-callout {
+            border-left: 3px solid rgba(255, 99, 99, 0.55); padding: 0.875rem 1rem 0.875rem 1.125rem;
+            background: rgba(255, 99, 99, 0.055); margin: 1rem 0; border-radius: 0 0.375rem 0.375rem 0;
+        }
+        .toc a { transition: color 0.15s; }
+        .toc a:hover { color: #ff7979; }
+        .chapter-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+            transition: all 0.3s ease;
+        }
+        .chapter-card:hover {
+            border-color: rgba(255, 99, 99, 0.2);
+            background: rgba(255, 255, 255, 0.03);
+        }
+    </style>
+    <link rel="stylesheet" href="motion.css" />
+</head>
+<body class="font-sans text-on-surface selection:bg-primary/30 selection:text-white">
+<div class="grain"></div>
+
+<nav class="motion-nav-shell fixed top-0 w-full z-[100] border-b border-white/[0.06] bg-[#070a0b]/92 backdrop-blur-md" id="site-nav">
+    <div class="max-w-[1400px] mx-auto px-6 h-[52px] flex items-center justify-between">
+        <div class="flex items-center gap-8">
+            <a class="font-semibold text-[15px] tracking-[-0.02em] text-white no-underline" href="index.html">Crest</a>
+            <div class="hidden lg:flex gap-6 text-[12px] font-medium text-white/42">
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#architecture">Stack</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#features">Product</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="index.html#download">Download</a>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="documentation.html">Documentation</a>
+                <span class="text-[12px] font-medium text-white/92">Tutorial</span>
+                <a class="motion-nav-link hover:text-white transition-colors duration-200" href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener">GitHub</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="mono-label hidden sm:block text-white/30">v0.2.6</span>
+            <a href="index.html#download" class="motion-btn rounded-lg bg-white text-black px-4 py-2.5 text-[12px] font-semibold hover:bg-white/95 transition-colors no-underline">Download</a>
+        </div>
+    </div>
+</nav>
+
+<main class="pt-28 pb-24 px-6 max-w-[1200px] mx-auto">
+    <header class="mb-14 max-w-2xl motion-rise motion-d-1">
+        <div class="mono-label mb-3 text-white/45">Under the hood</div>
+        <h1 class="text-4xl md:text-5xl text-white tracking-tight mb-4 font-bold uppercase">Architecture Tutorial</h1>
+        <p class="text-white/48 text-[17px] leading-relaxed font-normal">
+            A step-by-step deep-dive into how Crest works. From hotkey registration in Rust to high-fidelity rendering in React.
+        </p>
+        <div class="docs-callout mt-8">
+            <p class="text-[13px] text-white/60 mb-0 italic">
+                Generated via Code2Tutorial and refined for technical minimalism.
+            </p>
+        </div>
+    </header>
+
+    <div class="lg:grid lg:grid-cols-[minmax(0,210px)_minmax(0,1fr)] gap-14 items-start">
+        <aside class="toc rigid-border rounded-lg p-5 bg-black/40 mb-10 lg:mb-0 lg:sticky lg:top-28 text-[13px] text-white/50 motion-rise motion-d-2 transition-[transform,box-shadow,border-color] duration-300 hover:border-white/[0.12]">
+            <div class="mono-label mb-4 text-white/60">Chapters</div>
+            <ul class="space-y-2.5 list-none p-0 m-0 uppercase tracking-widest text-[10px]">
+                <li><a href="#hotkeys" class="text-white/65 no-underline">01 Hotkeys</a></li>
+                <li><a href="#search" class="text-white/65 no-underline">02 Search Engine</a></li>
+                <li><a href="#indexing" class="text-white/65 no-underline">03 Data Indexers</a></li>
+                <li><a href="#plugins" class="text-white/65 no-underline">04 Plugin System</a></li>
+                <li><a href="#ipc" class="text-white/65 no-underline">05 Tauri IPC</a></li>
+                <li><a href="#frontend" class="text-white/65 no-underline">06 Frontend State</a></li>
+            </ul>
+        </aside>
+
+        <article class="docs-prose min-w-0 motion-rise motion-d-3">
+            
+            <section id="hotkeys" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Chapter 01</div>
+                <h2 class="mt-0">Global Hotkey & Window Management</h2>
+                <p>The entry point for any launcher is the global hotkey. Crest uses the <code>global-hotkey</code> Rust crate to listen for system-wide key events even when the app isn't focused.</p>
+                <ul>
+                    <li><strong>Mechanism:</strong> Rust backend registers a persistent listener for <code>Super+Space</code> (configurable).</li>
+                    <li><strong>Logic:</strong> When triggered, the backend sends a window-toggle signal. If the window is hidden, it shows and focuses; if visible, it hides.</li>
+                    <li><strong>Optimization:</strong> We use an async event loop to ensure zero-latency response between the keypress and the UI appearance.</li>
+                </ul>
+            </section>
+
+            <section id="search" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Chapter 02</div>
+                <h2 class="mt-0">Unified Search Engine</h2>
+                <p>The "brain" of Crest processes user queries in real-time. It's designed for sub-millisecond ranking across multiple sources.</p>
+                <ul>
+                    <li><strong>Engine:</strong> Powered by the <code>nucleo</code> crate for high-performance fuzzy matching.</li>
+                    <li><strong>Mechanism:</strong> Queries are sent from the frontend on every keystroke and processed by the Rust backend in parallel.</li>
+                    <li><strong>Prioritization:</strong> Results are weighted based on source type (Apps > Commands > Files) and usage frequency.</li>
+                </ul>
+            </section>
+
+            <section id="indexing" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Chapter 03</div>
+                <h2 class="mt-0">Data Indexers</h2>
+                <p>To keep searches instantaneous, Crest doesn't scan the disk live. Instead, it maintains a persistent local index.</p>
+                <ul>
+                    <li><strong>Sources:</strong> Indexers scan <code>.desktop</code> files, system binaries, and user-defined directories.</li>
+                    <li><strong>Storage:</strong> Metadata is stored in a local <strong>SQLite</strong> database for ultra-fast retrieval.</li>
+                    <li><strong>Refresh:</strong> Background workers periodically check for changes to ensure the index stays current without eating CPU.</li>
+                </ul>
+            </section>
+
+            <section id="plugins" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Chapter 04</div>
+                <h2 class="mt-0">Plugin System</h2>
+                <p>Extensibility is at the heart of Crest. Our plugin system allows anyone to add new functionality with simple scripts.</p>
+                <ul>
+                    <li><strong>Architecture:</strong> Manifest-driven (<code>manifest.json</code>). Only explicitly registered plugins are loaded.</li>
+                    <li><strong>Security:</strong> Plugins run as isolated processes. They communicate via JSON stdout, keeping the core app safe.</li>
+                    <li><strong>Standardization:</strong> Any language can be used (Node, Python, Bash) as long as it outputs the Crest Result Schema.</li>
+                </ul>
+            </section>
+
+            <section id="ipc" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Chapter 05</div>
+                <h2 class="mt-0">Tauri IPC Bridge</h2>
+                <p>The communication channel between our Rust "muscles" and React "skin."</p>
+                <ul>
+                    <li><strong>Mechanism:</strong> Uses Tauri's optimized <code>invoke</code> and <code>emit</code> patterns.</li>
+                    <li><strong>Data Flow:</strong> Keystrokes flow down to Rust; ranked results flow back up to the TypeScript layer.</li>
+                    <li><strong>Latency:</strong> By keeping the IPC payloads small and structured, we maintain a consistent 60+ FPS search experience.</li>
+                </ul>
+            </section>
+
+            <section id="frontend" class="chapter-card scroll-mt-[5.5rem] pb-0 mb-0">
+                <div class="mono-label mb-4">Chapter 06</div>
+                <h2 class="mt-0">Frontend State Management</h2>
+                <p>The frontend is responsible for the "Visual Revolution"—rendering results with high-fidelity aesthetics and smooth motion.</p>
+                <ul>
+                    <li><strong>State:</strong> Managed via <strong>Zustand</strong> for lightweight, reactive updates without the overhead of Redux.</li>
+                    <li><strong>Motion:</strong> Powered by <strong>Framer Motion</strong> for glassy transitions and spring-based selection highlights.</li>
+                    <li><strong>Accessibility:</strong> Full keyboard-driven navigation (arrows, enter, shortcuts) is handled via dedicated hooks.</li>
+                </ul>
+            </section>
+
+        </article>
+    </div>
+</main>
+
+<footer class="pt-16 pb-10 px-6 border-t border-white/[0.06] bg-black mt-16">
+    <div class="max-w-[1200px] mx-auto flex flex-col sm:flex-row justify-between gap-8 items-start sm:items-center">
+        <a class="font-semibold text-white no-underline" href="index.html">Crest</a>
+        <div class="flex flex-wrap gap-6 text-[11px] font-mono text-white/32">
+            <a href="index.html#download" class="hover:text-primary transition-colors no-underline">Download</a>
+            <a href="documentation.html" class="hover:text-primary transition-colors no-underline">Documentation</a>
+            <a href="tutorial.html" class="text-white/55 no-underline">Tutorial</a>
+            <a href="https://github.com/KOUSTAV2409/crest/blob/master/DOCUMENTBOOK.md" target="_blank" rel="noopener" class="hover:text-primary transition-colors no-underline">DOCUMENTBOOK.md</a>
+            <a href="https://github.com/KOUSTAV2409/crest" target="_blank" rel="noopener" class="hover:text-primary transition-colors no-underline">GitHub</a>
+        </div>
+        <div class="text-[10px] font-mono text-white/25 tracking-wider">
+            Linux · MIT · Created by <a href="https://iamk.xyz" class="hover:text-white/60 underline underline-offset-4 decoration-white/10" target="_blank" rel="noopener">Koustav</a> @ <a href="https://www.makershot.tech/" class="hover:text-white/60 underline underline-offset-4 decoration-white/10" target="_blank" rel="noopener">Makershot</a>
+        </div>
+    </div>
+</footer>
+<script src="motion-init.js" defer></script>
+</body>
+</html>
