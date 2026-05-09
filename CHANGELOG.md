@@ -89,3 +89,4 @@ The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
 [0.2.4]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.4
 [0.2.5]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.5
 [0.2.6]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.6
+[0.2.7]: https://github.com/KOUSTAV2409/crest/releases/tag/v0.2.7
