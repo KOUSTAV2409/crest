@@ -60,6 +60,21 @@
             background: rgba(255, 99, 99, 0.06); border: 1px solid rgba(255, 99, 99, 0.22);
             border-radius: 0.25rem; padding: 0.1rem 0.4rem; color: #ffb4ae;
         }
+        .docs-prose pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        .docs-prose pre code {
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+        }
         .docs-prose kbd { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
         .docs-callout {
             border-left: 3px solid rgba(255, 99, 99, 0.55); padding: 0.875rem 1rem 0.875rem 1.125rem;
@@ -79,6 +94,9 @@
             border-color: rgba(255, 99, 99, 0.2);
             background: rgba(255, 255, 255, 0.03);
         }
+        .syntax-comment { color: rgba(255, 255, 255, 0.3); }
+        .syntax-keyword { color: #ff7979; }
+        .syntax-string { color: #a2fca2; }
     </style>
     <link rel="stylesheet" href="motion.css" />
 </head>
@@ -110,11 +128,11 @@
         <div class="mono-label mb-3 text-white/45">Under the hood</div>
         <h1 class="text-4xl md:text-5xl text-white tracking-tight mb-4 font-bold uppercase">Architecture Tutorial</h1>
         <p class="text-white/48 text-[17px] leading-relaxed font-normal">
-            A step-by-step deep-dive into how Crest works. From hotkey registration in Rust to high-fidelity rendering in React.
+            A detailed, step-by-step deep-dive into how Crest works. From hotkey registration in Rust to high-fidelity rendering in React.
         </p>
         <div class="docs-callout mt-8">
             <p class="text-[13px] text-white/60 mb-0 italic">
-                Generated via Code2Tutorial and refined for technical minimalism.
+                Sourced directly from the official Crest codebase tutorial.
             </p>
         </div>
     </header>
@@ -123,6 +141,7 @@
         <aside class="toc rigid-border rounded-lg p-5 bg-black/40 mb-10 lg:mb-0 lg:sticky lg:top-28 text-[13px] text-white/50 motion-rise motion-d-2 transition-[transform,box-shadow,border-color] duration-300 hover:border-white/[0.12]">
             <div class="mono-label mb-4 text-white/60">Chapters</div>
             <ul class="space-y-2.5 list-none p-0 m-0 uppercase tracking-widest text-[10px]">
+                <li><a href="#overview" class="text-white/65 no-underline">Overview</a></li>
                 <li><a href="#hotkeys" class="text-white/65 no-underline">01 Hotkeys</a></li>
                 <li><a href="#search" class="text-white/65 no-underline">02 Search Engine</a></li>
                 <li><a href="#indexing" class="text-white/65 no-underline">03 Data Indexers</a></li>
@@ -134,70 +153,250 @@
 
         <article class="docs-prose min-w-0 motion-rise motion-d-3">
             
+            <section id="overview" class="chapter-card scroll-mt-[5.5rem]">
+                <div class="mono-label mb-4">Overview</div>
+                <h2 class="mt-0">Overview of Crest</h2>
+                <p>Crest is a powerful, unified search engine and productivity tool designed to streamline your digital workflow. It acts as a central hub for accessing applications, files, web searches, calculations, and more, all through a simple and intuitive interface.</p>
+                <p>This tutorial will guide you through the core components of Crest, from its global hotkey management to its sophisticated plugin system and state management.</p>
+                
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>Global Hotkey & Window Management</strong>: Instant access to Crest from anywhere in your system.</li>
+                    <li><strong>Unified Search Engine</strong>: A single search bar to find everything you need.</li>
+                    <li><strong>Data Indexers</strong>: Efficiently indexing your local data for lightning-fast retrieval.</li>
+                    <li><strong>Plugin System</strong>: Extend Crest's functionality with custom plugins.</li>
+                    <li><strong>Tauri IPC Bridge</strong>: Secure communication between the frontend and the Rust backend.</li>
+                    <li><strong>Frontend State Management</strong>: A responsive and synchronized user interface powered by Zustand.</li>
+                </ul>
+                <p>Explore the chapters on the left to dive deep into each of these areas and understand how Crest is built and how it works.</p>
+            </section>
+
             <section id="hotkeys" class="chapter-card scroll-mt-[5.5rem]">
                 <div class="mono-label mb-4">Chapter 01</div>
                 <h2 class="mt-0">Global Hotkey & Window Management</h2>
-                <p>The entry point for any launcher is the global hotkey. Crest uses the <code>global-hotkey</code> Rust crate to listen for system-wide key events even when the app isn't focused.</p>
-                <ul>
-                    <li><strong>Mechanism:</strong> Rust backend registers a persistent listener for <code>Super+Space</code> (configurable).</li>
-                    <li><strong>Logic:</strong> When triggered, the backend sends a window-toggle signal. If the window is hidden, it shows and focuses; if visible, it hides.</li>
-                    <li><strong>Optimization:</strong> We use an async event loop to ensure zero-latency response between the keypress and the UI appearance.</li>
-                </ul>
+                <p>In this chapter, we explore how Crest handles global hotkeys and window management using the Tauri framework. This is the entry point for the user, allowing them to summon Crest instantly with a simple keyboard shortcut.</p>
+                
+                <h3>The Global Hotkey</h3>
+                <p>Crest uses the <code>tauri-plugin-global-shortcut</code> to listen for a specific key combination (e.g., <code>Alt+Space</code> or <code>Cmd+Space</code>). When this shortcut is pressed, the backend receives an event and toggles the visibility of the main window.</p>
+                
+                <h4>Backend Implementation (Rust)</h4>
+<pre><code class="language-rust"><span class="syntax-comment">// src-tauri/src/main.rs</span>
+<span class="syntax-comment">// ... imports ...</span>
+
+<span class="syntax-keyword">fn</span> main() {
+    tauri::Builder::default()
+        .plugin(tauri_plugin_global_shortcut::Builder::new().build())
+        .setup(|app| {
+            <span class="syntax-keyword">let</span> handle = app.handle();
+            <span class="syntax-comment">// Register the global shortcut</span>
+            app.global_shortcut_manager().register(<span class="syntax-string">"Alt+Space"</span>, <span class="syntax-keyword">move</span> || {
+                <span class="syntax-keyword">let</span> window = handle.get_window(<span class="syntax-string">"main"</span>).unwrap();
+                <span class="syntax-keyword">if</span> window.is_visible().unwrap() {
+                    window.hide().unwrap();
+                } <span class="syntax-keyword">else</span> {
+                    window.show().unwrap();
+                    window.set_focus().unwrap();
+                }
+            }).unwrap();
+            <span class="syntax-keyword">Ok</span>(())
+        })
+        <span class="syntax-comment">// ...</span>
+        .run(tauri::generate_context!())
+        .expect(<span class="syntax-string">"error while running tauri application"</span>);
+}</code></pre>
+
+                <h3>Window Management</h3>
+                <p>Crest's main window is configured to be borderless and transparent, providing a modern "palette" feel. We also handle events like "blur" (when the window loses focus) to automatically hide the application.</p>
+                
+                <h4>Blur Event Handling</h4>
+<pre><code class="language-typescript"><span class="syntax-comment">// src/App.tsx</span>
+<span class="syntax-keyword">import</span> { useEffect } <span class="syntax-keyword">from</span> <span class="syntax-string">'react'</span>;
+<span class="syntax-keyword">import</span> { appWindow } <span class="syntax-keyword">from</span> <span class="syntax-string">'@tauri-apps/api/window'</span>;
+
+<span class="syntax-keyword">function</span> App() {
+  useEffect(() => {
+    <span class="syntax-keyword">const</span> unlisten = appWindow.onFocusChanged(({ payload: focused }) => {
+      <span class="syntax-keyword">if</span> (!focused) {
+        appWindow.hide();
+      }
+    });
+    <span class="syntax-keyword">return</span> () => {
+      unlisten.then(f => f());
+    };
+  }, []);
+  <span class="syntax-comment">// ...</span>
+}</code></pre>
+                <p>By combining global shortcuts with smart window event handling, Crest provides a seamless and "always-available" experience for the user.</p>
             </section>
 
             <section id="search" class="chapter-card scroll-mt-[5.5rem]">
                 <div class="mono-label mb-4">Chapter 02</div>
                 <h2 class="mt-0">Unified Search Engine</h2>
-                <p>The "brain" of Crest processes user queries in real-time. It's designed for sub-millisecond ranking across multiple sources.</p>
+                <p>In our last chapter, we learned how to summon Crest to life with a magical keyboard shortcut, making it pop up and disappear instantly. But what happens <em>after</em> Crest appears? That's where the "Unified Search Engine" comes in – it's the brain that makes Crest intelligent and incredibly useful!</p>
+                <p>Think of Crest's search engine as your personal, super-efficient assistant. Instead of having to open a separate app for everything – a calculator for math, a file manager for documents, or a browser for web searches – Crest brings it all together into one simple box. It processes whatever you type and instantly pulls up the most relevant results from all corners of your digital world.</p>
+                <p>The core problem this system solves is <strong>information fragmentation</strong>. You have apps, files, clipboard history, and the entire internet, all scattered. Crest's Unified Search Engine acts as a master key, unlocking and organizing all this information right at your fingertips.</p>
+                
+                <h3>What is the Unified Search Engine?</h3>
+                <p>The Unified Search Engine is a centralized system that takes your search query and broadcasts it to various "Search Providers." Each provider is an expert in a specific area:</p>
                 <ul>
-                    <li><strong>Engine:</strong> Powered by the <code>nucleo</code> crate for high-performance fuzzy matching.</li>
-                    <li><strong>Mechanism:</strong> Queries are sent from the frontend on every keystroke and processed by the Rust backend in parallel.</li>
-                    <li><strong>Prioritization:</strong> Results are weighted based on source type (Apps > Commands > Files) and usage frequency.</li>
+                    <li><strong>App Provider:</strong> Finds and launches installed applications on your computer.</li>
+                    <li><strong>File Provider:</strong> Searches for documents, folders, and files across your hard drive.</li>
+                    <li><strong>Calculator:</strong> Instantly solves mathematical expressions as you type.</li>
+                    <li><strong>Web Search:</strong> Quickly searches Google, DuckDuckGo, or other engines.</li>
+                    <li><strong>Clipboard:</strong> Retrieves items you've recently copied to your clipboard.</li>
                 </ul>
+
+                <h3>The Search Result Object</h3>
+                <p>Every result found, whether it's an app or a math answer, is converted into a standard "Search Result" format. This allows Crest to display them consistently in the list.</p>
+<pre><code class="language-typescript"><span class="syntax-comment">// src/types/ipc.ts</span>
+<span class="syntax-keyword">export interface</span> SearchResult {
+  id: <span class="syntax-keyword">string</span>;          <span class="syntax-comment">// A unique identifier</span>
+  title: <span class="syntax-keyword">string</span>;       <span class="syntax-comment">// The main text shown (e.g., "Google Chrome")</span>
+  subtitle?: <span class="syntax-keyword">string</span>;   <span class="syntax-comment">// Extra info (e.g., "/Applications/Google Chrome.app")</span>
+  icon?: <span class="syntax-keyword">string</span>;       <span class="syntax-comment">// An icon representing the result</span>
+  category: <span class="syntax-keyword">string</span>;    <span class="syntax-comment">// What kind of result it is (e.g., "App", "File", "Math")</span>
+  action: SearchAction; <span class="syntax-comment">// What happens when you click it</span>
+}</code></pre>
             </section>
 
             <section id="indexing" class="chapter-card scroll-mt-[5.5rem]">
                 <div class="mono-label mb-4">Chapter 03</div>
                 <h2 class="mt-0">Data Indexers</h2>
-                <p>To keep searches instantaneous, Crest doesn't scan the disk live. Instead, it maintains a persistent local index.</p>
+                <p>In our last chapter, we unveiled the magic of Crest's Unified Search Engine, learning how it intelligently processes your queries to find applications, files, and even web results. But a truly smart search engine needs to <em>know</em> what's on your computer! How does Crest get this information? That's where <strong>Data Indexers</strong> come into play.</p>
+                <p>Imagine Crest as a super-fast librarian. The Unified Search Engine is how you ask the librarian for a book. But before you can ask, someone needs to actually go out, find all the books, read their titles, authors, and summaries, and neatly organize them on shelves. These dedicated "book-finders" and "organizers" are Crest's Data Indexers.</p>
+                
+                <h3>What is a Data Indexer?</h3>
+                <p>A Data Indexer is a specialized background process that crawls through a specific type of data on your system, extracts the important bits, and stores them in a highly optimized "Index" (like a giant, searchable catalog).</p>
                 <ul>
-                    <li><strong>Sources:</strong> Indexers scan <code>.desktop</code> files, system binaries, and user-defined directories.</li>
-                    <li><strong>Storage:</strong> Metadata is stored in a local <strong>SQLite</strong> database for ultra-fast retrieval.</li>
-                    <li><strong>Refresh:</strong> Background workers periodically check for changes to ensure the index stays current without eating CPU.</li>
+                    <li><strong>App Indexer:</strong> Scans system application folders (like <code>/Applications</code> or <code>C:\Program Files</code>) for app names, icons, and locations.</li>
+                    <li><strong>File Indexer:</strong> Scans your home directory and other folders you specify for file names, paths, and metadata.</li>
+                    <li><strong>Clipboard Indexer:</strong> Scans your system clipboard for recently copied text, links, or images.</li>
                 </ul>
+
+                <h3>The App Indexer (A Rust Example)</h3>
+                <p>In Crest's backend (written in Rust), the App Indexer is responsible for finding your installed programs.</p>
+<pre><code class="language-rust"><span class="syntax-comment">// src-tauri/src/indexers/app_indexer.rs (Simplified)</span>
+<span class="syntax-keyword">use</span> std::fs;
+<span class="syntax-keyword">use</span> std::path::Path;
+
+<span class="syntax-keyword">pub struct</span> AppInfo {
+    <span class="syntax-keyword">pub</span> name: String,
+    <span class="syntax-keyword">pub</span> path: String,
+}
+
+<span class="syntax-keyword">pub fn</span> index_apps() -> Vec&lt;AppInfo&gt; {
+    <span class="syntax-keyword">let mut</span> apps = Vec::new();
+    <span class="syntax-keyword">let</span> app_dir = Path::new(<span class="syntax-string">"/Applications"</span>);
+
+    <span class="syntax-keyword">if let</span> Ok(entries) = fs::read_dir(app_dir) {
+        <span class="syntax-keyword">for</span> entry <span class="syntax-keyword">in</span> entries.flatten() {
+            <span class="syntax-keyword">let</span> path = entry.path();
+            <span class="syntax-keyword">if</span> path.extension().and_then(|s| s.to_str()) == Some(<span class="syntax-string">"app"</span>) {
+                <span class="syntax-keyword">let</span> name = path.file_stem().unwrap().to_str().unwrap().to_string();
+                apps.push(AppInfo { name, path: path.to_str().unwrap().to_string() });
+            }
+        }
+    }
+    apps
+}</code></pre>
             </section>
 
             <section id="plugins" class="chapter-card scroll-mt-[5.5rem]">
                 <div class="mono-label mb-4">Chapter 04</div>
                 <h2 class="mt-0">Plugin System</h2>
-                <p>Extensibility is at the heart of Crest. Our plugin system allows anyone to add new functionality with simple scripts.</p>
-                <ul>
-                    <li><strong>Architecture:</strong> Manifest-driven (<code>manifest.json</code>). Only explicitly registered plugins are loaded.</li>
-                    <li><strong>Security:</strong> Plugins run as isolated processes. They communicate via JSON stdout, keeping the core app safe.</li>
-                    <li><strong>Standardization:</strong> Any language can be used (Node, Python, Bash) as long as it outputs the Crest Result Schema.</li>
-                </ul>
+                <p>In our journey through Crest so far, we've learned how to summon it with a Global Hotkey, how its Unified Search Engine intelligently finds information, and how Data Indexers keep everything up-to-date. But what if you need Crest to do something really specific? That's where the <strong>Plugin System</strong> shines!</p>
+                <p>The main problem the Plugin System solves is <strong>customization without complexity</strong>. Instead of having to change Crest's core code, you can write small, independent programs (plugins) that Crest can run.</p>
+
+                <h3>A Simple JavaScript Plugin (Conceptual)</h3>
+                <p>Crest allows you to write plugins in simple JavaScript. Here's what a basic "Hello World" plugin might look like:</p>
+<pre><code class="language-javascript"><span class="syntax-comment">// hello-plugin.js</span>
+<span class="syntax-keyword">module</span>.exports = {
+  onSearch: <span class="syntax-keyword">async</span> (query) => {
+    <span class="syntax-keyword">if</span> (query.startsWith(<span class="syntax-string">'hello'</span>)) {
+      <span class="syntax-keyword">return</span> [{
+        id: <span class="syntax-string">'hello-result'</span>,
+        title: <span class="syntax-string">'Say Hello!'</span>,
+        subtitle: <span class="syntax-string">'Crest is happy to see you.'</span>,
+        category: <span class="syntax-string">'Plugin'</span>,
+        action: { type: <span class="syntax-string">'copy'</span>, value: <span class="syntax-string">'Hello from Crest!'</span> }
+      }];
+    }
+    <span class="syntax-keyword">return</span> [];
+  },
+  onAction: (result) => {
+    console.log(<span class="syntax-string">"Plugin action triggered:"</span>, result.title);
+  }
+};</code></pre>
             </section>
 
             <section id="ipc" class="chapter-card scroll-mt-[5.5rem]">
                 <div class="mono-label mb-4">Chapter 05</div>
                 <h2 class="mt-0">Tauri IPC Bridge</h2>
-                <p>The communication channel between our Rust "muscles" and React "skin."</p>
-                <ul>
-                    <li><strong>Mechanism:</strong> Uses Tauri's optimized <code>invoke</code> and <code>emit</code> patterns.</li>
-                    <li><strong>Data Flow:</strong> Keystrokes flow down to Rust; ranked results flow back up to the TypeScript layer.</li>
-                    <li><strong>Latency:</strong> By keeping the IPC payloads small and structured, we maintain a consistent 60+ FPS search experience.</li>
-                </ul>
+                <p>The "Tauri IPC Bridge" is exactly this secure communication channel. "IPC" stands for <strong>Inter-Process Communication</strong>, which is just a fancy way of saying "two separate programs talking to each other." Tauri, the framework Crest is built with, provides an incredibly safe and fast bridge between the frontend and the backend.</p>
+                <p>The core problem the IPC Bridge solves is <strong>secure and efficient coordination</strong>.</p>
+
+                <h3>How to Use the IPC Bridge (A Search Example)</h3>
+                <h4>1. Defining a Command in the Backend (Rust)</h4>
+<pre><code class="language-rust"><span class="syntax-comment">// src-tauri/src/main.rs (Simplified)</span>
+#[tauri::command]
+<span class="syntax-keyword">fn</span> search(query: String) -> Vec&lt;SearchResult&gt; {
+    println!(<span class="syntax-string">"Backend received search query: {}"</span>, query);
+    <span class="syntax-keyword">let</span> results = core_engine::run_search(query);
+    results
+}
+
+<span class="syntax-keyword">fn</span> main() {
+  tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![search])
+    .run(tauri::generate_context!())
+    .expect(<span class="syntax-string">"error while running tauri application"</span>);
+}</code></pre>
+
+                <h4>2. Invoking the Command from the Frontend (TypeScript)</h4>
+<pre><code class="language-typescript"><span class="syntax-comment">// src/components/SearchInput.tsx (Simplified)</span>
+<span class="syntax-keyword">import</span> { invoke } <span class="syntax-keyword">from</span> <span class="syntax-string">'@tauri-apps/api/core'</span>;
+
+<span class="syntax-keyword">const</span> handleSearch = <span class="syntax-keyword">async</span> (query: <span class="syntax-keyword">string</span>) => {
+  <span class="syntax-keyword">try</span> {
+    <span class="syntax-keyword">const</span> results = <span class="syntax-keyword">await</span> invoke&lt;SearchResult[]&gt;(<span class="syntax-string">'search'</span>, { query: query });
+    console.log(<span class="syntax-string">"Frontend received results:"</span>, results);
+  } <span class="syntax-keyword">catch</span> (error) {
+    console.error(<span class="syntax-string">"IPC call failed:"</span>, error);
+  }
+};</code></pre>
             </section>
 
             <section id="frontend" class="chapter-card scroll-mt-[5.5rem] pb-0 mb-0">
                 <div class="mono-label mb-4">Chapter 06</div>
                 <h2 class="mt-0">Frontend State Management</h2>
-                <p>The frontend is responsible for the "Visual Revolution"—rendering results with high-fidelity aesthetics and smooth motion.</p>
-                <ul>
-                    <li><strong>State:</strong> Managed via <strong>Zustand</strong> for lightweight, reactive updates without the overhead of Redux.</li>
-                    <li><strong>Motion:</strong> Powered by <strong>Framer Motion</strong> for glassy transitions and spring-based selection highlights.</li>
-                    <li><strong>Accessibility:</strong> Full keyboard-driven navigation (arrows, enter, shortcuts) is handled via dedicated hooks.</li>
-                </ul>
+                <p>"Frontend State Management" is the system that organizes all the monitors, data screens, and controls within the control room itself. It ensures that when you type a query, the search box updates, the results list changes, and the preview panel shows details for the correct active item, all in perfect sync.</p>
+
+                <h3>Zustand State Store</h3>
+                <p>Crest uses <strong>Zustand</strong> to manage its global state. This store holds the current search results and the active selection.</p>
+<pre><code class="language-typescript"><span class="syntax-comment">// src/store/useSearchStore.ts</span>
+<span class="syntax-keyword">import</span> { create } <span class="syntax-keyword">from</span> <span class="syntax-string">'zustand'</span>;
+<span class="syntax-keyword">import</span> { SearchResult } <span class="syntax-keyword">from</span> <span class="syntax-string">'../types/ipc'</span>;
+
+<span class="syntax-keyword">interface</span> SearchState {
+  results: SearchResult[];
+  selectedIndex: <span class="syntax-keyword">number</span>;
+  setResults: (results: SearchResult[]) => <span class="syntax-keyword">void</span>;
+  nextResult: () => <span class="syntax-keyword">void</span>;
+  prevResult: () => <span class="syntax-keyword">void</span>;
+}
+
+<span class="syntax-keyword">export const</span> useSearchStore = create&lt;SearchState&gt;((set) => ({
+  results: [],
+  selectedIndex: 0,
+  setResults: (results) => set({ results, selectedIndex: 0 }),
+  nextResult: () => set((state) => ({ 
+    selectedIndex: Math.min(state.selectedIndex + 1, state.results.length - 1) 
+  })),
+  prevResult: () => set((state) => ({ 
+    selectedIndex: Math.max(state.selectedIndex - 1, 0) 
+  })),
+}));</code></pre>
+                <p>By centralizing the state in a Zustand store, any component in Crest can easily access and update the search results or the currently selected item, ensuring a consistent user experience.</p>
             </section>
 
         </article>
