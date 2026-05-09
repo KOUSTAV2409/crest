@@ -2,7 +2,7 @@
   "name": "crest",
   "description": "A high-performance, Raycast-inspired productivity launcher for Linux.",
   "private": true,
-  "version": "0.2.6",
+  "version": "0.2.7",
   "type": "module",
   "scripts": {
     "dev": "vite",

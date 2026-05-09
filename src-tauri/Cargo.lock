@@ -725,9 +725,10 @@ dependencies = [
 
 [[package]]
 name = "crest"
-version = "0.2.4"
+version = "0.2.6"
 dependencies = [
  "arboard",
+ "base64 0.22.1",
  "dirs 5.0.1",
  "fend-core",
  "freedesktop-icons",

@@ -27,6 +27,17 @@ function asSearchResults(value: unknown): SearchResult[] {
   return Array.isArray(value) ? (value as SearchResult[]) : [];
 }
 
+// Fast Base64 to JSON Decoder for high-performance IPC
+function decodeBase64Results(base64Str: string): SearchResult[] {
+  const binaryString = atob(base64Str);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  const jsonStr = new TextDecoder().decode(bytes);
+  return JSON.parse(jsonStr) as SearchResult[];
+}
+
 const SearchInput: React.FC = () => {
   const setQuery = useAppStore((s) => s.setQuery);
   const setMode = useAppStore((s) => s.setMode);
@@ -141,7 +152,7 @@ const SearchInput: React.FC = () => {
         try {
           const queryStr = val === '/' ? '' : val.substring(1);
           const res = asSearchResults(
-            await invoke<unknown>('search_files', { query: queryStr })
+            decodeBase64Results(await invoke<string>('search_files', { query: queryStr }))
           );
           startTransition(() => setResults(res));
         } catch (e) {
@@ -202,7 +213,7 @@ const SearchInput: React.FC = () => {
           if (useAppStore.getState().query !== capturedQuery) return;
 
           let res = asSearchResults(
-            await invoke<unknown>('search', { query: capturedQuery, category: null })
+            decodeBase64Results(await invoke<string>('search', { query: capturedQuery, category: null }))
           );
 
           if (useAppStore.getState().query !== capturedQuery) return;

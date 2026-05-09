@@ -298,10 +298,14 @@ fn search_blocking(query: String, _category: Option<String>) -> Result<Vec<Searc
 }
 
 #[tauri::command]
-pub async fn search(query: String, category: Option<String>) -> Result<Vec<SearchResult>, String> {
-    tokio::task::spawn_blocking(move || search_blocking(query, category))
+pub async fn search(query: String, category: Option<String>) -> Result<String, String> {
+    let results = tokio::task::spawn_blocking(move || search_blocking(query, category))
         .await
-        .map_err(|e| format!("search task join failed: {}", e))?
+        .map_err(|e| format!("search task join failed: {}", e))??;
+        
+    let json_bytes = serde_json::to_vec(&results).map_err(|e| e.to_string())?;
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+    Ok(STANDARD.encode(json_bytes))
 }
 
 #[tauri::command]
@@ -512,10 +516,14 @@ fn search_files_blocking(query: String) -> Result<Vec<SearchResult>, String> {
 }
 
 #[tauri::command]
-pub async fn search_files(query: String) -> Result<Vec<SearchResult>, String> {
-    tokio::task::spawn_blocking(move || search_files_blocking(query))
+pub async fn search_files(query: String) -> Result<String, String> {
+    let results = tokio::task::spawn_blocking(move || search_files_blocking(query))
         .await
-        .map_err(|e| format!("search_files task join failed: {}", e))?
+        .map_err(|e| format!("search_files task join failed: {}", e))??;
+        
+    let json_bytes = serde_json::to_vec(&results).map_err(|e| e.to_string())?;
+    use base64::{Engine as _, engine::general_purpose::STANDARD};
+    Ok(STANDARD.encode(json_bytes))
 }
 
 #[tauri::command]
