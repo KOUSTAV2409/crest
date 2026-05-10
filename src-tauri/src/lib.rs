@@ -73,7 +73,11 @@ pub fn run() {
             commands::system::get_shortcut_setup_hint,
             commands::extensions::run_extension,
             commands::extensions::get_clipboard_history,
-            commands::icons::resolve_desktop_icon_path
+            commands::icons::resolve_desktop_icon_path,
+            commands::pty::spawn_pty,
+            commands::pty::write_pty,
+            commands::pty::resize_pty,
+            commands::pty::kill_pty
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

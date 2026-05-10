@@ -141,7 +141,19 @@ const SearchInput: React.FC = () => {
 
     if (val.startsWith('>')) {
       cancelDefaultSearchDebounce();
-      setMode('command');
+      setMode('terminal');
+      const cmd = val.substring(1).trim();
+      startTransition(() => {
+        setResults([{
+          id: `term-${cmd}`,
+          title: 'Interactive Shell',
+          subtitle: cmd ? `Execute: ${cmd}` : 'Launch a persistent native terminal session',
+          category: 'Terminal',
+          icon: { kind: 'emoji', value: '>_' },
+          score: 1,
+          actions: [{ id: 'run_terminal', title: 'Start', shortcut: '↵' }],
+        }]);
+      });
       return;
     }
 
@@ -346,6 +358,7 @@ const SearchInput: React.FC = () => {
           }}
           placeholder={currentPlaceholder}
           className="search-input"
+          id="main-search-input"
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"

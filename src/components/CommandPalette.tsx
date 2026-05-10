@@ -4,6 +4,7 @@ import { useAppStore } from '../store';
 import SearchInput from './SearchInput';
 import ResultList from './ResultList';
 import PreviewPanel from './PreviewPanel';
+import TerminalPanel from './TerminalPanel';
 import ShortcutSetupBanner from './ShortcutSetupBanner';
 import clsx from 'clsx';
 import './CommandPalette.css';
@@ -19,6 +20,7 @@ const modeLabel: Record<string, string> = {
 const CommandPalette: React.FC = () => {
   const results = useAppStore((s) => s.results);
   const mode = useAppStore((s) => s.mode);
+  const activeTerminalCommand = useAppStore((s) => s.activeTerminalCommand);
 
   useEffect(() => {
     // Keyboard navigation handled in ResultList
@@ -49,7 +51,11 @@ const CommandPalette: React.FC = () => {
 
           {results.length > 0 && (
             <div className="preview-panel-container">
-              <PreviewPanel />
+              {activeTerminalCommand !== null ? (
+                <TerminalPanel command={activeTerminalCommand} />
+              ) : (
+                <PreviewPanel />
+              )}
             </div>
           )}
         </div>

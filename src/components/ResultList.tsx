@@ -69,6 +69,9 @@ const ResultList: React.FC = () => {
       const { setMode, setQuery } = useAppStore.getState();
       setMode('clipboard');
       setQuery(''); // Clear query to show all history
+    } else if (actionId === 'run_terminal') {
+      const cmd = item.id.replace('term-', '');
+      useAppStore.getState().setActiveTerminalCommand(cmd);
     } else if (actionId === 'run_extension') {
       invoke<unknown>('run_extension', { id: item.id, action: 'run', args: {} })
         .then((res) => {

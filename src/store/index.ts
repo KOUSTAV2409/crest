@@ -10,15 +10,10 @@ interface AppState {
   setActiveIndex: (index: number) => void;
   activeCategory: string | null;
   setActiveCategory: (cat: string | null) => void;
-  mode:
-    | 'default'
-    | 'calculator'
-    | 'file'
-    | 'command'
-    | 'clipboard';
-  setMode: (
-    mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard'
-  ) => void;
+  mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard' | 'terminal';
+  setMode: (mode: 'default' | 'calculator' | 'file' | 'command' | 'clipboard' | 'terminal') => void;
+  activeTerminalCommand: string | null;
+  setActiveTerminalCommand: (cmd: string | null) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -31,5 +26,7 @@ export const useAppStore = create<AppState>((set) => ({
   activeCategory: null,
   setActiveCategory: (c) => set({ activeCategory: c }),
   mode: 'default',
-  setMode: (m) => set({ mode: m }),
+  setMode: (m) => set({ mode: m, activeTerminalCommand: null }),
+  activeTerminalCommand: null,
+  setActiveTerminalCommand: (cmd) => set({ activeTerminalCommand: cmd }),
 }));

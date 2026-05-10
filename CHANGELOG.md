@@ -4,6 +4,18 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
  
+## [0.2.8] - 2026-05-10
+
+### Added
+- **Quake-Style Persistent Terminal**: Integrated native Linux PTY (`portable-pty`) to spawn fully persistent, interactive system shells (zsh/bash) directly inside the launcher.
+- **Embedded Xterm.js**: Added a hardware-accelerated canvas terminal emulator to perfectly render shell colors, themes, and ANSI formatting.
+- **Interactive Shell Mode**: Typing `>` triggers the new interactive terminal mode with instant focus hand-off from the search bar to the terminal canvas.
+- **Command Injection**: Typing `>command` automatically boots up your native shell, injects the command, executes it, and leaves you inside the active session.
+
+### Fixed
+- **Strict-Mode Ghost Typing**: Resolved a React 18 race condition that caused duplicate keystrokes (e.g. typing `ls` resulted in `llss`).
+- **Terminal Layout**: Fixed CSS flexbox `box-sizing` layout bugs to prevent terminal output from being cut off at the bottom of the window.
+- **Backend Stability**: Cleaned up Rust warnings to ensure completely clean compilation and process lifecycle management.
 ## [0.2.7] - 2026-05-09
 
 ### Added

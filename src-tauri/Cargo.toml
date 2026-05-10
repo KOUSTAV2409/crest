@@ -1,6 +1,6 @@
 [package]
 name = "crest"
-version = "0.2.7"
+version = "0.2.8"
 description = "A Raycast-equivalent launcher for Linux"
 authors = ["you"]
 edition = "2021"
@@ -44,6 +44,7 @@ scraper = "0.19"
 tauri-plugin-single-instance = "2"
 freedesktop-icons = "0.4"
 base64 = "0.22"
+portable-pty = "0.8.1"
 
 [profile.release]
 codegen-units = 1
