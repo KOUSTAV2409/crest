@@ -4,6 +4,10 @@ All notable changes to this project are documented in this file.
 
 The format is loosely based on [Keep a Changelog](https://keepachangelog.com/).
  
+## [0.2.9] - 2026-05-10
+
+### Added
+- **Terax-Style Auto-Updater**: Integrated Tauri's official `tauri-plugin-updater` with a custom, sleek glassmorphism UI modal. The app now silently checks for updates in the background and elegantly prompts the user to "Install & restart" when a new version is available.
 ## [0.2.8] - 2026-05-10
 
 ### Added
